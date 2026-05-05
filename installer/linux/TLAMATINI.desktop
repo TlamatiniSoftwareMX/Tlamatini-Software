@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=TLAMATINI
+Comment=TLAMATINI con IA local offline
+Exec=/usr/bin/tlamatini
+Icon=tlamatini
+Terminal=false
+Categories=Utility;
+StartupNotify=true

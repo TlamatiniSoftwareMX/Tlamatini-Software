@@ -1,0 +1,473 @@
+{
+  "generated_at": "2026-04-19 00:00:00",
+  "entries": [
+    {
+      "id": "primeros-auxilios-es",
+      "name": "Primeros auxilios esenciales",
+      "language": "es",
+      "category": "Salud",
+      "level": "Basico",
+      "size_human": "1-3 MB",
+      "description": "Curso base para responder a emergencias comunes con conceptos de RCP, hemorragias, quemaduras, fracturas y deshidratacion.",
+      "format": "mediawiki_course",
+      "download_url": "https://es.wikipedia.org/wiki/Primeros_auxilios",
+      "source": "Wikipedia",
+      "source_url": "https://es.wikipedia.org/wiki/Primeros_auxilios",
+      "version": "2026-04",
+      "content_type": "curso_practico",
+      "tags": ["salud", "emergencia", "primeros auxilios", "supervivencia"],
+      "modules": [
+        {
+          "id": "fundamentos",
+          "title": "Respuesta inicial",
+          "lessons": [
+            {"id": "primeros_auxilios", "title": "Primeros auxilios", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Primeros_auxilios"},
+            {"id": "rcp", "title": "Reanimacion cardiopulmonar", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Reanimación_cardiopulmonar"},
+            {"id": "hemorragia", "title": "Control de hemorragias", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Hemorragia"}
+          ]
+        },
+        {
+          "id": "trauma",
+          "title": "Lesiones frecuentes",
+          "lessons": [
+            {"id": "quemadura", "title": "Quemaduras", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Quemadura"},
+            {"id": "fractura", "title": "Fracturas", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Fractura"},
+            {"id": "deshidratacion", "title": "Deshidratacion", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Deshidratación"}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "agua-saneamiento-es",
+      "name": "Agua y saneamiento comunitario",
+      "language": "es",
+      "category": "Agua y saneamiento",
+      "level": "Basico",
+      "size_human": "1-3 MB",
+      "description": "Curso introductorio sobre agua segura, captacion, tratamiento, saneamiento y manejo de aguas residuales.",
+      "format": "mediawiki_course",
+      "download_url": "https://es.wikipedia.org/wiki/Agua_potable",
+      "source": "Wikipedia",
+      "source_url": "https://es.wikipedia.org/wiki/Agua_potable",
+      "version": "2026-04",
+      "content_type": "curso_practico",
+      "tags": ["agua", "saneamiento", "salud publica", "resiliencia"],
+      "modules": [
+        {
+          "id": "agua",
+          "title": "Abasto y calidad",
+          "lessons": [
+            {"id": "agua_potable", "title": "Agua potable", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Agua_potable"},
+            {"id": "captacion_lluvia", "title": "Captacion de agua de lluvia", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Captación_de_agua_de_lluvia"},
+            {"id": "desalinizacion", "title": "Desalinizacion", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Desalinización"}
+          ]
+        },
+        {
+          "id": "saneamiento",
+          "title": "Saneamiento local",
+          "lessons": [
+            {"id": "aguas_residuales", "title": "Aguas residuales", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Aguas_residuales"},
+            {"id": "letrina", "title": "Letrina", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Letrina"},
+            {"id": "saneamiento", "title": "Saneamiento", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Saneamiento"}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "huerto-autosustentacion-es",
+      "name": "Huerto y autosustentacion",
+      "language": "es",
+      "category": "Agricultura",
+      "level": "Basico",
+      "size_human": "1-3 MB",
+      "description": "Curso para iniciar un huerto, mejorar suelo, compostar y manejar agua en pequeña escala.",
+      "format": "mediawiki_course",
+      "download_url": "https://es.wikipedia.org/wiki/Huerto",
+      "source": "Wikipedia",
+      "source_url": "https://es.wikipedia.org/wiki/Huerto",
+      "version": "2026-04",
+      "content_type": "curso_practico",
+      "tags": ["agricultura", "huerto", "compost", "autosuficiencia"],
+      "modules": [
+        {
+          "id": "cultivo",
+          "title": "Base del cultivo",
+          "lessons": [
+            {"id": "huerto", "title": "Huerto", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Huerto"},
+            {"id": "agricultura_organica", "title": "Agricultura organica", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Agricultura_orgánica"},
+            {"id": "permacultura", "title": "Permacultura", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Permacultura"}
+          ]
+        },
+        {
+          "id": "suelo_y_agua",
+          "title": "Suelo y riego",
+          "lessons": [
+            {"id": "compost", "title": "Compost", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Compost"},
+            {"id": "rotacion_cultivos", "title": "Rotacion de cultivos", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Rotación_de_cultivos"},
+            {"id": "riego_goteo", "title": "Riego por goteo", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Riego_por_goteo"}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "energia-electricidad-es",
+      "name": "Energia solar y electricidad basica",
+      "language": "es",
+      "category": "Energia",
+      "level": "Basico",
+      "size_human": "1-3 MB",
+      "description": "Curso para entender energia solar, corriente continua, circuitos, baterias y medicion electrica basica.",
+      "format": "mediawiki_course",
+      "download_url": "https://es.wikipedia.org/wiki/Energía_solar_fotovoltaica",
+      "source": "Wikipedia",
+      "source_url": "https://es.wikipedia.org/wiki/Energía_solar_fotovoltaica",
+      "version": "2026-04",
+      "content_type": "curso_tecnico",
+      "tags": ["energia", "solar", "electricidad", "off-grid"],
+      "modules": [
+        {
+          "id": "energia_solar",
+          "title": "Sistemas solares",
+          "lessons": [
+            {"id": "energia_fotovoltaica", "title": "Energia solar fotovoltaica", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Energía_solar_fotovoltaica"},
+            {"id": "panel_solar", "title": "Panel solar", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Panel_solar"},
+            {"id": "bateria_recargable", "title": "Bateria recargable", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Batería_recargable"}
+          ]
+        },
+        {
+          "id": "circuitos",
+          "title": "Electricidad basica",
+          "lessons": [
+            {"id": "corriente_continua", "title": "Corriente continua", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Corriente_continua"},
+            {"id": "circuito", "title": "Circuito electrico", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Circuito"},
+            {"id": "multimetro", "title": "Multimetro", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Multímetro"}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "comunicacion-emergencia-es",
+      "name": "Comunicacion de emergencia",
+      "language": "es",
+      "category": "Comunicacion",
+      "level": "Basico",
+      "size_human": "1-3 MB",
+      "description": "Curso sobre radio, bandas VHF/UHF, antenas y redes de apoyo para situaciones sin infraestructura plena.",
+      "format": "mediawiki_course",
+      "download_url": "https://es.wikipedia.org/wiki/Radioafición",
+      "source": "Wikipedia",
+      "source_url": "https://es.wikipedia.org/wiki/Radioafición",
+      "version": "2026-04",
+      "content_type": "curso_practico",
+      "tags": ["radio", "comunicacion", "vhf", "uhf", "emergencia"],
+      "modules": [
+        {
+          "id": "radio",
+          "title": "Radio local",
+          "lessons": [
+            {"id": "radioaficion", "title": "Radioaficion", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Radioafición"},
+            {"id": "walkie_talkie", "title": "Walkie-talkie", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Walkie-talkie"},
+            {"id": "antena", "title": "Antena", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Antena"}
+          ]
+        },
+        {
+          "id": "bandas_y_redes",
+          "title": "Bandas y redes",
+          "lessons": [
+            {"id": "vhf", "title": "Frecuencia muy alta", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Frecuencia_muy_alta"},
+            {"id": "uhf", "title": "Frecuencia ultraalta", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Frecuencia_ultraalta"},
+            {"id": "red_malla", "title": "Red en malla", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Red_en_malla"}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "herramientas-reparacion-es",
+      "name": "Herramientas y reparacion basica",
+      "language": "es",
+      "category": "Oficios",
+      "level": "Basico",
+      "size_human": "1-3 MB",
+      "description": "Curso base de herramientas manuales, medicion, mantenimiento preventivo y soldadura blanda.",
+      "format": "mediawiki_course",
+      "download_url": "https://es.wikipedia.org/wiki/Herramienta_manual",
+      "source": "Wikipedia",
+      "source_url": "https://es.wikipedia.org/wiki/Herramienta_manual",
+      "version": "2026-04",
+      "content_type": "curso_practico",
+      "tags": ["herramientas", "reparacion", "mantenimiento", "oficios"],
+      "modules": [
+        {
+          "id": "herramientas",
+          "title": "Herramientas de mano",
+          "lessons": [
+            {"id": "herramienta_manual", "title": "Herramienta manual", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Herramienta_manual"},
+            {"id": "destornillador", "title": "Destornillador", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Destornillador"},
+            {"id": "llave_inglesa", "title": "Llave inglesa", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Llave_inglesa"}
+          ]
+        },
+        {
+          "id": "diagnostico",
+          "title": "Diagnostico y mantenimiento",
+          "lessons": [
+            {"id": "alicates", "title": "Alicates", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Alicates"},
+            {"id": "soldadura_blanda", "title": "Soldadura blanda", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Soldadura_blanda"},
+            {"id": "mantenimiento_preventivo", "title": "Mantenimiento preventivo", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Mantenimiento_preventivo"}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "matematicas-esenciales-es",
+      "name": "Matematicas esenciales",
+      "language": "es",
+      "category": "Educacion",
+      "level": "Basico",
+      "size_human": "1-3 MB",
+      "description": "Curso de continuidad educativa con aritmetica, fracciones, porcentajes, ecuaciones y geometria.",
+      "format": "mediawiki_course",
+      "download_url": "https://es.wikipedia.org/wiki/Aritmética",
+      "source": "Wikipedia",
+      "source_url": "https://es.wikipedia.org/wiki/Aritmética",
+      "version": "2026-04",
+      "content_type": "curso_escolar",
+      "tags": ["matematicas", "escuela", "alfabetizacion", "continuidad educativa"],
+      "modules": [
+        {
+          "id": "numeros",
+          "title": "Numeros y operaciones",
+          "lessons": [
+            {"id": "aritmetica", "title": "Aritmetica", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Aritmética"},
+            {"id": "fraccion", "title": "Fraccion", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Fracción"},
+            {"id": "porcentaje", "title": "Porcentaje", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Porcentaje"}
+          ]
+        },
+        {
+          "id": "estructuras",
+          "title": "Patrones y formas",
+          "lessons": [
+            {"id": "numero_primo", "title": "Numero primo", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Número_primo"},
+            {"id": "ecuacion", "title": "Ecuacion", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Ecuación"},
+            {"id": "geometria", "title": "Geometria", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Geometría"}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ciencias-esenciales-es",
+      "name": "Ciencias esenciales",
+      "language": "es",
+      "category": "Educacion",
+      "level": "Basico",
+      "size_human": "1-3 MB",
+      "description": "Curso escolar basico para comprender materia, energia, celulas, ecosistemas, atmosfera y clima.",
+      "format": "mediawiki_course",
+      "download_url": "https://es.wikipedia.org/wiki/Materia",
+      "source": "Wikipedia",
+      "source_url": "https://es.wikipedia.org/wiki/Materia",
+      "version": "2026-04",
+      "content_type": "curso_escolar",
+      "tags": ["ciencias", "escuela", "naturaleza", "comunidad"],
+      "modules": [
+        {
+          "id": "fisica_natural",
+          "title": "Materia y energia",
+          "lessons": [
+            {"id": "materia", "title": "Materia", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Materia"},
+            {"id": "energia", "title": "Energia", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Energía"},
+            {"id": "atmosfera", "title": "Atmosfera", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Atmósfera"}
+          ]
+        },
+        {
+          "id": "vida_y_entorno",
+          "title": "Vida y entorno",
+          "lessons": [
+            {"id": "celula", "title": "Celula", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Célula"},
+            {"id": "ecosistema", "title": "Ecosistema", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Ecosistema"},
+            {"id": "clima", "title": "Clima", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Clima"}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "conservacion-alimentos-es",
+      "name": "Conservacion de alimentos",
+      "language": "es",
+      "category": "Alimentacion",
+      "level": "Basico",
+      "size_human": "1-3 MB",
+      "description": "Curso practico sobre inocuidad, secado, fermentacion, salado y tecnicas de conservacion para reducir perdidas.",
+      "format": "mediawiki_course",
+      "download_url": "https://es.wikipedia.org/wiki/Conservación_de_los_alimentos",
+      "source": "Wikipedia",
+      "source_url": "https://es.wikipedia.org/wiki/Conservación_de_los_alimentos",
+      "version": "2026-04",
+      "content_type": "curso_practico",
+      "tags": ["alimentos", "conservacion", "nutricion", "cocina"],
+      "modules": [
+        {
+          "id": "metodos",
+          "title": "Metodos de conservacion",
+          "lessons": [
+            {"id": "conservacion_alimentos", "title": "Conservacion de los alimentos", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Conservación_de_los_alimentos"},
+            {"id": "deshidratacion_alimentos", "title": "Deshidratacion", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Deshidratación"},
+            {"id": "fermentacion", "title": "Fermentacion", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Fermentación"}
+          ]
+        },
+        {
+          "id": "seguridad",
+          "title": "Seguridad alimentaria",
+          "lessons": [
+            {"id": "inocuidad_alimentaria", "title": "Inocuidad alimentaria", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Inocuidad_alimentaria"},
+            {"id": "refrigeracion", "title": "Refrigeracion", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Refrigeración"},
+            {"id": "salazon", "title": "Salazon", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Salazón"}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "refugios-construccion-es",
+      "name": "Refugios y construccion basica",
+      "language": "es",
+      "category": "Infraestructura",
+      "level": "Basico",
+      "size_human": "1-3 MB",
+      "description": "Curso sobre vivienda temporal, materiales, herramientas y tecnicas sencillas para levantar refugios y mejorar espacios seguros.",
+      "format": "mediawiki_course",
+      "download_url": "https://es.wikipedia.org/wiki/Refugio",
+      "source": "Wikipedia",
+      "source_url": "https://es.wikipedia.org/wiki/Refugio",
+      "version": "2026-04",
+      "content_type": "curso_practico",
+      "tags": ["refugio", "construccion", "infraestructura", "emergencia"],
+      "modules": [
+        {
+          "id": "estructura",
+          "title": "Base del refugio",
+          "lessons": [
+            {"id": "refugio", "title": "Refugio", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Refugio"},
+            {"id": "vivienda", "title": "Vivienda", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Vivienda"},
+            {"id": "carpa", "title": "Carpa", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Carpa"}
+          ]
+        },
+        {
+          "id": "materiales_y_oficio",
+          "title": "Materiales y trabajo",
+          "lessons": [
+            {"id": "madera", "title": "Madera", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Madera"},
+            {"id": "cordel", "title": "Cuerda", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Cuerda"},
+            {"id": "martillo", "title": "Martillo", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Martillo"}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "orientacion-navegacion-es",
+      "name": "Orientacion y navegacion terrestre",
+      "language": "es",
+      "category": "Territorio",
+      "level": "Basico",
+      "size_human": "1-3 MB",
+      "description": "Curso para ubicarse con mapa, brujula, coordenadas, relieve y referencias naturales en desplazamientos terrestres.",
+      "format": "mediawiki_course",
+      "download_url": "https://es.wikipedia.org/wiki/Orientación",
+      "source": "Wikipedia",
+      "source_url": "https://es.wikipedia.org/wiki/Orientación",
+      "version": "2026-04",
+      "content_type": "curso_practico",
+      "tags": ["orientacion", "mapa", "brujula", "territorio"],
+      "modules": [
+        {
+          "id": "lectura_terreno",
+          "title": "Mapa y terreno",
+          "lessons": [
+            {"id": "orientacion", "title": "Orientacion", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Orientación"},
+            {"id": "cartografia", "title": "Cartografia", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Cartografía"},
+            {"id": "topografia", "title": "Topografia", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Topografía"}
+          ]
+        },
+        {
+          "id": "instrumentos",
+          "title": "Instrumentos y referencia",
+          "lessons": [
+            {"id": "brujula", "title": "Brujula", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Brújula"},
+            {"id": "coordenadas_geograficas", "title": "Coordenadas geograficas", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Coordenadas_geográficas"},
+            {"id": "punto_referencia", "title": "Punto de referencia", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Punto_de_referencia"}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "higiene-salud-publica-es",
+      "name": "Higiene y salud publica",
+      "language": "es",
+      "category": "Salud",
+      "level": "Basico",
+      "size_human": "1-3 MB",
+      "description": "Curso para prevenir brotes y enfermedades mediante higiene, lavado de manos, desinfeccion y organizacion sanitaria local.",
+      "format": "mediawiki_course",
+      "download_url": "https://es.wikipedia.org/wiki/Higiene",
+      "source": "Wikipedia",
+      "source_url": "https://es.wikipedia.org/wiki/Higiene",
+      "version": "2026-04",
+      "content_type": "curso_practico",
+      "tags": ["higiene", "salud publica", "prevencion", "comunidad"],
+      "modules": [
+        {
+          "id": "prevencion",
+          "title": "Prevencion comunitaria",
+          "lessons": [
+            {"id": "higiene", "title": "Higiene", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Higiene"},
+            {"id": "lavado_manos", "title": "Lavado de manos", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Lavado_de_manos"},
+            {"id": "desinfeccion", "title": "Desinfeccion", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Desinfección"}
+          ]
+        },
+        {
+          "id": "control_brotes",
+          "title": "Control de enfermedades",
+          "lessons": [
+            {"id": "epidemia", "title": "Epidemia", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Epidemia"},
+            {"id": "salud_publica", "title": "Salud publica", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Salud_pública"},
+            {"id": "vacuna", "title": "Vacuna", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Vacuna"}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "logistica-comunitaria-es",
+      "name": "Logistica y organizacion comunitaria",
+      "language": "es",
+      "category": "Organizacion",
+      "level": "Basico",
+      "size_human": "1-3 MB",
+      "description": "Curso para organizar recursos, inventarios, distribucion, liderazgo local y coordinacion de tareas en comunidad.",
+      "format": "mediawiki_course",
+      "download_url": "https://es.wikipedia.org/wiki/Logística",
+      "source": "Wikipedia",
+      "source_url": "https://es.wikipedia.org/wiki/Logística",
+      "version": "2026-04",
+      "content_type": "curso_practico",
+      "tags": ["logistica", "organizacion", "inventario", "comunidad"],
+      "modules": [
+        {
+          "id": "gestion_recursos",
+          "title": "Gestion de recursos",
+          "lessons": [
+            {"id": "logistica", "title": "Logistica", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Logística"},
+            {"id": "inventario", "title": "Inventario", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Inventario"},
+            {"id": "cadena_suministro", "title": "Cadena de suministro", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Cadena_de_suministro"}
+          ]
+        },
+        {
+          "id": "coordinacion",
+          "title": "Coordinacion y liderazgo",
+          "lessons": [
+            {"id": "liderazgo", "title": "Liderazgo", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Liderazgo"},
+            {"id": "organizacion_comunitaria", "title": "Organizacion comunitaria", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Organización_comunitaria"},
+            {"id": "toma_decisiones", "title": "Toma de decisiones", "source_type": "mediawiki", "source_url": "https://es.wikipedia.org/wiki/Toma_de_decisiones"}
+          ]
+        }
+      ]
+    }
+  ]
+}

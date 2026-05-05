@@ -1,0 +1,11 @@
+{
+  "models": {
+    "gemma3": {
+      "alias": "gemma3:4b",
+      "role": "primary",
+      "port": 18437,
+      "path": "local_ai/models/gemma3/model.gguf",
+      "context_window": 4096
+    }
+  }
+}

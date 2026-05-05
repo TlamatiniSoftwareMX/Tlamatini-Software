@@ -1,0 +1,19 @@
+{
+  "name": "tlamatini",
+  "version": "1.0.0",
+  "description": "TLAMATINI es una aplicación de escritorio con módulos offline y activación local por código de licencia.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@google/genai": "^1.51.0"
+  }
+}

@@ -1,0 +1,171 @@
+name: Build Full
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+env:
+  TLAMATINI_AI_BACKEND: local
+  TLAMATINI_SKIP_RUNTIME_VERIFY: "1"
+  TLAMATINI_GEMMA3_URL: https://huggingface.co/gaianet/gemma-3-4b-it-GGUF/resolve/main/gemma-3-4b-it-Q4_K_M.gguf?download=true
+  CLIENT_DEPS: pyinstaller pillow requests pmtiles tkinterdnd2 cryptography numpy opencv-python PyMuPDF pytesseract
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            platform: linux
+            artifact_name: TLAMATINI-full-linux
+            build_command: sh scripts/build_full_release_linux.sh
+            final_files: |
+              dist/TLAMATINI-full-linux-x86_64.tar.gz
+              dist/tlamatini-5.2.2-amd64.deb
+              dist/SHA256SUMS.txt
+              dist/SHA256SUMS.json
+              dist/release_metadata.json
+          - os: windows-latest
+            platform: windows
+            artifact_name: TLAMATINI-full-windows
+            build_command: powershell -ExecutionPolicy Bypass -File scripts/build_full_release_windows.ps1
+            final_files: |
+              dist/TLAMATINI-full-windows-x86_64.zip
+              dist/SHA256SUMS.txt
+              dist/SHA256SUMS.json
+              dist/release_metadata.json
+          - os: macos-latest
+            platform: macos
+            artifact_name: TLAMATINI-full-macos
+            build_command: sh scripts/build_full_release_macos.sh
+            final_files: |
+              dist/TLAMATINI-full-macos.zip
+              dist/TLAMATINI-full-macos.dmg
+              dist/SHA256SUMS.txt
+              dist/SHA256SUMS.json
+              dist/release_metadata.json
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Linux packaging tools
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y dpkg-dev
+
+      - name: Create venv and install dependencies on Linux/macOS
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          python3 -m venv .venv
+          source .venv/bin/activate
+          python -m pip install --upgrade pip
+          python -m pip install $CLIENT_DEPS
+
+      - name: Create venv and install dependencies on Windows
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          python -m venv .venv
+          .\.venv\Scripts\python -m pip install --upgrade pip
+          .\.venv\Scripts\python -m pip install $env:CLIENT_DEPS.Split(" ")
+
+      - name: Download runtime and Gemma on Linux/macOS
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          source .venv/bin/activate
+          python scripts/local_ai_tool.py download_models
+
+      - name: Download runtime and Gemma on Windows
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          .\.venv\Scripts\python scripts/local_ai_tool.py download_models
+
+      - name: Build Full release
+        run: ${{ matrix.build_command }}
+
+      - name: Build Linux DEB
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          sh scripts/package_linux_deb.sh
+
+      - name: Verify release bundle on Linux/macOS
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          python3 scripts/verify_release_bundle.py dist/tlamatini_full
+          python3 scripts/local_ai_tool.py doctor_full_release
+
+      - name: Verify release bundle on Windows
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          python scripts/verify_release_bundle.py dist/tlamatini_full
+          python scripts/local_ai_tool.py doctor_full_release
+
+      - name: Refresh Linux checksums after DEB
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          files = [
+              Path("dist/TLAMATINI-full-linux-x86_64.tar.gz"),
+              Path("dist/tlamatini-5.2.2-amd64.deb"),
+              Path("dist/tlamatini_full/tlamatini.png"),
+              Path("dist/tlamatini_full/TLAMATINI"),
+              Path("dist/tlamatini_full/release_manifest.json"),
+              Path("dist/tlamatini_full/install.sh"),
+          ]
+          records = []
+          lines = []
+          for path in files:
+              if not path.exists():
+                  continue
+              h = hashlib.sha256()
+              with path.open("rb") as handle:
+                  for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+                      h.update(chunk)
+              digest = h.hexdigest()
+              records.append({"path": str(path), "sha256": digest, "size": path.stat().st_size})
+              lines.append(f"{digest}  {path}")
+          Path("dist/SHA256SUMS.txt").write_text("\n".join(lines) + "\n", encoding="utf-8")
+          Path("dist/SHA256SUMS.json").write_text(json.dumps({"artifacts": records}, indent=2, ensure_ascii=False), encoding="utf-8")
+          metadata = {"app": "TLAMATINI", "edition": "full", "platform": "linux", "version": "5.2.2", "artifacts": records}
+          Path("dist/release_metadata.json").write_text(json.dumps(metadata, indent=2, ensure_ascii=False), encoding="utf-8")
+          Path("dist/tlamatini_full/release_metadata.json").write_text(json.dumps(metadata, indent=2, ensure_ascii=False), encoding="utf-8")
+          PY
+          sha256sum -c dist/SHA256SUMS.txt
+
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: ${{ matrix.final_files }}
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Upload tag release assets
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ matrix.final_files }}

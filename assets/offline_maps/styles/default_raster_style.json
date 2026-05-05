@@ -1,0 +1,7 @@
+{
+  "id": "default-raster-style",
+  "name": "Raster Offline Default",
+  "version": 1,
+  "type": "raster",
+  "description": "Estilo base para mapas raster offline en TLAMATINI."
+}

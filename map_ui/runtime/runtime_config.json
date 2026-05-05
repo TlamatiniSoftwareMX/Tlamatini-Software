@@ -1,0 +1,452 @@
+{
+  "updated_at": "2026-05-05 01:14:34 UTC",
+  "viewer_url": "http://127.0.0.1:40773/",
+  "mapa": {
+    "id": "aguascalientes-estado",
+    "name": "Aguascalientes PMTiles",
+    "description": "Extracto estatal aproximado para Aguascalientes, generado bajo demanda por BBBike para uso offline en TLAMATINI.",
+    "format": "pmtiles",
+    "viewer_mode": "pmtiles_vector",
+    "schema": "shortbread",
+    "centerLat": 21.8853,
+    "centerLon": -102.2916,
+    "minZoom": 0,
+    "maxZoom": 14,
+    "zoomInicial": 10,
+    "bounds": [],
+    "pmtilesUrl": "http://127.0.0.1:40773/maps/aguascalientes-estado/archive.pmtiles",
+    "hasPmtiles": true,
+    "hasRasterTiles": false,
+    "pmtilesMetadata": {}
+  },
+  "styles": [
+    {
+      "id": "standard",
+      "label": "Estándar"
+    },
+    {
+      "id": "dark",
+      "label": "Oscuro"
+    },
+    {
+      "id": "tactical",
+      "label": "Táctico"
+    },
+    {
+      "id": "paper",
+      "label": "Papel"
+    },
+    {
+      "id": "desert",
+      "label": "Desierto"
+    },
+    {
+      "id": "nightwatch",
+      "label": "Nightwatch"
+    },
+    {
+      "id": "high_contrast",
+      "label": "Alto contraste"
+    }
+  ],
+  "preferences": {
+    "style_id": "standard",
+    "map_base": "mapa",
+    "base_layers": {
+      "land": true,
+      "water": true,
+      "roads": true,
+      "rails": true,
+      "air": true,
+      "buildings": true,
+      "parks": true,
+      "terrain": true,
+      "landuse": true,
+      "boundaries": true,
+      "labels": true,
+      "place_labels": true,
+      "water_labels": true,
+      "boundary_labels": true
+    },
+    "overlay_layers": {
+      "puntos": true,
+      "rutas": true,
+      "poligonos": true,
+      "refugios": true,
+      "recursos": true,
+      "nodos": true,
+      "sensores": true,
+      "comunicaciones": true,
+      "observacion": true,
+      "control": true,
+      "rutas_evacuacion": true,
+      "rutas_logisticas": true,
+      "rutas_patrullaje": true,
+      "zonas_seguras": true,
+      "perimetros": true,
+      "amenazas": true,
+      "imported": true,
+      "curvas_nivel": false,
+      "areas_verdes": false,
+      "areas_urbanas": false
+    },
+    "category_options": {
+      "point": [
+        {
+          "value": "refugio",
+          "label": "Refugio"
+        },
+        {
+          "value": "recurso",
+          "label": "Recurso"
+        },
+        {
+          "value": "zona_riesgo",
+          "label": "Zona de riesgo"
+        },
+        {
+          "value": "nodo",
+          "label": "Nodo"
+        },
+        {
+          "value": "sensor",
+          "label": "Sensor"
+        },
+        {
+          "value": "punto_interes",
+          "label": "Punto de interés"
+        },
+        {
+          "value": "comunicaciones",
+          "label": "Comunicaciones"
+        },
+        {
+          "value": "observacion",
+          "label": "Observación"
+        },
+        {
+          "value": "checkpoint",
+          "label": "Checkpoint"
+        }
+      ],
+      "route": [
+        {
+          "value": "ruta",
+          "label": "Ruta"
+        },
+        {
+          "value": "evacuacion",
+          "label": "Evacuación"
+        },
+        {
+          "value": "abastecimiento",
+          "label": "Abastecimiento"
+        },
+        {
+          "value": "patrullaje",
+          "label": "Patrullaje"
+        },
+        {
+          "value": "escape",
+          "label": "Escape"
+        },
+        {
+          "value": "enlace",
+          "label": "Enlace"
+        }
+      ],
+      "polygon": [
+        {
+          "value": "zona_riesgo",
+          "label": "Zona de riesgo"
+        },
+        {
+          "value": "perimetro",
+          "label": "Perímetro"
+        },
+        {
+          "value": "operacion",
+          "label": "Operación"
+        },
+        {
+          "value": "zona_segura",
+          "label": "Zona segura"
+        },
+        {
+          "value": "amenaza",
+          "label": "Amenaza"
+        },
+        {
+          "value": "resguardo",
+          "label": "Resguardo"
+        }
+      ]
+    },
+    "category_hidden": {
+      "point": [],
+      "route": [],
+      "polygon": []
+    },
+    "custom_layers": [],
+    "layer_option_labels": {
+      "puntos": "Puntos guardados",
+      "rutas": "Rutas",
+      "poligonos": "Zonas de riesgo",
+      "refugios": "Refugios",
+      "recursos": "Recursos",
+      "nodos": "Nodos",
+      "sensores": "Sensores",
+      "comunicaciones": "Comunicaciones",
+      "observacion": "Observación",
+      "control": "Control y checkpoints",
+      "rutas_evacuacion": "Rutas de evacuación",
+      "rutas_logisticas": "Rutas logísticas",
+      "rutas_patrullaje": "Rutas de patrullaje",
+      "zonas_seguras": "Zonas seguras",
+      "perimetros": "Perímetros",
+      "amenazas": "Amenazas",
+      "imported": "GeoJSON importado"
+    },
+    "layer_hidden": {
+      "point": [],
+      "route": [],
+      "polygon": []
+    },
+    "last_center": {
+      "lat": 22.108007103455947,
+      "lon": -102.30008626989894
+    },
+    "last_zoom": 16,
+    "measurement_enabled": false,
+    "telemetry_visible": false
+  },
+  "capas": {
+    "puntos": {
+      "id": "puntos",
+      "label": "Puntos guardados",
+      "url": "/runtime/puntos.geojson",
+      "feature_count": 0
+    },
+    "rutas": {
+      "id": "rutas",
+      "label": "Rutas",
+      "url": "/runtime/rutas.geojson",
+      "feature_count": 0
+    },
+    "poligonos": {
+      "id": "poligonos",
+      "label": "Zonas de riesgo",
+      "url": "/runtime/poligonos.geojson",
+      "feature_count": 0
+    },
+    "refugios": {
+      "id": "refugios",
+      "label": "Refugios",
+      "url": "/runtime/refugios.geojson",
+      "feature_count": 0
+    },
+    "recursos": {
+      "id": "recursos",
+      "label": "Recursos",
+      "url": "/runtime/recursos.geojson",
+      "feature_count": 0
+    },
+    "nodos": {
+      "id": "nodos",
+      "label": "Nodos",
+      "url": "/runtime/nodos.geojson",
+      "feature_count": 0
+    },
+    "sensores": {
+      "id": "sensores",
+      "label": "Sensores",
+      "url": "/runtime/sensores.geojson",
+      "feature_count": 0
+    },
+    "comunicaciones": {
+      "id": "comunicaciones",
+      "label": "Comunicaciones",
+      "url": "/runtime/comunicaciones.geojson",
+      "feature_count": 0
+    },
+    "observacion": {
+      "id": "observacion",
+      "label": "Observación",
+      "url": "/runtime/observacion.geojson",
+      "feature_count": 0
+    },
+    "control": {
+      "id": "control",
+      "label": "Control y checkpoints",
+      "url": "/runtime/control.geojson",
+      "feature_count": 0
+    },
+    "rutas_evacuacion": {
+      "id": "rutas_evacuacion",
+      "label": "Rutas de evacuación",
+      "url": "/runtime/rutas_evacuacion.geojson",
+      "feature_count": 0
+    },
+    "rutas_logisticas": {
+      "id": "rutas_logisticas",
+      "label": "Rutas logísticas",
+      "url": "/runtime/rutas_logisticas.geojson",
+      "feature_count": 0
+    },
+    "rutas_patrullaje": {
+      "id": "rutas_patrullaje",
+      "label": "Rutas de patrullaje",
+      "url": "/runtime/rutas_patrullaje.geojson",
+      "feature_count": 0
+    },
+    "zonas_seguras": {
+      "id": "zonas_seguras",
+      "label": "Zonas seguras",
+      "url": "/runtime/zonas_seguras.geojson",
+      "feature_count": 0
+    },
+    "perimetros": {
+      "id": "perimetros",
+      "label": "Perímetros",
+      "url": "/runtime/perimetros.geojson",
+      "feature_count": 0
+    },
+    "amenazas": {
+      "id": "amenazas",
+      "label": "Amenazas",
+      "url": "/runtime/amenazas.geojson",
+      "feature_count": 0
+    },
+    "imported": {
+      "id": "imported",
+      "label": "GeoJSON importado",
+      "url": "/runtime/imported.geojson",
+      "feature_count": 0
+    }
+  },
+  "layer_meta": [
+    {
+      "id": "puntos",
+      "label": "Puntos guardados",
+      "color": "",
+      "feature_count": 0,
+      "geometry_types": []
+    },
+    {
+      "id": "rutas",
+      "label": "Rutas",
+      "color": "",
+      "feature_count": 0,
+      "geometry_types": []
+    },
+    {
+      "id": "poligonos",
+      "label": "Zonas de riesgo",
+      "color": "",
+      "feature_count": 0,
+      "geometry_types": []
+    },
+    {
+      "id": "refugios",
+      "label": "Refugios",
+      "color": "",
+      "feature_count": 0,
+      "geometry_types": []
+    },
+    {
+      "id": "recursos",
+      "label": "Recursos",
+      "color": "",
+      "feature_count": 0,
+      "geometry_types": []
+    },
+    {
+      "id": "nodos",
+      "label": "Nodos",
+      "color": "",
+      "feature_count": 0,
+      "geometry_types": []
+    },
+    {
+      "id": "sensores",
+      "label": "Sensores",
+      "color": "",
+      "feature_count": 0,
+      "geometry_types": []
+    },
+    {
+      "id": "comunicaciones",
+      "label": "Comunicaciones",
+      "color": "",
+      "feature_count": 0,
+      "geometry_types": []
+    },
+    {
+      "id": "observacion",
+      "label": "Observación",
+      "color": "",
+      "feature_count": 0,
+      "geometry_types": []
+    },
+    {
+      "id": "control",
+      "label": "Control y checkpoints",
+      "color": "",
+      "feature_count": 0,
+      "geometry_types": []
+    },
+    {
+      "id": "rutas_evacuacion",
+      "label": "Rutas de evacuación",
+      "color": "",
+      "feature_count": 0,
+      "geometry_types": []
+    },
+    {
+      "id": "rutas_logisticas",
+      "label": "Rutas logísticas",
+      "color": "",
+      "feature_count": 0,
+      "geometry_types": []
+    },
+    {
+      "id": "rutas_patrullaje",
+      "label": "Rutas de patrullaje",
+      "color": "",
+      "feature_count": 0,
+      "geometry_types": []
+    },
+    {
+      "id": "zonas_seguras",
+      "label": "Zonas seguras",
+      "color": "",
+      "feature_count": 0,
+      "geometry_types": []
+    },
+    {
+      "id": "perimetros",
+      "label": "Perímetros",
+      "color": "",
+      "feature_count": 0,
+      "geometry_types": []
+    },
+    {
+      "id": "amenazas",
+      "label": "Amenazas",
+      "color": "",
+      "feature_count": 0,
+      "geometry_types": []
+    },
+    {
+      "id": "imported",
+      "label": "GeoJSON importado",
+      "color": "",
+      "feature_count": 0,
+      "geometry_types": []
+    }
+  ],
+  "satellite": {
+    "configured": true,
+    "provider_url": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+  }
+}

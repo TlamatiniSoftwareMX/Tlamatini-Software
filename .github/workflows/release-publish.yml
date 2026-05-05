@@ -1,0 +1,14 @@
+name: Release Publish
+
+on:
+  workflow_dispatch:
+
+jobs:
+  info:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Use Build Full for releases
+        run: |
+          echo "Los paquetes Full se generan y publican desde .github/workflows/build-full.yml."
+          echo "Ejecuta Build Full manualmente o crea un tag v* para subir Linux, Windows y macOS al release."

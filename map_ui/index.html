@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TLAMATINI Mapa Offline</title>
+    <link rel="stylesheet" href="/vendor/maplibre-gl.css">
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <div id="app">
+      <header id="toolbar">
+        <div class="toolbar-col">
+          <div class="title-row">
+            <strong id="mapName">Sin mapa activo</strong>
+            <span id="mapMeta"></span>
+          </div>
+        </div>
+        <div class="toolbar-col toolbar-right">
+          <div id="viewerMode">Sin runtime</div>
+          <div id="status">Inicializando visor...</div>
+        </div>
+      </header>
+
+      <main id="mapWrap">
+        <aside id="leftPanel">
+          <section class="panel-card">
+            <h3>Estilo</h3>
+            <select id="styleSelect"></select>
+          </section>
+
+          <section class="panel-card">
+            <button class="collapse-toggle" type="button" data-target="toolsPanel">
+              <span>Herramientas</span>
+              <span class="collapse-icon">+</span>
+            </button>
+            <div id="toolsPanel" class="collapse-body hidden">
+              <div class="panel-title-row panel-title-inline">
+                <div></div>
+                <button id="recenterBtn" class="ghost-btn">Centrar</button>
+              </div>
+              <div class="tool-grid">
+                <button id="measureToggleBtn" class="ghost-btn">Medir</button>
+                <button id="clearMeasureBtn" class="ghost-btn">Limpiar medida</button>
+                <button id="refreshBtn" class="ghost-btn">Recargar capas</button>
+                <button id="telemetryToggleBtn" class="ghost-btn">Mostrar telemetría</button>
+                <button id="downloadSatelliteBtn" class="ghost-btn">Descargar satélite offline</button>
+                <button id="cancelSatelliteBtn" class="ghost-btn hidden">Cancelar descarga satélite</button>
+              </div>
+              <div id="satelliteStatus" class="tool-status">Satélite: pendiente</div>
+            </div>
+          </section>
+
+          <section class="panel-card">
+            <button class="collapse-toggle" type="button" data-target="mapBasePanel">
+              <span>Mapa base</span>
+              <span class="collapse-icon">+</span>
+            </button>
+            <div id="mapBasePanel" class="collapse-body hidden">
+              <div id="mapBaseList" class="layer-list"></div>
+            </div>
+          </section>
+
+          <section class="panel-card">
+            <button class="collapse-toggle" type="button" data-target="baseLayersPanel">
+              <span>Capas base</span>
+              <span class="collapse-icon">+</span>
+            </button>
+            <div id="baseLayersPanel" class="collapse-body hidden">
+              <div id="baseLayersList" class="layer-list"></div>
+            </div>
+          </section>
+
+          <section class="panel-card">
+            <button class="collapse-toggle" type="button" data-target="overlayLayersPanel">
+              <span>Capas operativas</span>
+              <span class="collapse-icon">+</span>
+            </button>
+            <div id="overlayLayersPanel" class="collapse-body hidden">
+              <div id="overlayLayersList" class="layer-list"></div>
+            </div>
+          </section>
+        </aside>
+
+        <section id="mapViewport">
+          <div id="mapCanvas"></div>
+          <div id="mapHud">
+            <div id="coordCursor">Cursor: --</div>
+            <div id="coordCenter">Centro: --</div>
+            <div id="measureInfo">Medición: inactiva</div>
+          </div>
+          <div id="telemetryPanel" class="telemetry-panel hidden">
+            <div class="telemetry-title">TELEMETRÍA</div>
+            <div id="telemetryContent" class="telemetry-content">
+              <div>Latitud: N/D</div>
+              <div>Longitud: N/D</div>
+              <div>Altitud: N/D</div>
+              <div>Rumbo: N/D</div>
+              <div>Velocidad: N/D</div>
+              <div>Zoom: N/D</div>
+              <div>Mapa: N/D</div>
+              <div>Conexión: N/D</div>
+              <div>GPS: N/D</div>
+            </div>
+          </div>
+          <div id="emptyState">
+            <h2>Visor</h2>
+          </div>
+        </section>
+
+        <aside id="rightPanel">
+          <section class="panel-card">
+            <h3>Detalle</h3>
+            <div id="featureInfo">Selecciona un elemento del mapa para ver su información útil.</div>
+            <div id="featureActions" class="feature-actions">
+              <button id="featureEditBtn" class="ghost-btn" type="button" disabled>Editar</button>
+              <button id="featureDeleteBtn" class="ghost-btn danger-btn" type="button" disabled>Eliminar</button>
+            </div>
+          </section>
+
+          <section class="panel-card">
+            <h3>Estado</h3>
+            <div id="viewerInfo">Esperando configuración del runtime local.</div>
+          </section>
+        </aside>
+      </main>
+    </div>
+
+    <script src="/vendor/maplibre-gl.js"></script>
+    <script src="/vendor/pmtiles.js"></script>
+    <div id="contextMenu" class="context-menu hidden"></div>
+    <div id="featureModal" class="modal-shell hidden">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3 id="modalTitle">Elemento</h3>
+          <button id="modalCloseBtn" class="icon-btn" type="button">Cerrar</button>
+        </div>
+        <form id="featureForm" class="feature-form">
+          <div class="form-grid">
+            <label>
+              <span>Nombre</span>
+              <input id="fieldNombre" name="nombre" type="text" required>
+            </label>
+            <label id="fieldCategoriaWrap">
+              <span>Categoría</span>
+              <div class="category-field-row">
+                <select id="fieldCategoria" name="categoria"></select>
+                <button id="categoryAddBtn" class="mini-btn" type="button">+</button>
+                <button id="categoryEditBtn" class="mini-btn" type="button">Editar</button>
+                <button id="categoryDeleteBtn" class="mini-btn danger-mini-btn" type="button">Eliminar</button>
+              </div>
+            </label>
+            <label>
+              <span>Tipo de riesgo</span>
+              <select id="fieldRiesgo" name="riesgo">
+                <option value="bajo">Bajo</option>
+                <option value="medio">Medio</option>
+                <option value="alto">Alto</option>
+                <option value="critico">Crítico</option>
+              </select>
+            </label>
+            <label id="fieldLayerWrap">
+              <span>Tipo de capa</span>
+              <div class="category-field-row">
+                <select id="fieldLayerId" name="layer_id"></select>
+                <button id="layerAddBtn" class="mini-btn" type="button">+</button>
+                <button id="layerEditBtn" class="mini-btn" type="button">Editar</button>
+                <button id="layerDeleteBtn" class="mini-btn danger-mini-btn" type="button">Eliminar</button>
+              </div>
+            </label>
+            <label>
+              <span>Latitud</span>
+              <input id="fieldLatitud" name="latitud" type="number" step="0.000001">
+            </label>
+            <label>
+              <span>Longitud</span>
+              <input id="fieldLongitud" name="longitud" type="number" step="0.000001">
+            </label>
+            <label id="emojiFieldWrap" class="hidden">
+              <span>Identificador</span>
+              <button id="emojiPickerBtn" class="emoji-picker-btn" type="button">Sin identificador</button>
+            </label>
+          </div>
+          <label class="form-block">
+            <span>Descripción</span>
+            <textarea id="fieldDescripcion" name="descripcion" rows="3"></textarea>
+          </label>
+          <label class="form-block hidden" id="coordsFieldWrap">
+            <span>Coordenadas</span>
+            <textarea id="fieldCoordinates" name="coordinates" rows="7" placeholder="lat,lon por línea"></textarea>
+          </label>
+          <div class="modal-actions">
+            <button id="deleteBtn" class="ghost-btn danger-btn hidden" type="button">Eliminar</button>
+            <button id="saveBtn" class="ghost-btn primary-btn" type="submit">Guardar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div id="emojiModal" class="modal-shell hidden">
+      <div class="modal-card emoji-modal-card">
+        <div class="modal-header">
+          <h3 id="emojiModalTitle">Agregar identificador</h3>
+          <button id="emojiModalCloseBtn" class="icon-btn" type="button">Cerrar</button>
+        </div>
+        <div class="emoji-modal-body">
+          <p class="emoji-modal-help">Selecciona un emoji para marcar casas, gasolineras, tiendas, vehículos, comida, herramientas, peligro y otros puntos de referencia.</p>
+          <div id="emojiPickerGrid" class="emoji-picker-grid"></div>
+        </div>
+      </div>
+    </div>
+    <script src="/app.js"></script>
+  </body>
+</html>

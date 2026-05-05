@@ -1,0 +1,49 @@
+name: Backend CI
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "backend/**"
+      - ".github/workflows/backend-ci.yml"
+  pull_request:
+    paths:
+      - "backend/**"
+      - ".github/workflows/backend-ci.yml"
+
+jobs:
+  test-backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m venv .venv
+          . .venv/bin/activate
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+
+      - name: Run backend tests
+        run: |
+          . .venv/bin/activate
+          pytest tests -q
+
+      - name: Validate production env template
+        run: |
+          cp .env.production.example .env.production
+          python scripts/validate_production_env.py
+
+      - name: Doctor backend
+        run: |
+          python scripts/doctor_backend.py

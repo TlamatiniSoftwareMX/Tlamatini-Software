@@ -1,0 +1,19 @@
+{
+  "profile": "fast",
+  "host": "127.0.0.1",
+  "timeout": 12,
+  "context_window": 4096,
+  "autostart": true,
+  "warmup_retries": 3,
+  "warmup_sleep": 0.5,
+  "threads": 10,
+  "threads_batch": 10,
+  "batch_size": 1024,
+  "ubatch_size": 512,
+  "parallel": 1,
+  "cache_ram": 1024,
+  "poll": 10,
+  "webui": false,
+  "accelerator": "auto",
+  "gpu_layers": "auto"
+}

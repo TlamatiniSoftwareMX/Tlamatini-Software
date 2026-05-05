@@ -1,0 +1,16 @@
+FUTURISTA_OSCURO = {
+    "fondo": "#040814",
+    "fondo_alt": "#08111f",
+    "panel": "#0b1629",
+    "panel_2": "#0f1d34",
+    "panel_3": "#0a1322",
+    "borde": "#17304a",
+    "borde_soft": "#213a57",
+    "texto": "#edf7ff",
+    "texto_dim": "#8aa6bf",
+    "acento": "#35d8ff",
+    "acento_2": "#00ffa6",
+    "alerta": "#ff5d7a",
+    "aviso": "#ffc857",
+    "ok": "#00c48c",
+}
