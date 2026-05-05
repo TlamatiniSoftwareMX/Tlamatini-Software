@@ -23,33 +23,34 @@ jobs:
         include:
           - os: ubuntu-latest
             platform: linux
-            artifact_name: TLAMATINI-full-linux
+            artifact_name: TLAMATINI-Linux
             build_command: sh scripts/build_full_release_linux.sh
             final_files: |
               dist/TLAMATINI-full-linux-x86_64.tar.gz
               dist/tlamatini-5.2.2-amd64.deb
-              dist/SHA256SUMS.txt
-              dist/SHA256SUMS.json
-              dist/release_metadata.json
+              dist/SHA256SUMS-linux.txt
+              dist/SHA256SUMS-linux.json
+              dist/release_metadata-linux.json
           - os: windows-latest
             platform: windows
-            artifact_name: TLAMATINI-full-windows
+            artifact_name: TLAMATINI-Windows
             build_command: powershell -ExecutionPolicy Bypass -File scripts/build_full_release_windows.ps1
             final_files: |
+              dist/TLAMATINI-Windows-Instalador-Full.exe
               dist/TLAMATINI-full-windows-x86_64.zip
-              dist/SHA256SUMS.txt
-              dist/SHA256SUMS.json
-              dist/release_metadata.json
+              dist/SHA256SUMS-windows.txt
+              dist/SHA256SUMS-windows.json
+              dist/release_metadata-windows.json
           - os: macos-latest
             platform: macos
-            artifact_name: TLAMATINI-full-macos
+            artifact_name: TLAMATINI-macOS
             build_command: sh scripts/build_full_release_macos.sh
             final_files: |
               dist/TLAMATINI-full-macos.zip
               dist/TLAMATINI-full-macos.dmg
-              dist/SHA256SUMS.txt
-              dist/SHA256SUMS.json
-              dist/release_metadata.json
+              dist/SHA256SUMS-macos.txt
+              dist/SHA256SUMS-macos.json
+              dist/release_metadata-macos.json
 
     runs-on: ${{ matrix.os }}
 
@@ -107,6 +108,18 @@ jobs:
         run: |
           sh scripts/package_linux_deb.sh
 
+      - name: Install Windows installer tooling
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          choco install innosetup -y --no-progress
+
+      - name: Build Windows installer
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "installer\windows\TLAMATINI_full.iss"
+
       - name: Verify release bundle on Linux/macOS
         if: runner.os != 'Windows'
         shell: bash
@@ -125,36 +138,20 @@ jobs:
         if: runner.os == 'Linux'
         shell: bash
         run: |
-          python3 - <<'PY'
-          import hashlib, json
-          from pathlib import Path
-          files = [
-              Path("dist/TLAMATINI-full-linux-x86_64.tar.gz"),
-              Path("dist/tlamatini-5.2.2-amd64.deb"),
-              Path("dist/tlamatini_full/tlamatini.png"),
-              Path("dist/tlamatini_full/TLAMATINI"),
-              Path("dist/tlamatini_full/release_manifest.json"),
-              Path("dist/tlamatini_full/install.sh"),
-          ]
-          records = []
-          lines = []
-          for path in files:
-              if not path.exists():
-                  continue
-              h = hashlib.sha256()
-              with path.open("rb") as handle:
-                  for chunk in iter(lambda: handle.read(1024 * 1024), b""):
-                      h.update(chunk)
-              digest = h.hexdigest()
-              records.append({"path": str(path), "sha256": digest, "size": path.stat().st_size})
-              lines.append(f"{digest}  {path}")
-          Path("dist/SHA256SUMS.txt").write_text("\n".join(lines) + "\n", encoding="utf-8")
-          Path("dist/SHA256SUMS.json").write_text(json.dumps({"artifacts": records}, indent=2, ensure_ascii=False), encoding="utf-8")
-          metadata = {"app": "TLAMATINI", "edition": "full", "platform": "linux", "version": "5.2.2", "artifacts": records}
-          Path("dist/release_metadata.json").write_text(json.dumps(metadata, indent=2, ensure_ascii=False), encoding="utf-8")
-          Path("dist/tlamatini_full/release_metadata.json").write_text(json.dumps(metadata, indent=2, ensure_ascii=False), encoding="utf-8")
-          PY
-          sha256sum -c dist/SHA256SUMS.txt
+          python3 scripts/refresh_release_checksums.py linux
+          sha256sum -c dist/SHA256SUMS-linux.txt
+
+      - name: Refresh Windows checksums after installer
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          python scripts\refresh_release_checksums.py windows
+
+      - name: Refresh macOS checksums
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          python3 scripts/refresh_release_checksums.py macos
 
       - name: Upload workflow artifact
         uses: actions/upload-artifact@v4

@@ -1,5 +1,5 @@
 #define MyAppName "TLAMATINI"
-#define MyAppVersion "5.2"
+#define MyAppVersion "5.2.2"
 #define MyAppPublisher "TLAMATINI"
 #define MyAppExeName "TLAMATINI.exe"
 
@@ -11,8 +11,10 @@ AppPublisher={#MyAppPublisher}
 DefaultDirName={autopf}\TLAMATINI
 DefaultGroupName=TLAMATINI
 DisableProgramGroupPage=yes
-OutputDir=dist
-OutputBaseFilename=TLAMATINI-full-windows-installer
+OutputDir=..\..\dist
+OutputBaseFilename=TLAMATINI-Windows-Instalador-Full
+SetupIconFile=..\..\assets\app_icon.ico
+UninstallDisplayIcon={app}\{#MyAppExeName}
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern

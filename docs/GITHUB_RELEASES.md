@@ -22,10 +22,10 @@ El modelo Full pesa varios GB. El workflow puede tardar bastante y consumir alma
 2. Selecciona `Build Full`.
 3. Pulsa `Run workflow`.
 4. Espera a que terminen los jobs de Linux, Windows y macOS.
-5. Descarga los artefactos:
-   - `TLAMATINI-full-linux`
-   - `TLAMATINI-full-windows`
-   - `TLAMATINI-full-macos`
+5. Descarga los artefactos separados por sistema:
+   - `TLAMATINI-Linux`
+   - `TLAMATINI-Windows`
+   - `TLAMATINI-macOS`
 
 ## Generar paquetes para un release
 
@@ -44,17 +44,29 @@ Linux:
 
 - `TLAMATINI-full-linux-x86_64.tar.gz`
 - `tlamatini-5.2.2-amd64.deb`
+- `SHA256SUMS-linux.txt`
+- `release_metadata-linux.json`
 
 Windows:
 
+- `TLAMATINI-Windows-Instalador-Full.exe`
 - `TLAMATINI-full-windows-x86_64.zip`
+- `SHA256SUMS-windows.txt`
+- `release_metadata-windows.json`
 
 macOS:
 
 - `TLAMATINI-full-macos.zip`
 - `TLAMATINI-full-macos.dmg`, si `hdiutil` logra generarlo en el runner.
+- `SHA256SUMS-macos.txt`
+- `release_metadata-macos.json`
 
-Todos los paquetes incluyen:
+Descargas recomendadas para usuarios:
+
+- Windows: `TLAMATINI-Windows-Instalador-Full.exe`
+- Linux Debian/Ubuntu/Mint: `tlamatini-5.2.2-amd64.deb`
+
+Los `.zip` y `.tar.gz` quedan como alternativas tecnicas/portables. Todos los paquetes incluyen:
 
 - ejecutable de TLAMATINI,
 - runtime local de `llama.cpp` para la plataforma,

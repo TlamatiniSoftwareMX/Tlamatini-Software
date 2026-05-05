@@ -4,6 +4,7 @@ TLAMATINI es una aplicación de escritorio con módulos offline y activación lo
 
 ## Documentación principal
 
+- `docs/DESCARGAS.md`: descargas separadas para usuarios de Windows y Linux.
 - `README_distribution.md`: build y empaquetado.
 - `README_LICENCIAS.md`: flujo de licencia manual/offline y generador privado.
 - `backend/README_backend.md`: backend SaaS para uso futuro.
