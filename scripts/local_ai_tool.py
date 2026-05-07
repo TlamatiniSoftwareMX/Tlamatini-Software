@@ -296,6 +296,18 @@ def _copy_full_local_ai_assets(target: Path) -> None:
             shutil.copy2(source, destination)
 
 
+def _copy_full_support_assets(target: Path) -> None:
+    for item in ("assets", "map_ui"):
+        source = PROJECT_ROOT / item
+        if not source.exists():
+            continue
+        destination = target / item
+        if destination.exists():
+            shutil.rmtree(destination)
+        shutil.copytree(source, destination)
+    _copy_if_exists(PROJECT_ROOT / "public_license_key.pem", target / "public_license_key.pem")
+
+
 def _archive_directory(source_dir: Path, archive_base: Path, fmt: str) -> Path:
     archive_path = shutil.make_archive(str(archive_base), fmt, root_dir=source_dir.parent, base_dir=source_dir.name)
     return Path(archive_path)
@@ -993,6 +1005,7 @@ def build_full_release() -> int:
     try:
         _build_pyinstaller_bundle()
         target = _copy_full_bundle_target()
+        _copy_full_support_assets(target)
         _copy_full_local_ai_assets(target)
         _write_release_manifest(target)
         _copy_platform_installers(target)

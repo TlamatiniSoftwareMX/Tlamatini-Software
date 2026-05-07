@@ -35,9 +35,6 @@ def pick_icon() -> str | None:
 datas = []
 datas += optional_tree("assets", "assets")
 datas += optional_tree("map_ui", "map_ui")
-datas += optional_tree("local_ai/config", "local_ai/config")
-datas += optional_tree("local_ai/runtime", "local_ai/runtime")
-datas += optional_tree("local_ai/models", "local_ai/models")
 datas += optional_tree("public_license_key.pem", ".")
 datas += collect_data_files("tkinterdnd2", include_py_files=False)
 datas += collect_data_files("PIL", include_py_files=False)

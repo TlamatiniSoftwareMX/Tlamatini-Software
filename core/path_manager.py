@@ -14,7 +14,8 @@ APP_NAME = "TLAMATINI"
 FALLBACK_REASON_ENV = "TLAMATINI_STORAGE_FALLBACK_REASON"
 FALLBACK_ROOT_ENV = "TLAMATINI_STORAGE_FALLBACK_ROOT"
 if getattr(sys, "frozen", False) and getattr(sys, "_MEIPASS", ""):
-    PROJECT_ROOT = Path(sys._MEIPASS).resolve()
+    executable_root = Path(sys.executable).resolve().parent
+    PROJECT_ROOT = executable_root if (executable_root / "local_ai").exists() else Path(sys._MEIPASS).resolve()
 else:
     PROJECT_ROOT = Path(__file__).resolve().parent.parent
 APP_ASSETS_DIR = PROJECT_ROOT / "assets"
