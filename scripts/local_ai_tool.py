@@ -248,7 +248,7 @@ def _write_release_manifest(target: Path) -> None:
         "app": "TLAMATINI",
         "edition": "full",
         "platform": _host_platform_tag(),
-        "version": os.environ.get("TLAMATINI_APP_VERSION", "5.2.2"),
+        "version": os.environ.get("TLAMATINI_APP_VERSION", "5.2.3"),
         "ai_backend": "local",
         "primary_model": "gemma3:4b",
         "model_path": "embedded",
@@ -275,6 +275,25 @@ def _copy_platform_installers(target: Path) -> None:
         _copy_if_exists(PROJECT_ROOT / "assets" / "app_icon.ico", target / "tlamatini.ico")
     elif _host_platform_tag() == "macos":
         _copy_if_exists(PROJECT_ROOT / "assets" / "app_icon.icns", target / "tlamatini.icns")
+
+
+def _copy_full_local_ai_assets(target: Path) -> None:
+    local_ai_target = target / "local_ai"
+    local_ai_target.mkdir(parents=True, exist_ok=True)
+    for item in ("config", "runtime", "models"):
+        source = LOCAL_AI_ROOT / item
+        if not source.exists():
+            continue
+        destination = local_ai_target / item
+        if destination.exists():
+            if destination.is_dir():
+                shutil.rmtree(destination)
+            else:
+                destination.unlink()
+        if source.is_dir():
+            shutil.copytree(source, destination)
+        else:
+            shutil.copy2(source, destination)
 
 
 def _archive_directory(source_dir: Path, archive_base: Path, fmt: str) -> Path:
@@ -312,7 +331,7 @@ def _write_release_metadata() -> Path:
         "app": "TLAMATINI",
         "edition": "full",
         "platform": _host_platform_tag(),
-        "version": os.environ.get("TLAMATINI_APP_VERSION", "5.2.2"),
+        "version": os.environ.get("TLAMATINI_APP_VERSION", "5.2.3"),
     }
     checksums_json = DIST_DIR / "SHA256SUMS.json"
     if checksums_json.exists():
@@ -974,6 +993,7 @@ def build_full_release() -> int:
     try:
         _build_pyinstaller_bundle()
         target = _copy_full_bundle_target()
+        _copy_full_local_ai_assets(target)
         _write_release_manifest(target)
         _copy_platform_installers(target)
     except Exception as exc:

@@ -32,7 +32,7 @@ def build_release_metadata() -> dict:
         "app": "TLAMATINI",
         "edition": "full",
         "platform": _detect_platform(),
-        "version": os.environ.get("TLAMATINI_APP_VERSION", "5.2.2"),
+        "version": os.environ.get("TLAMATINI_APP_VERSION", "5.2.3"),
         "artifacts": checksums.get("artifacts", []),
     }
     return metadata

@@ -8,12 +8,29 @@ if [ ! -f dist/tlamatini_full/TLAMATINI ]; then
 fi
 
 ROOT=pkg_deb
-VERSION="${TLAMATINI_APP_VERSION:-5.2.2}"
+VERSION="${TLAMATINI_APP_VERSION:-5.2.3}"
 rm -rf "$ROOT"
-mkdir -p "$ROOT/DEBIAN" "$ROOT/opt/tlamatini" "$ROOT/usr/share/applications" "$ROOT/usr/share/pixmaps" "$ROOT/usr/bin"
+mkdir -p \
+  "$ROOT/DEBIAN" \
+  "$ROOT/opt/tlamatini" \
+  "$ROOT/usr/share/applications" \
+  "$ROOT/usr/share/pixmaps" \
+  "$ROOT/usr/share/icons/hicolor/256x256/apps" \
+  "$ROOT/usr/bin"
 cp dist/tlamatini_full/TLAMATINI "$ROOT/opt/tlamatini/TLAMATINI"
+if [ -d dist/tlamatini_full/local_ai ]; then
+  cp -a dist/tlamatini_full/local_ai "$ROOT/opt/tlamatini/local_ai"
+elif [ -d local_ai ]; then
+  mkdir -p "$ROOT/opt/tlamatini/local_ai"
+  for item in config runtime models; do
+    if [ -e "local_ai/$item" ]; then
+      cp -a "local_ai/$item" "$ROOT/opt/tlamatini/local_ai/$item"
+    fi
+  done
+fi
 cp installer/linux/TLAMATINI.desktop "$ROOT/usr/share/applications/tlamatini.desktop"
 cp assets/app_icon.png "$ROOT/usr/share/pixmaps/tlamatini.png"
+cp assets/app_icon.png "$ROOT/usr/share/icons/hicolor/256x256/apps/tlamatini.png"
 chmod 755 "$ROOT/opt/tlamatini/TLAMATINI"
 
 cat > "$ROOT/usr/bin/tlamatini" <<'EOF'
@@ -32,6 +49,9 @@ fi
 if command -v xdg-desktop-menu >/dev/null 2>&1; then
   xdg-desktop-menu forceupdate >/dev/null 2>&1 || true
 fi
+if command -v gtk-update-icon-cache >/dev/null 2>&1; then
+  gtk-update-icon-cache -q -t -f /usr/share/icons/hicolor >/dev/null 2>&1 || true
+fi
 EOF
 chmod 755 "$ROOT/DEBIAN/postinst"
 
@@ -42,11 +62,11 @@ Section: utils
 Priority: optional
 Architecture: amd64
 Maintainer: TLAMATINI
-Description: TLAMATINI Full con IA local embebida
+Description: TLAMATINI Desktop con activación offline
 EOF
 
 sed -i "s/__TLAMATINI_VERSION__/$VERSION/" "$ROOT/DEBIAN/control"
 
 DEB_PATH="dist/tlamatini-${VERSION}-amd64.deb"
-dpkg-deb --build "$ROOT" "$DEB_PATH"
+dpkg-deb --root-owner-group --build "$ROOT" "$DEB_PATH"
 echo "Paquete DEB generado en $DEB_PATH"

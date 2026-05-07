@@ -22,7 +22,7 @@ def _sha256_file(path: Path) -> str:
 
 
 def _version() -> str:
-    return os.environ.get("TLAMATINI_APP_VERSION", "5.2.2")
+    return os.environ.get("TLAMATINI_APP_VERSION", "5.2.3")
 
 
 def _platform_files(platform: str) -> list[Path]:
