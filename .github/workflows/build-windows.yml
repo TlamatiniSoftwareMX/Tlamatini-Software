@@ -40,10 +40,6 @@ jobs:
         shell: powershell
         run: .\.venv\Scripts\python scripts/local_ai_tool.py build_full_release
 
-      - name: Package portable ZIP
-        shell: powershell
-        run: .\.venv\Scripts\python scripts/local_ai_tool.py package_full_release
-
       - name: Install Inno Setup
         shell: powershell
         run: choco install innosetup -y --no-progress
@@ -68,7 +64,7 @@ jobs:
           New-Item -ItemType Directory -Force $releaseDir | Out-Null
           $source = [System.IO.File]::OpenRead($sourcePath)
           try {
-            $count = [Math]::Ceiling($source.Length / $chunkSize)
+            $count = [int][Math]::Ceiling($source.Length / $chunkSize)
             $buffer = New-Object byte[] (1MB)
             for ($index = 1; $index -le $count; $index++) {
               $name = "tlamatini-5.2.4-windows-installer.chunk-{0:D3}-of-{1:D3}" -f $index, $count
