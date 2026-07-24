@@ -1,21 +1,37 @@
-# TLAMATINI 5.2.4 para Linux
+# TLAMATINI 5.2.4
 
 TLAMATINI es una aplicación de escritorio con herramientas de consulta,
 organización, mapas, cámara e inteligencia artificial local integrada.
 
-No requiere suscripción, pago, licencia ni conexión permanente a Internet.
-
 ## Descargar
 
 Abre la sección [Releases](https://github.com/TlamatiniSoftwareMX/Tlamatini-Software/releases/latest)
-y descarga en una misma carpeta:
+y elige las instrucciones de tu sistema.
+
+## Windows
+
+Descarga en una misma carpeta:
+
+- Los 42 archivos llamados
+  `tlamatini-5.2.4-windows-installer.chunk-001-of-042` hasta
+  `tlamatini-5.2.4-windows-installer.chunk-042-of-042`.
+- `INSTALAR-TLAMATINI-WINDOWS.cmd`.
+- `INSTALAR-TLAMATINI-WINDOWS.ps1`.
+- `SHA256-WINDOWS-INSTALADOR.txt`.
+
+Haz doble clic en `INSTALAR-TLAMATINI-WINDOWS.cmd`. El asistente comprobará
+el instalador y abrirá la instalación de TLAMATINI.
+
+## Linux
+
+Descarga en una misma carpeta:
 
 - Los 44 archivos llamados
   `tlamatini-5.2.4-linux-amd64.chunk-001-of-044` hasta
   `tlamatini-5.2.4-linux-amd64.chunk-044-of-044`.
 - `INSTALAR-TLAMATINI.sh`.
 
-## Instalar
+### Instalar en Linux
 
 TLAMATINI es compatible con Debian, Ubuntu y Linux Mint de 64 bits. Se
 recomiendan al menos 8 GB de memoria RAM y aproximadamente 5 GB de espacio
