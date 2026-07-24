@@ -7,7 +7,7 @@ from urllib.parse import urlparse
 import requests
 
 from core.installation_identity import get_installation_payload
-from core.license_code_validator import validate_license_code
+from core.license_code_validator import normalize_license_code, validate_license_code
 from core.local_license_store import (
     activate_local_trial,
     clear_auth_session,
@@ -21,7 +21,6 @@ from core.local_license_store import (
     save_backend_url,
     update_local_license_from_backend,
 )
-from core.license_validator import validate_local_license
 from core.logs import registrar_log
 from core.user_profile import load_user_profile
 
@@ -192,11 +191,12 @@ class LicenseClient:
         return payload
 
     def activate_manual_license(self, license_code: str) -> Dict[str, Any]:
-        normalized = str(license_code or "").strip()
+        normalized = normalize_license_code(license_code)
         try:
             status = validate_license_code(normalized, installation_id=get_installation_payload()["installation_id"])
         except Exception as exc:
             raise LicenseClientError(str(exc).strip() or "No se pudo activar la licencia manual.") from exc
+        normalized = str(status.get("license_code", normalized)).strip()
         save_offline_license_code(normalized)
 
         payload = status.get("payload") or {}
@@ -214,31 +214,35 @@ class LicenseClient:
         return status
 
     def local_status(self) -> Dict[str, Any]:
-        status = validate_local_license(load_local_license())
         cfg = self.backend_profile()
         session = self.session_data()
-        payload = status.get("payload") or {}
+        profile = load_user_profile()
         customer_email = (
-            str(status.get("customer_email", "")).strip()
-            or str(payload.get("customer_email", payload.get("email", ""))).strip()
+            str(profile.get("email", "")).strip()
             or str(session.get("user", {}).get("email", "")).strip()
         )
         customer_name = (
-            str(status.get("customer_name", "")).strip()
-            or str(payload.get("customer_name", payload.get("name", ""))).strip()
+            str(profile.get("full_name", "")).strip()
             or str(session.get("user", {}).get("name", "")).strip()
         )
-        status.update(
-            {
-                "backend_mode": cfg.get("mode", "hybrid"),
-                "backend_url": cfg.get("effective_url", ""),
-                "backend_saved_url": cfg.get("raw_url", ""),
-                "backend_configured": bool(cfg.get("configured", False)),
-                "backend_blocked_reason": cfg.get("blocked_reason", ""),
-                "offline_ready": bool(status.get("is_valid")),
-                "customer_email": customer_email,
-                "customer_name": customer_name,
-                "session_email": str(session.get("user", {}).get("email", "")).strip(),
-            }
-        )
-        return status
+        return {
+            "is_valid": True,
+            "state": "valid",
+            "source": "free_use",
+            "status": "active",
+            "message": "Uso libre",
+            "plan": "libre",
+            "expires_at": "",
+            "grace_until": "",
+            "days_remaining": None,
+            "trial_expired": False,
+            "offline_ready": True,
+            "backend_mode": "disabled",
+            "backend_url": cfg.get("effective_url", ""),
+            "backend_saved_url": cfg.get("raw_url", ""),
+            "backend_configured": False,
+            "backend_blocked_reason": "",
+            "customer_email": customer_email,
+            "customer_name": customer_name,
+            "session_email": str(session.get("user", {}).get("email", "")).strip(),
+        }

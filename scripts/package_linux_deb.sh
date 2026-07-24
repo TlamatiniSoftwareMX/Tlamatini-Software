@@ -8,7 +8,8 @@ if [ ! -f dist/tlamatini_full/TLAMATINI ]; then
 fi
 
 ROOT=pkg_deb
-VERSION="${TLAMATINI_APP_VERSION:-5.2.3}"
+VERSION="${TLAMATINI_PACKAGE_VERSION:-${TLAMATINI_APP_VERSION:-5.2.4}}"
+COMPRESSION="${TLAMATINI_DEB_COMPRESSION:-none}"
 rm -rf "$ROOT"
 mkdir -p \
   "$ROOT/DEBIAN" \
@@ -62,11 +63,14 @@ Section: utils
 Priority: optional
 Architecture: amd64
 Maintainer: TLAMATINI
-Description: TLAMATINI Desktop con activación offline
+Description: TLAMATINI Desktop con IA local integrada
 EOF
 
 sed -i "s/__TLAMATINI_VERSION__/$VERSION/" "$ROOT/DEBIAN/control"
 
 DEB_PATH="dist/tlamatini-${VERSION}-amd64.deb"
-dpkg-deb --root-owner-group --build "$ROOT" "$DEB_PATH"
+TEMP_DEB_PATH="${DEB_PATH}.building"
+rm -f "$TEMP_DEB_PATH"
+dpkg-deb "-Z${COMPRESSION}" --root-owner-group --build "$ROOT" "$TEMP_DEB_PATH"
+mv "$TEMP_DEB_PATH" "$DEB_PATH"
 echo "Paquete DEB generado en $DEB_PATH"

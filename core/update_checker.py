@@ -192,9 +192,9 @@ class UpdateChecker:
         if state.get("last_error"):
             lowered = str(state.get("last_error", "")).lower()
             if "backend local de actualizaciones no está disponible" in lowered:
-                return {"text": "Backend de actualizaciones inactivo", "available": False, "mandatory": False}
+                return {"text": "Actualizaciones no disponibles", "available": False, "mandatory": False}
             if "no hay backend configurado" in lowered or "solo se usa en modo desarrollo" in lowered:
-                return {"text": "Actualizaciones en espera de backend SaaS", "available": False, "mandatory": False}
+                return {"text": "Actualizaciones no configuradas", "available": False, "mandatory": False}
             if "modo offline local" in lowered:
                 return {"text": "Actualizaciones no disponibles sin internet", "available": False, "mandatory": False}
             return {"text": "Actualizaciones no disponibles", "available": False, "mandatory": False}

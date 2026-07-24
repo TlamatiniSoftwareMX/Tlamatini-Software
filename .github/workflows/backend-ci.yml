@@ -3,6 +3,8 @@ name: Backend CI
 on:
   workflow_dispatch:
   push:
+    branches:
+      - "main"
     paths:
       - "backend/**"
       - ".github/workflows/backend-ci.yml"
@@ -37,13 +39,13 @@ jobs:
       - name: Run backend tests
         run: |
           . .venv/bin/activate
-          pytest tests -q
+          python -m pytest tests -q
 
       - name: Validate production env template
         run: |
           cp .env.production.example .env.production
-          python scripts/validate_production_env.py
+          .venv/bin/python scripts/validate_production_env.py
 
       - name: Doctor backend
         run: |
-          python scripts/doctor_backend.py
+          .venv/bin/python scripts/doctor_backend.py

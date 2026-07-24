@@ -162,10 +162,10 @@
     "polygon": []
   },
   "last_center": {
-    "lat": 22.108007103455947,
-    "lon": -102.30008626989894
+    "lat": 19.4326,
+    "lon": -99.1332
   },
-  "last_zoom": 16,
+  "last_zoom": 11.0,
   "measurement_enabled": false,
   "telemetry_visible": false
 }

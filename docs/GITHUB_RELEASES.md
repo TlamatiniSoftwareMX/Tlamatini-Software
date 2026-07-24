@@ -32,8 +32,8 @@ El modelo Full pesa varios GB. El workflow puede tardar bastante y consumir alma
 Desde tu máquina local:
 
 ```bash
-git tag v5.2.2
-git push origin v5.2.2
+git tag v5.2.4
+git push origin v5.2.4
 ```
 
 El workflow `Build Full` se ejecuta por el tag `v*` y sube los paquetes al release del tag.
@@ -43,7 +43,7 @@ El workflow `Build Full` se ejecuta por el tag `v*` y sube los paquetes al relea
 Linux:
 
 - `TLAMATINI-full-linux-x86_64.tar.gz`
-- `tlamatini-5.2.2-amd64.deb`
+- `tlamatini-5.2.4-amd64.deb`
 - `SHA256SUMS-linux.txt`
 - `release_metadata-linux.json`
 
@@ -64,7 +64,7 @@ macOS:
 Descargas recomendadas para usuarios:
 
 - Windows: `TLAMATINI-Windows-Instalador-Full.exe`
-- Linux Debian/Ubuntu/Mint: `tlamatini-5.2.2-amd64.deb`
+- Linux Debian/Ubuntu/Mint: `tlamatini-5.2.4-amd64.deb`
 
 Los `.zip` y `.tar.gz` quedan como alternativas tecnicas/portables. Todos los paquetes incluyen:
 

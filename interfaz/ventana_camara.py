@@ -6,6 +6,7 @@ from pathlib import Path
 
 from PIL import Image, ImageTk
 
+from core.inventario_foto import abrir_camara
 from core.memoria import RUTA_BASE_DATOS
 from core.window_geometry import aplicar_geometria_relativa
 from interfaz.ventana_consulta import VentanaConsulta
@@ -279,11 +280,8 @@ class VentanaCamara(tk.Toplevel):
             self.label_estado.config(text="La cámara ya está activa.")
             return
 
-        cap = cv2.VideoCapture(self.indice_camara, cv2.CAP_DSHOW)
-        if not cap.isOpened():
-            cap = cv2.VideoCapture(self.indice_camara)
-
-        if not cap.isOpened():
+        cap = abrir_camara(self.indice_camara)
+        if cap is None:
             messagebox.showerror(
                 "Error de cámara",
                 "No se pudo abrir la cámara.\nVerifica que esté conectada o libre."

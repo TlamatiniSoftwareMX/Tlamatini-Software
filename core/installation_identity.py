@@ -6,11 +6,20 @@ from uuid import uuid4
 from core.local_license_store import load_installation_identity, save_installation_identity
 from core.memoria import obtener_seccion
 
-DEFAULT_APP_VERSION = "5.2.2"
+DEFAULT_APP_VERSION = "5.2.4"
 
 
 def _utcnow_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
+
+
+def _version_tuple(value: str) -> tuple[int, ...]:
+    parts = []
+    for part in str(value or "").strip().split("."):
+        if not part.isdigit():
+            break
+        parts.append(int(part))
+    return tuple(parts)
 
 
 def get_app_version() -> str:
@@ -20,7 +29,7 @@ def get_app_version() -> str:
     configuracion = obtener_seccion("configuracion", {})
     if isinstance(configuracion, dict):
         stored = str(configuracion.get("version", "")).strip()
-        if stored and stored not in {"5.1", "5.2"}:
+        if stored and _version_tuple(stored) > _version_tuple(DEFAULT_APP_VERSION):
             return stored
     return DEFAULT_APP_VERSION
 

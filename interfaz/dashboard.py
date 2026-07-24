@@ -356,7 +356,6 @@ class DashboardTLAMATINI:
             registrar_log("error", f"Fallo al construir dashboard: {exc}", "dashboard")
             self._crear_fallback_error_ui(exc)
         self.root.bind("<FocusIn>", self._al_recuperar_foco)
-        self.root.after(1800, self._check_updates_soft_startup)
 
     def _aplicar_icono_ventana(self):
         icon_path = PROJECT_ROOT / "assets" / "app_icon.png"
@@ -529,25 +528,6 @@ class DashboardTLAMATINI:
         for widget in self.status_right.winfo_children():
             widget.destroy()
 
-        if not self._can_access_with_status(status):
-            tk.Label(
-                self.status_left,
-                text=self._current_version_label(),
-                font=("Arial", 9),
-                bg=self.ui["footer"],
-                fg=self.ui["text_dim"],
-            ).pack(side="left", padx=(0, 12), pady=6)
-            return
-
-        license_status = self._license_status_summary()
-        update_status = self.update_checker.status_summary()
-        tk.Label(
-            self.status_left,
-            text=license_status["text"],
-            font=("Arial", 9, "bold"),
-            bg=self.ui["footer"],
-            fg=license_status["color"],
-        ).pack(side="left", padx=(0, 12), pady=6)
         tk.Label(
             self.status_left,
             text=self._current_version_label(),
@@ -555,27 +535,6 @@ class DashboardTLAMATINI:
             bg=self.ui["footer"],
             fg=self.ui["text_dim"],
         ).pack(side="left", padx=(0, 12), pady=6)
-        tk.Label(
-            self.status_left,
-            text=str(update_status.get("text", "Actualizaciones al día")),
-            font=("Arial", 9, "bold"),
-            bg=self.ui["footer"],
-            fg=self.ui["warning"] if update_status.get("mandatory") else (self.ui["info"] if update_status.get("available") else self.ui["text_dim"]),
-        ).pack(side="left", padx=(0, 12), pady=6)
-        tk.Button(
-            self.status_left,
-            text="Licencia",
-            font=("Arial", 10, "bold"),
-            bg=self.ui["surface_alt"],
-            fg=self.ui["text"],
-            activebackground=self.ui["surface_soft"],
-            activeforeground=self.ui["text"],
-            relief="flat",
-            bd=0,
-            padx=12,
-            pady=6,
-            command=lambda: abrir_licencia(self.app_root, self.root),
-        ).pack(side="left", pady=6)
         tk.Button(
             self.status_left,
             text="Actualizaciones",
@@ -591,84 +550,14 @@ class DashboardTLAMATINI:
             command=lambda: abrir_actualizaciones(self.app_root, self.root),
         ).pack(side="left", pady=6)
 
-        tk.Button(
-            self.status_right,
-            text="Sincronizar datos",
-            font=("Arial", 10, "bold"),
-            bg=self.ui["accent"],
-            fg="#00111d",
-            activebackground="#77e8ff",
-            activeforeground="#00111d",
-            relief="flat",
-            bd=0,
-            padx=14,
-            pady=6,
-            command=self._sincronizar_datos,
-        ).pack(pady=6)
-
     def _can_access_with_status(self, status):
-        license_status = self._safe_dict(status.get("license_status", {}))
-        state = str(license_status.get("state", "")).strip().lower()
-        return state in {"valid", "grace"}
+        return True
 
     def _can_access_app(self):
         return self._can_access_with_status({"license_status": self.license_enforcer.current_status()})
 
     def _access_gate_state(self, status):
-        license_status = self._safe_dict(status.get("license_status", {}))
-        profile_ready = is_profile_complete(self._user_profile())
-        if not profile_ready:
-            return "profile_form"
-        if license_status.get("trial_expired"):
-            return "trial_expired"
-        state = str(license_status.get("state", "")).strip().lower()
-        if state in {"valid", "grace"}:
-            plan = str(license_status.get("plan", "")).strip().lower()
-            return "trial_active" if plan == "trial" else "license_active"
-        return "choose_path"
-
-    def _license_status_summary(self):
-        try:
-            estado = self.license_client.local_status()
-        except Exception as exc:
-            return {"text": f"Licencia local no disponible: {exc}", "color": self.ui["warning"]}
-
-        state = str(estado.get("state", "missing")).strip().lower()
-        backend_configured = bool(estado.get("backend_configured", False))
-        backend_blocked = str(estado.get("backend_blocked_reason", "")).strip()
-        plan = str(estado.get("plan", "")).strip().lower()
-        if state in {"valid", "grace"} and plan == "trial":
-            return {
-                "text": f"Prueba activa · vence {estado.get('expires_at') or '--'}",
-                "color": self.ui["success"],
-            }
-        if estado.get("trial_expired"):
-            return {
-                "text": "Prueba gratuita ya utilizada · solicita licencia mensual o pega tu código",
-                "color": self.ui["warning"],
-            }
-        text_map = {
-            "valid": f"Licencia válida · {estado.get('plan') or 'plan'} · vence {estado.get('expires_at') or '--'}",
-            "grace": f"Licencia en gracia · hasta {estado.get('grace_until') or '--'}",
-            "expired": "Licencia vencida · acceso SaaS restringido",
-            "invalid": "Licencia inválida · revisa clave pública o sincronización",
-            "missing": "Sin licencia local · puedes iniciar prueba o solicitar activación manual",
-        }
-        color_map = {
-            "valid": self.ui["success"],
-            "grace": self.ui["warning"],
-            "expired": self.ui["danger"],
-            "invalid": self.ui["danger"],
-            "missing": self.ui["text_dim"],
-        }
-        if state in {"valid", "grace"} and not backend_configured:
-            return {
-                "text": f"Licencia local activa · modo offline listo · {estado.get('plan') or 'plan'}",
-                "color": self.ui["success"] if state == "valid" else self.ui["warning"],
-            }
-        if backend_blocked:
-            return {"text": backend_blocked, "color": self.ui["warning"]}
-        return {"text": text_map.get(state, "Estado de licencia desconocido"), "color": color_map.get(state, self.ui["text_dim"])}
+        return "license_active"
 
     def _bind_double_click_action(self, widget, action):
         widget.bind("<Double-Button-1>", lambda _event: action())
@@ -681,11 +570,7 @@ class DashboardTLAMATINI:
             mod["funcion"]()
 
     def _permitir_acceso_modulo(self, module_id, titulo: str | None = None):
-        nombre = titulo or str(module_id or "").replace("_", " ").title()
-        if self.license_enforcer.can_access_module(module_id):
-            return True
-        self._mostrar_bloqueo_licencia(nombre, self.license_enforcer.block_reason_for(nombre))
-        return False
+        return True
 
     def _mostrar_bloqueo_licencia(self, titulo_modulo, motivo):
         ventana = tk.Toplevel(self.root)
@@ -1292,14 +1177,7 @@ class DashboardTLAMATINI:
             status = self._collect_dashboard_data()
             self._wrap_jobs = []
             self._clear_primary_view()
-            if not self._can_access_with_status(status):
-                self._render_access_gate(status)
-                self._render_status_bar_with_status(status)
-                self._last_dashboard_refresh = monotonic()
-                return
             self._build_dashboard_layout()
-            if self.license_enforcer.should_show_block_screen():
-                self._render_license_block_screen(status)
             self._render_license_banner(status)
             self._render_alerts_panel(status)
             self._render_module_cards()
@@ -1307,7 +1185,6 @@ class DashboardTLAMATINI:
             self._render_consumption_panel(status)
             self._render_actions_panel(status)
             self._render_plans_panel(status)
-            self._render_license_info_panel(status)
             self._render_status_bar_with_status(status)
             self._last_dashboard_refresh = monotonic()
         except Exception as exc:
@@ -1623,15 +1500,7 @@ class DashboardTLAMATINI:
         self._reconstruir_dashboard()
 
     def _license_panel_mode(self, license_status, profile_ready):
-        if not profile_ready:
-            return "profile_form"
-        state = str(license_status.get("state", "")).strip().lower()
-        plan = str(license_status.get("plan", "")).strip().lower()
-        if state in {"valid", "grace"} and plan == "trial":
-            return "trial_active"
-        if state in {"valid", "grace"}:
-            return "license_active"
-        return "choose_path"
+        return "license_active"
 
     def _render_license_info_panel(self, status):
         license_status = self._safe_dict(status.get("license_status", {}))
@@ -2490,26 +2359,6 @@ class DashboardTLAMATINI:
         registrar_log("bitacora", mensaje, "dashboard")
         self._reconstruir_dashboard()
 
-    def _sincronizar_datos(self):
-        registrar_log("dashboard", "Sincronización local solicitada desde barra inferior.", "dashboard")
-        try:
-            if self.license_client.is_authenticated():
-                self.license_client.sync_license()
-                registrar_log("dashboard", "Licencia SaaS sincronizada desde barra inferior.", "licencias")
-        except Exception as exc:
-            registrar_log("warning", f"No se pudo sincronizar licencia SaaS: {exc}", "licencias")
-        try:
-            self.update_checker.check_in_background(on_complete=lambda _state: self.root.after(0, self._refrescar_estado_sin_reconstruir))
-        except Exception as exc:
-            registrar_log("warning", f"No se pudo revisar updates en sincronización: {exc}", "updates")
-        self._reconstruir_dashboard()
-
-    def _check_updates_soft_startup(self):
-        try:
-            self.update_checker.check_in_background(on_complete=lambda _state: self.root.after(0, self._refrescar_estado_sin_reconstruir))
-        except Exception as exc:
-            registrar_log("warning", f"No se pudo iniciar revisión suave de updates: {exc}", "updates")
-
     def _inventory_status(self, items, inventory_alerts):
         total_items = len(items)
         critical_item_ids = {str(alerta.get("item_id", "")).strip() for alerta in inventory_alerts if str(alerta.get("item_id", "")).strip()}
@@ -2785,13 +2634,6 @@ class DashboardTLAMATINI:
                 "reason": "No hay planes registrados o activos en el sistema.",
                 "module": "Planes",
             })
-        if status["connectivity_status"]["internet_available"] is True and status["connectivity_status"]["sync_state"] != "Reciente":
-            suggestions.append({
-                "icon": "🔄",
-                "title": "Sincronizar datos",
-                "reason": "Hay conectividad disponible y no se detecta una sincronización reciente.",
-                "module": "Barra inferior",
-            })
         if status["mapa_activo"].get("name"):
             suggestions.append({
                 "icon": "🗺",
@@ -2972,12 +2814,8 @@ class DashboardTLAMATINI:
             if not self.root.winfo_exists():
                 return
             try:
-                elapsed = monotonic() - self._last_dashboard_refresh
-                if elapsed >= 12.0:
-                    self._reconstruir_dashboard()
-                else:
-                    self._refrescar_estado_sin_reconstruir()
-            except Exception:
-                self._reconstruir_dashboard()
+                self._refrescar_estado_sin_reconstruir()
+            except Exception as exc:
+                registrar_log("warning", f"No se pudo refrescar el estado al recuperar el foco: {exc}", "dashboard")
 
         self._focus_refresh_job = self.root.after(80, _run_refresh)

@@ -1,24 +1,7 @@
 {
-  "updated_at": "2026-05-05 01:14:34 UTC",
-  "viewer_url": "http://127.0.0.1:40773/",
-  "mapa": {
-    "id": "aguascalientes-estado",
-    "name": "Aguascalientes PMTiles",
-    "description": "Extracto estatal aproximado para Aguascalientes, generado bajo demanda por BBBike para uso offline en TLAMATINI.",
-    "format": "pmtiles",
-    "viewer_mode": "pmtiles_vector",
-    "schema": "shortbread",
-    "centerLat": 21.8853,
-    "centerLon": -102.2916,
-    "minZoom": 0,
-    "maxZoom": 14,
-    "zoomInicial": 10,
-    "bounds": [],
-    "pmtilesUrl": "http://127.0.0.1:40773/maps/aguascalientes-estado/archive.pmtiles",
-    "hasPmtiles": true,
-    "hasRasterTiles": false,
-    "pmtilesMetadata": {}
-  },
+  "updated_at": "2026-07-23 23:42:23 UTC",
+  "viewer_url": "http://127.0.0.1:48575/",
+  "mapa": null,
   "styles": [
     {
       "id": "standard",
@@ -213,10 +196,10 @@
       "polygon": []
     },
     "last_center": {
-      "lat": 22.108007103455947,
-      "lon": -102.30008626989894
+      "lat": 19.4326,
+      "lon": -99.1332
     },
-    "last_zoom": 16,
+    "last_zoom": 11.0,
     "measurement_enabled": false,
     "telemetry_visible": false
   },
@@ -324,127 +307,7 @@
       "feature_count": 0
     }
   },
-  "layer_meta": [
-    {
-      "id": "puntos",
-      "label": "Puntos guardados",
-      "color": "",
-      "feature_count": 0,
-      "geometry_types": []
-    },
-    {
-      "id": "rutas",
-      "label": "Rutas",
-      "color": "",
-      "feature_count": 0,
-      "geometry_types": []
-    },
-    {
-      "id": "poligonos",
-      "label": "Zonas de riesgo",
-      "color": "",
-      "feature_count": 0,
-      "geometry_types": []
-    },
-    {
-      "id": "refugios",
-      "label": "Refugios",
-      "color": "",
-      "feature_count": 0,
-      "geometry_types": []
-    },
-    {
-      "id": "recursos",
-      "label": "Recursos",
-      "color": "",
-      "feature_count": 0,
-      "geometry_types": []
-    },
-    {
-      "id": "nodos",
-      "label": "Nodos",
-      "color": "",
-      "feature_count": 0,
-      "geometry_types": []
-    },
-    {
-      "id": "sensores",
-      "label": "Sensores",
-      "color": "",
-      "feature_count": 0,
-      "geometry_types": []
-    },
-    {
-      "id": "comunicaciones",
-      "label": "Comunicaciones",
-      "color": "",
-      "feature_count": 0,
-      "geometry_types": []
-    },
-    {
-      "id": "observacion",
-      "label": "Observación",
-      "color": "",
-      "feature_count": 0,
-      "geometry_types": []
-    },
-    {
-      "id": "control",
-      "label": "Control y checkpoints",
-      "color": "",
-      "feature_count": 0,
-      "geometry_types": []
-    },
-    {
-      "id": "rutas_evacuacion",
-      "label": "Rutas de evacuación",
-      "color": "",
-      "feature_count": 0,
-      "geometry_types": []
-    },
-    {
-      "id": "rutas_logisticas",
-      "label": "Rutas logísticas",
-      "color": "",
-      "feature_count": 0,
-      "geometry_types": []
-    },
-    {
-      "id": "rutas_patrullaje",
-      "label": "Rutas de patrullaje",
-      "color": "",
-      "feature_count": 0,
-      "geometry_types": []
-    },
-    {
-      "id": "zonas_seguras",
-      "label": "Zonas seguras",
-      "color": "",
-      "feature_count": 0,
-      "geometry_types": []
-    },
-    {
-      "id": "perimetros",
-      "label": "Perímetros",
-      "color": "",
-      "feature_count": 0,
-      "geometry_types": []
-    },
-    {
-      "id": "amenazas",
-      "label": "Amenazas",
-      "color": "",
-      "feature_count": 0,
-      "geometry_types": []
-    },
-    {
-      "id": "imported",
-      "label": "GeoJSON importado",
-      "color": "",
-      "feature_count": 0,
-      "geometry_types": []
-    }
-  ],
+  "layer_meta": [],
   "satellite": {
     "configured": true,
     "provider_url": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"

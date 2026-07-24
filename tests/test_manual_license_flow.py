@@ -11,7 +11,7 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
 from core.installation_identity import get_installation_id
 from core.license_client import LicenseClient, LicenseClientError
-from core.license_code_validator import validate_license_code
+from core.license_code_validator import normalize_license_code, validate_license_code
 from core.local_license_store import load_local_license, load_offline_license_code, save_installation_identity, save_local_license
 from core.user_profile import save_user_profile
 
@@ -95,9 +95,24 @@ class ManualLicenseFlowTests(unittest.TestCase):
         self.assertEqual(status["plan"], "mensual")
         self.assertEqual(load_offline_license_code(), code)
         local_status = client.local_status()
-        self.assertEqual(local_status["source"], "offline_code")
-        self.assertEqual(local_status["customer_email"], "cliente@example.com")
-        self.assertEqual(local_status["customer_name"], "Cliente Demo")
+        self.assertEqual(local_status["source"], "free_use")
+        self.assertEqual(local_status["plan"], "libre")
+
+    def test_manual_activation_accepts_wrapped_code(self):
+        installation_id = get_installation_id()
+        client = LicenseClient()
+        code = _build_license_code(self.private_key, installation_id=installation_id)
+        wrapped = "Solicitud aprobada:\n" + "\n ".join(code[index : index + 72] for index in range(0, len(code), 72))
+
+        status = client.activate_manual_license(wrapped)
+
+        self.assertTrue(status["is_valid"])
+        self.assertEqual(status["license_code"], code)
+        self.assertEqual(load_offline_license_code(), code)
+
+    def test_normalize_license_code_removes_copy_formatting(self):
+        code = "TLAMATINI-LICENSE-v1.abc_DEF-123"
+        self.assertEqual(normalize_license_code("  " + code[:24] + "\n\t" + code[24:] + "  "), code)
 
     def test_manual_activation_rejects_expired_code(self):
         installation_id = get_installation_id()
@@ -164,8 +179,8 @@ class ManualLicenseFlowTests(unittest.TestCase):
         status = client.start_trial()
 
         self.assertTrue(status["is_valid"])
-        self.assertEqual(status["plan"], "trial")
-        self.assertEqual(status["source"], "local_trial")
+        self.assertEqual(status["plan"], "libre")
+        self.assertEqual(status["source"], "free_use")
         self.assertEqual(status["customer_email"], "cliente@example.com")
         self.assertTrue(load_local_license()["trial_expires_at"])
 
@@ -183,9 +198,9 @@ class ManualLicenseFlowTests(unittest.TestCase):
         client = LicenseClient()
         status = client.local_status()
 
-        self.assertFalse(status["is_valid"])
-        self.assertEqual(status["state"], "missing")
-        self.assertTrue(status["trial_expired"])
+        self.assertTrue(status["is_valid"])
+        self.assertEqual(status["state"], "valid")
+        self.assertFalse(status["trial_expired"])
 
 
 if __name__ == "__main__":

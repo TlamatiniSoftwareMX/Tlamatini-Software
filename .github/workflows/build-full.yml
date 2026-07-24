@@ -2,9 +2,6 @@ name: Build Full
 
 on:
   workflow_dispatch:
-  push:
-    tags:
-      - "v*"
 
 permissions:
   contents: write
@@ -27,7 +24,7 @@ jobs:
             build_command: sh scripts/build_full_release_linux.sh
             final_files: |
               dist/TLAMATINI-full-linux-x86_64.tar.gz
-              dist/tlamatini-5.2.3-amd64.deb
+              dist/tlamatini-5.2.4-amd64.deb
               dist/SHA256SUMS-linux.txt
               dist/SHA256SUMS-linux.json
               dist/release_metadata-linux.json

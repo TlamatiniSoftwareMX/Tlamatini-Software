@@ -1,23 +1,52 @@
-# TLAMATINI
+# TLAMATINI 5.2.4 para Linux
 
-TLAMATINI es una aplicación de escritorio con módulos offline y activación local por código de licencia.
+TLAMATINI es una aplicación de escritorio con herramientas de consulta,
+organización, mapas, cámara e inteligencia artificial local integrada.
 
-## Documentación principal
+No requiere suscripción, pago, licencia ni conexión permanente a Internet.
 
-- `docs/DESCARGAS.md`: descargas separadas para usuarios de Windows y Linux.
-- `README_distribution.md`: build y empaquetado.
-- `README_LICENCIAS.md`: flujo de licencia manual/offline y generador privado.
-- `backend/README_backend.md`: backend SaaS para uso futuro.
+## Descargar
 
-## Flujo actual de licencia
+Abre la sección [Releases](https://github.com/TlamatiniSoftwareMX/Tlamatini-Software/releases/latest)
+y descarga en una misma carpeta:
 
-1. El usuario instala TLAMATINI.
-2. Copia su solicitud de licencia desde la app.
-3. Envía esa solicitud después del pago.
-4. Recibe un código de licencia.
-5. Pega el código en TLAMATINI y activa offline.
+- Los 44 archivos llamados
+  `tlamatini-5.2.4-linux-amd64.chunk-001-of-044` hasta
+  `tlamatini-5.2.4-linux-amd64.chunk-044-of-044`.
+- `INSTALAR-TLAMATINI.sh`.
 
-## Notas
+## Instalar
 
-- La app distribuida solo incluye `public_license_key.pem`.
-- `tools_private/` y la clave privada no deben distribuirse.
+TLAMATINI es compatible con Debian, Ubuntu y Linux Mint de 64 bits. Se
+recomiendan al menos 8 GB de memoria RAM y aproximadamente 5 GB de espacio
+libre durante la instalación.
+
+Abre una terminal en la carpeta donde guardaste los archivos y ejecuta:
+
+```bash
+bash INSTALAR-TLAMATINI.sh
+```
+
+El instalador unirá y verificará automáticamente las 44 partes. Después
+solicitará tu contraseña de administrador e instalará TLAMATINI junto con sus
+dependencias.
+
+## Abrir TLAMATINI
+
+Busca **TLAMATINI** en el menú de aplicaciones. También puedes abrirlo desde
+una terminal con:
+
+```bash
+tlamatini
+```
+
+La primera carga de la inteligencia artificial puede tardar más que las
+siguientes porque el modelo local se inicia por primera vez.
+
+## Solución de problemas
+
+- Si falta una parte, confirma que los 44 fragmentos estén en la misma carpeta.
+- Si falla la verificación, vuelve a descargar el fragmento indicado.
+- Si la cámara no abre, comprueba que esté conectada y que otra aplicación no
+  la esté utilizando.
+- Conserva los fragmentos hasta que la instalación termine correctamente.

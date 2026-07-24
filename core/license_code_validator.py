@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import base64
 import json
+import re
 from datetime import datetime, timezone
 from typing import Any, Dict
 
@@ -19,6 +20,7 @@ except Exception:
 
 
 LICENSE_CODE_PREFIX = "TLAMATINI-LICENSE-v1."
+LICENSE_CODE_BODY_RE = re.compile(r"[^A-Za-z0-9_-]")
 REQUIRED_PAYLOAD_FIELDS = (
     "license_version",
     "license_id",
@@ -30,9 +32,29 @@ REQUIRED_PAYLOAD_FIELDS = (
 )
 
 
+def normalize_license_code(license_code: str) -> str:
+    raw = str(license_code or "").strip()
+    if not raw:
+        return ""
+
+    compact = "".join(raw.split())
+    prefix_index = compact.find(LICENSE_CODE_PREFIX)
+    if prefix_index > 0:
+        compact = compact[prefix_index:]
+    if not compact.startswith(LICENSE_CODE_PREFIX):
+        return compact
+
+    encoded_body = compact[len(LICENSE_CODE_PREFIX) :]
+    encoded_body = LICENSE_CODE_BODY_RE.sub("", encoded_body)
+    return f"{LICENSE_CODE_PREFIX}{encoded_body}"
+
+
 def _base64url_decode(value: str) -> bytes:
     padding = "=" * (-len(value) % 4)
-    return base64.urlsafe_b64decode((value + padding).encode("ascii"))
+    try:
+        return base64.urlsafe_b64decode((value + padding).encode("ascii"))
+    except Exception:
+        return base64.b64decode((value + padding).encode("ascii"))
 
 
 def _parse_datetime(value: str | None) -> datetime | None:
@@ -68,7 +90,7 @@ def _payload_bytes(payload: Dict[str, Any]) -> bytes:
 
 
 def decode_license_code(license_code: str) -> Dict[str, Any]:
-    token = str(license_code or "").strip()
+    token = normalize_license_code(license_code)
     if not token.startswith(LICENSE_CODE_PREFIX):
         raise ValueError("El código de licencia no tiene un formato válido.")
 
@@ -130,7 +152,7 @@ def verify_license_code_signature(license_code: str) -> Dict[str, Any]:
 
 
 def validate_license_code(license_code: str, *, installation_id: str | None = None) -> Dict[str, Any]:
-    token = str(license_code or "").strip()
+    token = normalize_license_code(license_code)
     if not token:
         return {
             "state": "missing",

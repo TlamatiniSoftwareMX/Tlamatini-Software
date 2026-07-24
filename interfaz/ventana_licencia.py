@@ -46,7 +46,7 @@ class VentanaLicencia(tk.Toplevel):
     def __init__(self, master, initial_view: str = "auto"):
         super().__init__(master)
         self.client = LicenseClient()
-        self.title("TLAMATINI - Activar licencia")
+        self.title("TLAMATINI - Uso libre")
         self.configure(bg=PALETA["bg"])
         self.minsize(920, 760)
         aplicar_geometria_relativa(self, master, rel_w=0.72, rel_h=0.88, min_w=940, min_h=780)
@@ -66,7 +66,7 @@ class VentanaLicencia(tk.Toplevel):
         self.var_profile_phone = tk.StringVar(value=str(profile.get("phone", "")).strip())
         self.var_profile_country = tk.StringVar(value=str(profile.get("country", "")).strip())
         self.var_auth_mode = tk.StringVar(value="register")
-        self.var_banner = tk.StringVar(value="Activa tu licencia pegando el código que recibiste después del pago.")
+        self.var_banner = tk.StringVar(value="TLAMATINI está configurado para uso libre.")
         self.var_manual_status = tk.StringVar(value="")
         self._initial_view = str(initial_view or "auto").strip().lower()
 
@@ -100,14 +100,14 @@ class VentanaLicencia(tk.Toplevel):
         header.pack(fill="x", pady=(0, 8))
         tk.Label(
             header,
-            text="Activar TLAMATINI",
+            text="TLAMATINI",
             font=("Arial", 24, "bold"),
             bg=PALETA["bg"],
             fg=PALETA["text"],
         ).pack(anchor="w")
         tk.Label(
             header,
-            text="Comienza activando una prueba gratuita o solicitando tu licencia mensual.",
+            text="Uso libre habilitado. No necesitas activar una licencia para trabajar.",
             font=("Arial", 11),
             bg=PALETA["bg"],
             fg=PALETA["text_dim"],
@@ -209,38 +209,7 @@ class VentanaLicencia(tk.Toplevel):
         self._render_content()
 
     def _sync_default_banner(self) -> None:
-        ctx = self._current_context
-        state = ctx["local_state"]
-        if not ctx.get("profile_ready"):
-            self._set_banner("Para comenzar, guarda tus datos y elige cómo quieres activar TLAMATINI.", "info")
-            return
-        if ctx["has_valid_license"]:
-            remaining = ctx["local_status"].get("days_remaining")
-            if str(ctx["local_status"].get("plan", "")).strip().lower() == "trial":
-                self._set_banner(f"Prueba activa. Te quedan {remaining if remaining is not None else '--'} día(s).", "success")
-                return
-            if remaining is not None:
-                self._set_banner(f"TLAMATINI está activado y puede operar offline. Te quedan {remaining} día(s) en este periodo.", "success")
-            else:
-                self._set_banner("TLAMATINI está activado correctamente y puede seguir operando offline en este equipo.", "success")
-            return
-        if ctx["local_status"].get("trial_expired"):
-            self._set_banner("La prueba gratuita ya fue utilizada en esta instalación.", "warning")
-            return
-
-        if state == "expired":
-            self._set_banner("La licencia está vencida. Pega una nueva licencia o solicita una renovación.", "warning")
-            return
-
-        if state == "grace":
-            self._set_banner("La licencia está en periodo de gracia. Conviene renovarla cuanto antes.", "warning")
-            return
-
-        if state == "invalid":
-            self._set_banner("La licencia local no pudo validarse. Revisa el código pegado o solicita uno nuevo.", "warning")
-            return
-
-        self._set_banner("Comienza activando una prueba gratuita o solicitando tu licencia mensual.", "info")
+        self._set_banner("TLAMATINI está configurado para uso libre.", "success")
 
     def _render_content(self) -> None:
         self._clear_frame(self._content_frame)
@@ -260,20 +229,9 @@ class VentanaLicencia(tk.Toplevel):
             self._render_trial_active_section(self._content_frame, ctx)
         else:
             self._render_license_active_section(self._content_frame, ctx)
-        self._render_advanced_section(self._content_frame, ctx)
 
     def _resolve_screen_state(self, ctx: dict) -> str:
-        if self._force_profile_view or not ctx.get("profile_ready"):
-            return "profile_form"
-        if self._screen_override in {"request_license", "paste_code"}:
-            return self._screen_override
-        if ctx["has_valid_license"]:
-            if str(ctx["plan"]).strip().lower() == "trial":
-                return "trial_active"
-            return "license_active"
-        if (ctx.get("local_status") or {}).get("trial_expired"):
-            return "trial_expired"
-        return "choose_path"
+        return "license_active"
 
     def _sync_profile_vars(self, profile=None) -> None:
         data = profile or load_user_profile()
@@ -556,14 +514,14 @@ class VentanaLicencia(tk.Toplevel):
         self._create_button(actions, "Pegar código recibido", self._show_manual_activation, role="soft").pack(side="left")
 
     def _render_license_active_section(self, parent, ctx: dict) -> None:
-        card = self._make_card(parent, "Licencia activa", "TLAMATINI ya está activado en esta instalación.", tone="success")
+        card = self._make_card(parent, "Uso libre", "TLAMATINI no requiere licencia en esta instalación.", tone="success")
         body = tk.Frame(card, bg=card.cget("bg"))
         body.pack(fill="x", padx=16, pady=(0, 14))
         for label, value in (
-            ("Estado", self._manual_license_state_label(ctx)),
+            ("Estado", "Uso libre"),
             ("Plan", str(ctx["local_status"].get("plan", "")).strip() or "Sin plan"),
-            ("Vence", str(ctx["local_status"].get("expires_at", "")).strip() or "No disponible"),
-            ("Días restantes", str(ctx["local_status"].get("days_remaining")) if ctx["local_status"].get("days_remaining") is not None else "No disponible"),
+            ("Vence", "No aplica"),
+            ("Días restantes", "No aplica"),
             ("Email", self._manual_license_email(ctx)),
         ):
             row = tk.Frame(body, bg=card.cget("bg"))
@@ -573,7 +531,6 @@ class VentanaLicencia(tk.Toplevel):
         actions = tk.Frame(body, bg=card.cget("bg"))
         actions.pack(fill="x", pady=(12, 0))
         self._create_button(actions, "Continuar a TLAMATINI", self.destroy, role="primary").pack(side="left", padx=(0, 8))
-        self._create_button(actions, "Renovar licencia", self._show_request_license, role="secondary").pack(side="left")
 
     def _render_connection_step(self, parent, ctx: dict) -> None:
         has_backend = ctx["has_backend"]

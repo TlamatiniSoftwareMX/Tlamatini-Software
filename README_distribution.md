@@ -31,7 +31,7 @@ Instalación mínima para empaquetar:
 ```bash
 python -m venv .venv
 source .venv/bin/activate
-pip install pyinstaller pillow requests pmtiles tkinterdnd2
+pip install pyinstaller pillow requests pmtiles tkinterdnd2 opencv-contrib-python
 ```
 
 En Windows:
@@ -39,7 +39,7 @@ En Windows:
 ```powershell
 python -m venv .venv
 .venv\Scripts\activate
-pip install pyinstaller pillow requests pmtiles tkinterdnd2
+pip install pyinstaller pillow requests pmtiles tkinterdnd2 opencv-contrib-python
 ```
 
 ## Estructura que entra al bundle
@@ -208,6 +208,25 @@ Contenido mínimo a distribuir:
 - recursos empaquetados en el mismo directorio
 
 ## Linux
+
+### Paquete 5.2.4
+
+Para distribuir el modo de uso libre, usar el paquete:
+
+- `dist/tlamatini-5.2.4-amd64.deb`
+
+Ese paquete no requiere prueba, suscripción ni código de activación para entrar.
+Incluye el ejecutable, el runtime local y Gemma 3; no requiere descargar la IA después de instalarlo.
+
+Instalación limpia sobre una versión anterior:
+
+```bash
+sudo apt remove -y tlamatini
+sudo apt install ./dist/tlamatini-5.2.4-amd64.deb
+dpkg -l | grep -i tlamatini
+```
+
+La verificación debe mostrar `5.2.4`.
 
 ### Build Full
 

@@ -1,4 +1,5 @@
 import re
+import sys
 from datetime import datetime
 from typing import Dict
 from pathlib import Path
@@ -21,18 +22,25 @@ VENTANA_ESCANER_CODIGO = "TLAMATINI - Escaner de codigo"
 DETECTOR_CODIGO = cv2.barcode_BarcodeDetector() if cv2 is not None and hasattr(cv2, "barcode_BarcodeDetector") else None
 
 
-def _abrir_camara():
+def _backends_camara():
+    if cv2 is None:
+        return []
+    if sys.platform.startswith("win") and hasattr(cv2, "CAP_DSHOW"):
+        return [cv2.CAP_DSHOW, None]
+    if sys.platform.startswith("linux") and hasattr(cv2, "CAP_V4L2"):
+        return [cv2.CAP_V4L2, None]
+    if sys.platform == "darwin" and hasattr(cv2, "CAP_AVFOUNDATION"):
+        return [cv2.CAP_AVFOUNDATION, None]
+    return [None]
+
+
+def abrir_camara(indice: int = 0):
     if cv2 is None:
         return None
 
-    backends = []
-    if hasattr(cv2, "CAP_DSHOW"):
-        backends.append(cv2.CAP_DSHOW)
-    backends.append(None)
-
-    for backend in backends:
+    for backend in _backends_camara():
         try:
-            cap = cv2.VideoCapture(0, backend) if backend is not None else cv2.VideoCapture(0)
+            cap = cv2.VideoCapture(indice, backend) if backend is not None else cv2.VideoCapture(indice)
         except Exception:
             continue
         if cap is not None and cap.isOpened():
@@ -42,6 +50,9 @@ def _abrir_camara():
         except Exception:
             pass
     return None
+
+
+_abrir_camara = abrir_camara
 
 
 def _preparar_ventana(nombre: str) -> None:
@@ -175,7 +186,7 @@ def capturar_foto_inventario_configurable(guardar: bool = True) -> Dict[str, str
 
     RUTA_FOTOS.mkdir(parents=True, exist_ok=True)
 
-    cap = _abrir_camara()
+    cap = abrir_camara()
     if cap is None:
         return {
             "estado": "error",
@@ -185,10 +196,20 @@ def capturar_foto_inventario_configurable(guardar: bool = True) -> Dict[str, str
     ruta_guardado = ""
     _preparar_ventana(VENTANA_CAPTURA_INVENTARIO)
 
+    fallos_lectura = 0
     while True:
         ok, frame = cap.read()
         if not ok:
+            fallos_lectura += 1
+            if fallos_lectura >= 60:
+                cap.release()
+                cv2.destroyAllWindows()
+                return {
+                    "estado": "error",
+                    "mensaje": "La cámara dejó de enviar imagen. Desconéctala, vuelve a conectarla e inténtalo otra vez."
+                }
             continue
+        fallos_lectura = 0
 
         texto = "ESPACIO = capturar | ESC = cancelar"
         cv2.putText(
@@ -244,7 +265,7 @@ def capturar_codigo_barras_inventario() -> Dict[str, str]:
 
     RUTA_FOTOS.mkdir(parents=True, exist_ok=True)
 
-    cap = _abrir_camara()
+    cap = abrir_camara()
     if cap is None:
         return {
             "estado": "error",
@@ -257,10 +278,20 @@ def capturar_codigo_barras_inventario() -> Dict[str, str]:
     lecturas_consecutivas = 0
     _preparar_ventana(VENTANA_ESCANER_CODIGO)
 
+    fallos_lectura = 0
     while True:
         ok, frame = cap.read()
         if not ok:
+            fallos_lectura += 1
+            if fallos_lectura >= 60:
+                cap.release()
+                cv2.destroyAllWindows()
+                return {
+                    "estado": "error",
+                    "mensaje": "La cámara dejó de enviar imagen. Desconéctala, vuelve a conectarla e inténtalo otra vez."
+                }
             continue
+        fallos_lectura = 0
 
         frame_original = frame.copy()
         codigo_detectado_frame, rect = _leer_codigo_barras(frame)

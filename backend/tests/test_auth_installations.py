@@ -2,6 +2,7 @@ import hashlib
 import hmac
 import json
 import time
+from datetime import datetime, timedelta, timezone
 
 import pytest
 from fastapi import HTTPException
@@ -42,10 +43,16 @@ def build_paddle_signature(raw_body: bytes) -> str:
 
 
 def build_transaction_completed_event(*, installation_id: str, installation_db_id: int, event_id: str) -> dict:
+    period_start = datetime.now(timezone.utc)
+    period_end = period_start + timedelta(days=30)
+
+    def iso_utc(value: datetime) -> str:
+        return value.isoformat().replace("+00:00", "Z")
+
     return {
         "event_id": event_id,
         "event_type": "transaction.completed",
-        "occurred_at": "2026-04-24T12:00:00Z",
+        "occurred_at": iso_utc(period_start),
         "notification_id": f"ntf_{event_id}",
         "data": {
             "id": f"txn_{event_id}",
@@ -60,8 +67,8 @@ def build_transaction_completed_event(*, installation_id: str, installation_db_i
                 "product_id": "pro_test",
             },
             "billing_period": {
-                "starts_at": "2026-04-24T12:00:00Z",
-                "ends_at": "2026-05-24T12:00:00Z",
+                "starts_at": iso_utc(period_start),
+                "ends_at": iso_utc(period_end),
             },
         },
     }

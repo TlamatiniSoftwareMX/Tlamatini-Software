@@ -8,8 +8,8 @@ class DashboardLicenseFlowTests(unittest.TestCase):
     def test_current_version_label_uses_runtime_version(self):
         app = dashboard.DashboardTLAMATINI.__new__(dashboard.DashboardTLAMATINI)
         app.update_checker = mock.Mock()
-        app.update_checker.local_state.return_value = {"current_version": "5.2.2"}
-        self.assertEqual(app._current_version_label(), "Versión 5.2.2")
+        app.update_checker.local_state.return_value = {"current_version": "5.2.4"}
+        self.assertEqual(app._current_version_label(), "Versión 5.2.4")
 
     def test_dashboard_license_request_uses_manual_format(self):
         app = dashboard.DashboardTLAMATINI.__new__(dashboard.DashboardTLAMATINI)
@@ -39,15 +39,15 @@ class DashboardLicenseFlowTests(unittest.TestCase):
 
     def test_license_panel_mode_without_profile_shows_form(self):
         app = dashboard.DashboardTLAMATINI.__new__(dashboard.DashboardTLAMATINI)
-        self.assertEqual(app._license_panel_mode({}, False), "profile_form")
+        self.assertEqual(app._license_panel_mode({}, False), "license_active")
 
     def test_license_panel_mode_with_profile_and_without_license_shows_two_paths(self):
         app = dashboard.DashboardTLAMATINI.__new__(dashboard.DashboardTLAMATINI)
-        self.assertEqual(app._license_panel_mode({"state": "missing", "plan": ""}, True), "choose_path")
+        self.assertEqual(app._license_panel_mode({"state": "missing", "plan": ""}, True), "license_active")
 
     def test_license_panel_mode_trial_active(self):
         app = dashboard.DashboardTLAMATINI.__new__(dashboard.DashboardTLAMATINI)
-        self.assertEqual(app._license_panel_mode({"state": "valid", "plan": "trial"}, True), "trial_active")
+        self.assertEqual(app._license_panel_mode({"state": "valid", "plan": "trial"}, True), "license_active")
 
     def test_license_panel_mode_license_active(self):
         app = dashboard.DashboardTLAMATINI.__new__(dashboard.DashboardTLAMATINI)
@@ -69,26 +69,26 @@ class DashboardLicenseFlowTests(unittest.TestCase):
         app = dashboard.DashboardTLAMATINI.__new__(dashboard.DashboardTLAMATINI)
         app._safe_dict = lambda value: value if isinstance(value, dict) else {}
         app._user_profile = lambda: {"full_name": "", "email": ""}
-        self.assertEqual(app._access_gate_state({"license_status": {}}), "profile_form")
+        self.assertEqual(app._access_gate_state({"license_status": {}}), "license_active")
 
     def test_access_gate_state_without_access_shows_choose_path(self):
         app = dashboard.DashboardTLAMATINI.__new__(dashboard.DashboardTLAMATINI)
         app._safe_dict = lambda value: value if isinstance(value, dict) else {}
         app._user_profile = lambda: {"full_name": "Cliente Demo", "email": "cliente@example.com"}
-        self.assertEqual(app._access_gate_state({"license_status": {"state": "missing"}}), "choose_path")
+        self.assertEqual(app._access_gate_state({"license_status": {"state": "missing"}}), "license_active")
 
     def test_access_gate_state_trial_expired(self):
         app = dashboard.DashboardTLAMATINI.__new__(dashboard.DashboardTLAMATINI)
         app._safe_dict = lambda value: value if isinstance(value, dict) else {}
         app._user_profile = lambda: {"full_name": "Cliente Demo", "email": "cliente@example.com"}
-        self.assertEqual(app._access_gate_state({"license_status": {"state": "missing", "trial_expired": True}}), "trial_expired")
+        self.assertEqual(app._access_gate_state({"license_status": {"state": "missing", "trial_expired": True}}), "license_active")
 
     def test_can_access_with_trial_or_license(self):
         app = dashboard.DashboardTLAMATINI.__new__(dashboard.DashboardTLAMATINI)
         app._safe_dict = lambda value: value if isinstance(value, dict) else {}
         self.assertTrue(app._can_access_with_status({"license_status": {"state": "valid", "plan": "trial"}}))
         self.assertTrue(app._can_access_with_status({"license_status": {"state": "valid", "plan": "mensual"}}))
-        self.assertFalse(app._can_access_with_status({"license_status": {"state": "missing"}}))
+        self.assertTrue(app._can_access_with_status({"license_status": {"state": "missing"}}))
 
 
 if __name__ == "__main__":

@@ -195,9 +195,9 @@ class VentanaActualizaciones(tk.Toplevel):
         elif state.get("last_error"):
             lowered = str(state.get("last_error", "")).lower()
             if "backend local de actualizaciones no está disponible" in lowered:
-                self.var_status.set("Backend local de actualizaciones inactivo.")
+                self.var_status.set("No se pudo revisar actualizaciones.")
             elif "no hay backend configurado" in lowered or "solo se usa en modo desarrollo" in lowered:
-                self.var_status.set("Actualizaciones en espera de backend SaaS.")
+                self.var_status.set("No hay una fuente de actualizaciones configurada.")
             else:
                 self.var_status.set("No se pudo revisar actualizaciones.")
             self.var_latest.set("Nueva versión: --")
