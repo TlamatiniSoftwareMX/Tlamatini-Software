@@ -57,42 +57,7 @@ jobs:
 
       - name: Split installer for GitHub
         shell: powershell
-        run: |
-          $sourcePath = "dist\TLAMATINI-Windows-Instalador-Full.exe"
-          $releaseDir = "dist\windows-release"
-          $chunkSize = 59MB
-          New-Item -ItemType Directory -Force $releaseDir | Out-Null
-          $source = [System.IO.File]::OpenRead($sourcePath)
-          try {
-            $count = [int][Math]::Ceiling($source.Length / $chunkSize)
-            $buffer = New-Object byte[] (1MB)
-            for ($index = 1; $index -le $count; $index++) {
-              $name = "tlamatini-5.2.4-windows-installer.chunk-{0:D3}-of-{1:D3}" -f $index, $count
-              $destination = [System.IO.File]::Create((Join-Path $releaseDir $name))
-              try {
-                $remaining = [Math]::Min($chunkSize, $source.Length - $source.Position)
-                while ($remaining -gt 0) {
-                  $read = $source.Read($buffer, 0, [Math]::Min($buffer.Length, $remaining))
-                  if ($read -le 0) { break }
-                  $destination.Write($buffer, 0, $read)
-                  $remaining -= $read
-                }
-              }
-              finally {
-                $destination.Dispose()
-              }
-            }
-          }
-          finally {
-            $source.Dispose()
-          }
-          $installerHash = (Get-FileHash -Algorithm SHA256 $sourcePath).Hash.ToLowerInvariant()
-          "$installerHash  TLAMATINI-Windows-Instalador-Full.exe" | Set-Content -Encoding ascii (Join-Path $releaseDir "SHA256-WINDOWS-INSTALADOR.txt")
-          Get-ChildItem -File (Join-Path $releaseDir "*.chunk-*") | Sort-Object Name | ForEach-Object {
-            $hash = (Get-FileHash -Algorithm SHA256 $_.FullName).Hash.ToLowerInvariant()
-            "$hash  $($_.Name)"
-          } | Set-Content -Encoding ascii (Join-Path $releaseDir "SHA256-WINDOWS-PARTES.txt")
-          Copy-Item scripts\INSTALAR-TLAMATINI-WINDOWS.ps1,scripts\INSTALAR-TLAMATINI-WINDOWS.cmd $releaseDir
+        run: .\.venv\Scripts\python scripts\split_windows_installer.py dist\TLAMATINI-Windows-Instalador-Full.exe dist\windows-release
 
       - name: Upload Windows installer to release
         shell: powershell
