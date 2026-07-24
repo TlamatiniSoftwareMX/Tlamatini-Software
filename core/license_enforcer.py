@@ -16,7 +16,7 @@ class LicenseEnforcer:
                 "state": "valid",
                 "source": "free_use",
                 "plan": "libre",
-                "message": "Uso libre",
+                "message": "Disponible",
                 "offline_ready": True,
                 "backend_mode": "disabled",
                 "backend_configured": False,
@@ -51,4 +51,4 @@ class LicenseEnforcer:
         return f"Tu licencia está vencida, tienes {remaining} restantes en modo gracia."
 
     def block_reason_for(self, name: str) -> str:
-        return "TLAMATINI está configurado para uso libre."
+        return ""

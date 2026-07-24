@@ -46,7 +46,7 @@ class VentanaLicencia(tk.Toplevel):
     def __init__(self, master, initial_view: str = "auto"):
         super().__init__(master)
         self.client = LicenseClient()
-        self.title("TLAMATINI - Uso libre")
+        self.title("TLAMATINI")
         self.configure(bg=PALETA["bg"])
         self.minsize(920, 760)
         aplicar_geometria_relativa(self, master, rel_w=0.72, rel_h=0.88, min_w=940, min_h=780)
@@ -66,7 +66,7 @@ class VentanaLicencia(tk.Toplevel):
         self.var_profile_phone = tk.StringVar(value=str(profile.get("phone", "")).strip())
         self.var_profile_country = tk.StringVar(value=str(profile.get("country", "")).strip())
         self.var_auth_mode = tk.StringVar(value="register")
-        self.var_banner = tk.StringVar(value="TLAMATINI está configurado para uso libre.")
+        self.var_banner = tk.StringVar(value="")
         self.var_manual_status = tk.StringVar(value="")
         self._initial_view = str(initial_view or "auto").strip().lower()
 
@@ -105,18 +105,7 @@ class VentanaLicencia(tk.Toplevel):
             bg=PALETA["bg"],
             fg=PALETA["text"],
         ).pack(anchor="w")
-        tk.Label(
-            header,
-            text="Uso libre habilitado. No necesitas activar una licencia para trabajar.",
-            font=("Arial", 11),
-            bg=PALETA["bg"],
-            fg=PALETA["text_dim"],
-            justify="left",
-            wraplength=840,
-        ).pack(anchor="w", pady=(6, 0))
-
         self._banner_frame = tk.Frame(wrapper, bg=PALETA["soft"], highlightthickness=1, highlightbackground=PALETA["border"])
-        self._banner_frame.pack(fill="x", pady=(0, 12))
         self._banner_label = tk.Label(
             self._banner_frame,
             textvariable=self.var_banner,
@@ -209,7 +198,7 @@ class VentanaLicencia(tk.Toplevel):
         self._render_content()
 
     def _sync_default_banner(self) -> None:
-        self._set_banner("TLAMATINI está configurado para uso libre.", "success")
+        self._set_banner("", "info")
 
     def _render_content(self) -> None:
         self._clear_frame(self._content_frame)
@@ -514,22 +503,11 @@ class VentanaLicencia(tk.Toplevel):
         self._create_button(actions, "Pegar código recibido", self._show_manual_activation, role="soft").pack(side="left")
 
     def _render_license_active_section(self, parent, ctx: dict) -> None:
-        card = self._make_card(parent, "Uso libre", "TLAMATINI no requiere licencia en esta instalación.", tone="success")
+        card = self._make_card(parent, "TLAMATINI", "", tone="default")
         body = tk.Frame(card, bg=card.cget("bg"))
         body.pack(fill="x", padx=16, pady=(0, 14))
-        for label, value in (
-            ("Estado", "Uso libre"),
-            ("Plan", str(ctx["local_status"].get("plan", "")).strip() or "Sin plan"),
-            ("Vence", "No aplica"),
-            ("Días restantes", "No aplica"),
-            ("Email", self._manual_license_email(ctx)),
-        ):
-            row = tk.Frame(body, bg=card.cget("bg"))
-            row.pack(fill="x", pady=2)
-            tk.Label(row, text=f"{label}:", font=("Arial", 10, "bold"), bg=card.cget("bg"), fg=PALETA["text"], width=18, anchor="w").pack(side="left")
-            tk.Label(row, text=value, font=("Arial", 10), bg=card.cget("bg"), fg=PALETA["text_dim"], anchor="w", justify="left").pack(side="left", fill="x", expand=True)
         actions = tk.Frame(body, bg=card.cget("bg"))
-        actions.pack(fill="x", pady=(12, 0))
+        actions.pack(fill="x")
         self._create_button(actions, "Continuar a TLAMATINI", self.destroy, role="primary").pack(side="left", padx=(0, 8))
 
     def _render_connection_step(self, parent, ctx: dict) -> None:

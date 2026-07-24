@@ -230,7 +230,7 @@ class LicenseClient:
             "state": "valid",
             "source": "free_use",
             "status": "active",
-            "message": "Uso libre",
+            "message": "Disponible",
             "plan": "libre",
             "expires_at": "",
             "grace_until": "",

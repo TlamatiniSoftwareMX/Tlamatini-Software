@@ -1,0 +1,70 @@
+name: Build Windows
+
+on:
+  workflow_dispatch:
+
+env:
+  TLAMATINI_AI_BACKEND: local
+  TLAMATINI_SKIP_RUNTIME_VERIFY: "1"
+  TLAMATINI_GEMMA3_URL: https://huggingface.co/bartowski/google_gemma-3-4b-it-GGUF/resolve/main/google_gemma-3-4b-it-Q4_K_M.gguf?download=true
+  CLIENT_DEPS: pyinstaller pillow requests pmtiles tkinterdnd2 cryptography numpy opencv-python PyMuPDF pytesseract
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Create environment
+        shell: powershell
+        run: |
+          python -m venv .venv
+          .\.venv\Scripts\python -m pip install --upgrade pip
+          .\.venv\Scripts\python -m pip install $env:CLIENT_DEPS.Split(" ")
+
+      - name: Download embedded AI
+        shell: powershell
+        run: .\.venv\Scripts\python scripts/local_ai_tool.py download_models
+
+      - name: Build portable package
+        shell: powershell
+        run: .\.venv\Scripts\python scripts/local_ai_tool.py build_full_release
+
+      - name: Package portable ZIP
+        shell: powershell
+        run: .\.venv\Scripts\python scripts/local_ai_tool.py package_full_release
+
+      - name: Install Inno Setup
+        shell: powershell
+        run: choco install innosetup -y --no-progress
+
+      - name: Build installer
+        shell: powershell
+        run: '& "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "installer\windows\TLAMATINI_full.iss"'
+
+      - name: Verify package
+        shell: powershell
+        run: |
+          .\.venv\Scripts\python scripts/verify_release_bundle.py dist/tlamatini_full
+          .\.venv\Scripts\python scripts/local_ai_tool.py doctor_full_release
+          .\.venv\Scripts\python scripts/refresh_release_checksums.py windows
+
+      - name: Upload Windows package
+        uses: actions/upload-artifact@v4
+        with:
+          name: TLAMATINI-Windows-5.2.4
+          path: |
+            dist/TLAMATINI-Windows-Instalador-Full.exe
+            dist/TLAMATINI-full-windows-x86_64.zip
+            dist/SHA256SUMS-windows.txt
+            dist/SHA256SUMS-windows.json
+            dist/release_metadata-windows.json
+          if-no-files-found: error
+          retention-days: 14
