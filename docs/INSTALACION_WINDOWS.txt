@@ -1,11 +1,11 @@
-TLAMATINI 5.2.4 para Windows
+TLAMATINI 5.2.5 para Windows
 ============================
 
 Descarga en una misma carpeta:
 
 1. Los 42 fragmentos del instalador, desde
-   tlamatini-5.2.4-windows-installer.chunk-001-of-042 hasta
-   tlamatini-5.2.4-windows-installer.chunk-042-of-042.
+   tlamatini-5.2.5-windows-installer.chunk-001-of-042 hasta
+   tlamatini-5.2.5-windows-installer.chunk-042-of-042.
 2. INSTALAR-TLAMATINI-WINDOWS.cmd
 3. INSTALAR-TLAMATINI-WINDOWS.ps1
 4. SHA256-WINDOWS-INSTALADOR.txt

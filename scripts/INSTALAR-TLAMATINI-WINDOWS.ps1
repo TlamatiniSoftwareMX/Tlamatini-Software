@@ -5,7 +5,7 @@ Set-Location $baseDir
 
 $outputName = "TLAMATINI-Windows-Instalador-Full.exe"
 $checksumFile = "SHA256-WINDOWS-INSTALADOR.txt"
-$parts = @(Get-ChildItem -File "tlamatini-5.2.4-windows-installer.chunk-*-of-*" | Sort-Object Name)
+$parts = @(Get-ChildItem -File "tlamatini-*-windows-installer.chunk-*-of-*" | Sort-Object Name)
 
 if ($parts.Count -eq 0) {
     Write-Host "No se encontraron las partes del instalador." -ForegroundColor Red

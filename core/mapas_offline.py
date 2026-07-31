@@ -106,6 +106,24 @@ def _write_json(path: Path, data: Dict) -> None:
     path.write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
 
 
+def _validate_pmtiles_signature(path: Path) -> None:
+    """Fail early with a useful message, even when the optional pmtiles module is absent."""
+    try:
+        with path.open("rb") as fh:
+            signature = fh.read(8)
+    except OSError as exc:
+        raise ValueError(f"No se pudo leer el archivo PMTiles: {exc}") from exc
+    if len(signature) < 8 or signature[:7] != b"PMTiles":
+        raise ValueError(
+            "El archivo no es un PMTiles válido (cabecera incorrecta). "
+            "Puede ser una descarga incompleta o una página de error guardada como mapa."
+        )
+    if signature[7] != 3:
+        raise ValueError(
+            f"La versión PMTiles {signature[7]} no es compatible; TLAMATINI requiere PMTiles v3."
+        )
+
+
 def _merge_map(base: Dict, overlay: Dict) -> Dict:
     result = dict(base)
     result.update({k: v for k, v in overlay.items() if v is not None})
@@ -367,6 +385,49 @@ class OfflineMapsService:
         }
         self._register_installed_map(metadata)
         return metadata
+
+    def import_pmtiles_file(
+        self,
+        file_path: str,
+        name: str,
+        region: str = "manual",
+        description: str = "",
+        center_lat: float = 19.4326,
+        center_lon: float = -99.1332,
+        default_zoom: int = 8,
+    ) -> Dict:
+        """Import a downloaded .pmtiles file or a ZIP containing one."""
+        source = Path(file_path).expanduser().resolve()
+        if not source.exists() or not source.is_file():
+            raise ValueError("El archivo de mapa no existe.")
+        map_id = _safe_slug(name)
+        if self._installed_map(map_id) or (INSTALLED_DIR / map_id).exists():
+            raise ValueError("Ya existe un mapa instalado con ese identificador.")
+
+        entry = {
+            "id": map_id,
+            "name": name.strip() or source.stem,
+            "region": region.strip() or "manual",
+            "description": description.strip(),
+            "version": _utcnow(),
+            "format": "pmtiles_zip" if zipfile.is_zipfile(source) else "pmtiles",
+            "destination_file": source.name,
+            "center_lat": float(center_lat),
+            "center_lon": float(center_lon),
+            "default_zoom": int(default_zoom),
+            "source_url": str(source),
+        }
+        try:
+            metadata = self._install_pmtiles_package(entry, source, entry["format"])
+            metadata["source_url"] = str(source)
+            metadata["source_type"] = "manual_pmtiles"
+            self._register_installed_map(metadata)
+            return metadata
+        except Exception:
+            install_dir = INSTALLED_DIR / map_id
+            if install_dir.exists():
+                shutil.rmtree(install_dir, ignore_errors=True)
+            raise
 
     def _register_installed_map(self, metadata: Dict) -> None:
         state = self._load_state()
@@ -697,8 +758,14 @@ class OfflineMapsService:
         install_dir.mkdir(parents=True, exist_ok=True)
 
         if format_id == "pmtiles_zip":
-            with zipfile.ZipFile(package_path) as zf:
-                zf.extractall(install_dir)
+            try:
+                with zipfile.ZipFile(package_path) as zf:
+                    bad_member = zf.testzip()
+                    if bad_member:
+                        raise ValueError(f"El ZIP está dañado en: {bad_member}")
+                    zf.extractall(install_dir)
+            except zipfile.BadZipFile as exc:
+                raise ValueError("El paquete descargado no es un ZIP válido o quedó incompleto.") from exc
             pmtiles_path = self._find_pmtiles_file(install_dir)
         else:
             pmtiles_name = entry.get("destination_file") or package_path.name
@@ -709,6 +776,8 @@ class OfflineMapsService:
 
         if not pmtiles_path or not pmtiles_path.exists():
             raise ValueError("El paquete no contiene un archivo .pmtiles utilizable.")
+
+        _validate_pmtiles_signature(pmtiles_path)
 
         package_metadata = _load_json(install_dir / "metadata.json", {})
         pmtiles_info = self._safe_pmtiles_info(entry, package_metadata, pmtiles_path)

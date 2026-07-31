@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import math
+import os
 import shutil
 from pathlib import Path
 
@@ -30,7 +31,8 @@ def split_installer(source: Path, output_dir: Path, chunk_size: int) -> list[Pat
     parts: list[Path] = []
     with source.open("rb") as input_handle:
         for index in range(1, total + 1):
-            part = output_dir / f"tlamatini-5.2.4-windows-installer.chunk-{index:03d}-of-{total:03d}"
+            version = os.environ.get("TLAMATINI_APP_VERSION", "5.2.5").strip() or "5.2.5"
+            part = output_dir / f"tlamatini-{version}-windows-installer.chunk-{index:03d}-of-{total:03d}"
             remaining = chunk_size
             with part.open("wb") as output_handle:
                 while remaining:

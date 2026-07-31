@@ -15,10 +15,12 @@ FALLBACK_REASON_ENV = "TLAMATINI_STORAGE_FALLBACK_REASON"
 FALLBACK_ROOT_ENV = "TLAMATINI_STORAGE_FALLBACK_ROOT"
 if getattr(sys, "frozen", False) and getattr(sys, "_MEIPASS", ""):
     executable_root = Path(sys.executable).resolve().parent
+    RESOURCE_ROOT = Path(sys._MEIPASS).resolve()
     PROJECT_ROOT = executable_root if (executable_root / "local_ai").exists() else Path(sys._MEIPASS).resolve()
 else:
     PROJECT_ROOT = Path(__file__).resolve().parent.parent
-APP_ASSETS_DIR = PROJECT_ROOT / "assets"
+    RESOURCE_ROOT = PROJECT_ROOT
+APP_ASSETS_DIR = RESOURCE_ROOT / "assets"
 
 
 def _set_secure_permissions(path: Path, *, is_dir: bool) -> None:
@@ -149,7 +151,7 @@ def _build_paths(root_dir: Path) -> AppPaths:
         offline_license_code_file=license_dir / "license_code.txt",
         installation_id_file=license_dir / "installation_identity.json",
         user_profile_file=root_dir / "user_profile.json",
-        bundled_public_key_file=PROJECT_ROOT / "public_license_key.pem",
+        bundled_public_key_file=RESOURCE_ROOT / "public_license_key.pem",
         local_updates_dir=updates_dir,
         local_ai_root=local_ai_root_dir,
         local_ai_config_dir=local_ai_root_dir / "config",

@@ -7,6 +7,7 @@ permissions:
   contents: write
 
 env:
+  TLAMATINI_APP_VERSION: "5.2.5"
   TLAMATINI_AI_BACKEND: local
   TLAMATINI_SKIP_RUNTIME_VERIFY: "1"
   TLAMATINI_GEMMA3_URL: https://huggingface.co/bartowski/google_gemma-3-4b-it-GGUF/resolve/main/google_gemma-3-4b-it-Q4_K_M.gguf?download=true
@@ -65,4 +66,4 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           $files = @(Get-ChildItem -File dist\windows-release | Sort-Object Name | ForEach-Object { $_.FullName })
-          gh release upload v5.2.4 $files --clobber --repo $env:GITHUB_REPOSITORY
+          gh release upload v5.2.5 $files --clobber --repo $env:GITHUB_REPOSITORY

@@ -34,7 +34,7 @@ from core.planes import listar_planes
 from core.resiliencia import estimar_agua_disponible_litros, estimar_reserva_agua, estimar_reserva_comida
 from core.update_checker import UpdateChecker
 from core.window_geometry import aplicar_geometria_relativa
-from core.path_manager import PROJECT_ROOT, get_paths
+from core.path_manager import APP_ASSETS_DIR, PROJECT_ROOT, get_paths
 from core.installation_identity import get_installation_payload
 from core.license_request import build_manual_license_request
 from core.user_profile import is_profile_complete, load_user_profile, save_user_profile
@@ -358,7 +358,7 @@ class DashboardTLAMATINI:
         self.root.bind("<FocusIn>", self._al_recuperar_foco)
 
     def _aplicar_icono_ventana(self):
-        icon_path = PROJECT_ROOT / "assets" / "app_icon.png"
+        icon_path = APP_ASSETS_DIR / "app_icon.png"
         if not icon_path.exists():
             return
         try:
@@ -477,7 +477,7 @@ class DashboardTLAMATINI:
         self.license_info_row.pack(fill="x", padx=22, pady=(0, 18))
 
     def _crear_logo_header(self, parent):
-        logo_path = PROJECT_ROOT / "assets" / "logo_tlamatini.png"
+        logo_path = APP_ASSETS_DIR / "logo_tlamatini.png"
         if not logo_path.exists():
             return None
         try:

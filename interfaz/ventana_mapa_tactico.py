@@ -4,7 +4,7 @@ from typing import Dict
 
 from core.capas_tacticas import LAYER_DEFS, agregar_poligono_tactico, agregar_punto_tactico, agregar_ruta_tactica, importar_geojson_capa, resumen_capas
 from core.mapas_offline import get_offline_maps_service
-from core.mapas_repo import obtener_mapa, obtener_mapa_activo, registrar_mapa_tiles
+from core.mapas_repo import obtener_mapa, obtener_mapa_activo, registrar_mapa_pmtiles, registrar_mapa_tiles
 from core.window_geometry import aplicar_geometria_relativa, habilitar_scroll_mouse
 from interfaz.mapa_canvas import OfflineMapCanvas
 from interfaz.mapa_runtime import open_map_viewer, update_map_runtime
@@ -47,6 +47,26 @@ class VentanaMapa(tk.Toplevel):
             fg="#cbd5e1",
         ).pack(anchor="w", pady=(4, 0))
 
+        actions = tk.Frame(header, bg="#111827")
+        actions.pack(anchor="w", pady=(10, 0))
+        for label, command, color in (
+            ("Descargar seleccionado", self._download_selected, "#2563eb"),
+            ("Importar PMTiles/ZIP", self._import_pmtiles_file, "#0f766e"),
+            ("Activar instalado", self._activate_selected, "#16a34a"),
+            ("Abrir visor", self._open_viewer, "#7c3aed"),
+        ):
+            tk.Button(
+                actions,
+                text=label,
+                command=command,
+                bg=color,
+                fg="white",
+                activeforeground="white",
+                relief="flat",
+                padx=10,
+                pady=5,
+            ).pack(side="left", padx=(0, 8))
+
         body = tk.PanedWindow(root, orient="horizontal", sashwidth=8, bg="#111827")
         body.pack(fill="both", expand=True)
 
@@ -79,6 +99,7 @@ class VentanaMapa(tk.Toplevel):
             self.catalog_tree.heading(col, text=title)
             self.catalog_tree.column(col, width=width, stretch=True)
         self.catalog_tree.bind("<<TreeviewSelect>>", self._on_catalog_select)
+        self.catalog_tree.bind("<Double-1>", lambda _event: self._download_selected())
         self.catalog_tree.bind("<Button-3>", self._show_catalog_menu)
         catalog_scroll = ttk.Scrollbar(catalog_panel, orient="vertical", command=self.catalog_tree.yview)
         self.catalog_tree.configure(yscrollcommand=catalog_scroll.set)
@@ -95,6 +116,7 @@ class VentanaMapa(tk.Toplevel):
             self.installed_tree.heading(col, text=title)
             self.installed_tree.column(col, width=width, stretch=True)
         self.installed_tree.bind("<<TreeviewSelect>>", self._on_installed_select)
+        self.installed_tree.bind("<Double-1>", lambda _event: self._activate_selected())
         self.installed_tree.bind("<Button-3>", self._show_installed_menu)
         installed_scroll = ttk.Scrollbar(installed_panel, orient="vertical", command=self.installed_tree.yview)
         self.installed_tree.configure(yscrollcommand=installed_scroll.set)
@@ -160,6 +182,7 @@ class VentanaMapa(tk.Toplevel):
             menu.add_command(label="Cancelar descarga", command=self._cancel_selected_download)
             menu.add_separator()
         menu.add_command(label="Actualizar catálogo", command=self._refresh_all)
+        menu.add_command(label="Importar archivo PMTiles/ZIP", command=self._import_pmtiles_file)
         menu.add_command(label="Importar carpeta XYZ", command=self._import_xyz_folder)
         try:
             menu.tk_popup(event.x_root, event.y_root)
@@ -418,6 +441,30 @@ class VentanaMapa(tk.Toplevel):
             messagebox.showinfo("Mapa importado", "Mapa XYZ importado correctamente.")
         except Exception as exc:
             messagebox.showerror("Importación", str(exc))
+
+    def _import_pmtiles_file(self):
+        path = filedialog.askopenfilename(
+            title="Seleccionar mapa PMTiles o paquete ZIP",
+            filetypes=[("Mapas PMTiles", "*.pmtiles *.zip"), ("Todos", "*.*")],
+        )
+        if not path:
+            return
+        suggested = path.rsplit("/", 1)[-1].rsplit("\\", 1)[-1]
+        for suffix in (".pmtiles", ".zip"):
+            if suggested.lower().endswith(suffix):
+                suggested = suggested[:-len(suffix)]
+        name = simpledialog.askstring("Nombre del mapa", "Nombre del mapa:", parent=self, initialvalue=suggested)
+        if not name:
+            return
+        region = simpledialog.askstring("Región", "Región del mapa:", parent=self, initialvalue="México") or "México"
+        try:
+            mapa = registrar_mapa_pmtiles(nombre=name, ruta_archivo=path, region=region)
+            self.selected_installed_id = mapa["id"]
+            self.service.set_active_map(mapa["id"])
+            self._refresh_all()
+            messagebox.showinfo("Mapa importado", "El mapa se validó, importó y activó correctamente.")
+        except Exception as exc:
+            messagebox.showerror("No se pudo abrir el mapa", str(exc))
 
     def _reload_active_map(self):
         active = self.service.get_active_map()

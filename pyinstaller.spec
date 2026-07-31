@@ -112,8 +112,8 @@ if sys.platform == "darwin":
             "CFBundleName": APP_NAME,
             "CFBundleDisplayName": APP_NAME,
             "CFBundleIdentifier": "com.tlamatini.desktop",
-            "CFBundleShortVersionString": os.environ.get("TLAMATINI_APP_VERSION", "5.2.4"),
-            "CFBundleVersion": os.environ.get("TLAMATINI_APP_VERSION", "5.2.4"),
+            "CFBundleShortVersionString": os.environ.get("TLAMATINI_APP_VERSION", "5.2.5"),
+            "CFBundleVersion": os.environ.get("TLAMATINI_APP_VERSION", "5.2.5"),
             "NSHighResolutionCapable": True,
         },
     )

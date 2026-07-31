@@ -6,10 +6,10 @@ from copy import deepcopy
 from pathlib import Path
 from typing import Any, Dict, Optional
 
-from core.path_manager import APP_ASSETS_DIR, PROJECT_ROOT, get_paths
+from core.path_manager import APP_ASSETS_DIR, PROJECT_ROOT, RESOURCE_ROOT, get_paths
 
 
-APP_DIR = PROJECT_ROOT
+APP_DIR = RESOURCE_ROOT
 BASE_DIR = APP_DIR
 _APP_PATHS = get_paths()
 DATA_DIR = _APP_PATHS.data_dir
@@ -35,7 +35,7 @@ ESTRUCTURA_BASE: Dict[str, Any] = {
     "configuracion": {
         "nombre_sistema": "TLAMATINI IA",
         "modo_operacion": "local",
-        "version": "5.2.4",
+        "version": "5.2.5",
         "tema": {
             "color_principal": "#0F172A",
             "color_secundario": "#111827",

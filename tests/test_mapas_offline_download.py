@@ -1,6 +1,10 @@
+import json
+from pathlib import Path
+
+import pytest
 import requests
 
-from core.mapas_offline import OfflineMapsService
+from core.mapas_offline import OfflineMapsService, _validate_pmtiles_signature
 
 
 class _FakeStreamResponse:
@@ -52,3 +56,29 @@ def test_remote_download_ready_returns_false_for_not_found_without_get(monkeypat
 
     assert OfflineMapsService()._remote_download_ready("https://example.test/map.zip") is False
     assert calls["get"] == 0
+
+
+def test_builtin_catalog_contains_mexico_and_all_32_entities():
+    catalog_path = Path(__file__).parents[1] / "assets" / "offline_maps" / "catalog.json"
+    maps = json.loads(catalog_path.read_text(encoding="utf-8"))["maps"]
+    state_maps = [item for item in maps if item["id"].endswith("-estado")]
+
+    assert any(item["id"] == "mexico-completo" for item in maps)
+    assert len(state_maps) == 32
+    assert all(item.get("schema") == "shortbread" for item in state_maps)
+    assert all(item.get("generator", {}).get("kind") == "bbbike_extract" for item in state_maps)
+
+
+def test_pmtiles_signature_rejects_incomplete_or_html_download(tmp_path):
+    bad_map = tmp_path / "mapa.pmtiles"
+    bad_map.write_text("<html>Error 503</html>", encoding="utf-8")
+
+    with pytest.raises(ValueError, match="descarga incompleta"):
+        _validate_pmtiles_signature(bad_map)
+
+
+def test_pmtiles_signature_accepts_version_3_header(tmp_path):
+    valid_map = tmp_path / "mapa.pmtiles"
+    valid_map.write_bytes(b"PMTiles\x03" + bytes(120))
+
+    _validate_pmtiles_signature(valid_map)

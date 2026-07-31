@@ -209,11 +209,11 @@ Contenido mínimo a distribuir:
 
 ## Linux
 
-### Paquete 5.2.4
+### Paquete 5.2.5
 
 Para distribuir el modo de uso libre, usar el paquete:
 
-- `dist/tlamatini-5.2.4-amd64.deb`
+- `dist/tlamatini-5.2.5-amd64.deb`
 
 Ese paquete no requiere prueba, suscripción ni código de activación para entrar.
 Incluye el ejecutable, el runtime local y Gemma 3; no requiere descargar la IA después de instalarlo.
@@ -222,11 +222,11 @@ Instalación limpia sobre una versión anterior:
 
 ```bash
 sudo apt remove -y tlamatini
-sudo apt install ./dist/tlamatini-5.2.4-amd64.deb
+sudo apt install ./dist/tlamatini-5.2.5-amd64.deb
 dpkg -l | grep -i tlamatini
 ```
 
-La verificación debe mostrar `5.2.4`.
+La verificación debe mostrar `5.2.5`.
 
 ### Build Full
 

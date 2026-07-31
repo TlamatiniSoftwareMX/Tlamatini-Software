@@ -37,6 +37,26 @@ def registrar_mapa_tiles(
     )
 
 
+def registrar_mapa_pmtiles(
+    nombre: str,
+    ruta_archivo: str,
+    descripcion: str = "",
+    region: str = "manual",
+    lat_centro: float = 19.4326,
+    lon_centro: float = -99.1332,
+    zoom_inicial: int = 8,
+) -> Dict:
+    return get_offline_maps_service().import_pmtiles_file(
+        file_path=ruta_archivo,
+        name=nombre,
+        region=region,
+        description=descripcion,
+        center_lat=lat_centro,
+        center_lon=lon_centro,
+        default_zoom=zoom_inicial,
+    )
+
+
 def seleccionar_mapa_activo(mapa_id: str) -> bool:
     return get_offline_maps_service().set_active_map(mapa_id)
 
