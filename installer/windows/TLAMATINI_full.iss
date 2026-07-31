@@ -1,5 +1,5 @@
 #define MyAppName "TLAMATINI"
-#define MyAppVersion "5.2.5"
+#define MyAppVersion "5.2.6"
 #define MyAppPublisher "TLAMATINI"
 #define MyAppExeName "TLAMATINI.exe"
 

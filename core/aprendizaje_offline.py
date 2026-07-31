@@ -22,6 +22,7 @@ from core.texto import normalizar_texto
 
 
 CATALOG_ASSET_PATH = APP_DIR / "assets" / "offline_learning" / "catalog.json"
+PRACTICAL_GUIDES_ASSET_PATH = APP_DIR / "assets" / "offline_learning" / "practical_guides.json"
 LOCAL_LEARNING_DIR = offline_learning_dir()
 CATALOG_DIR = LOCAL_LEARNING_DIR / "catalog"
 COURSES_DIR = LOCAL_LEARNING_DIR / "courses"
@@ -278,6 +279,11 @@ def load_catalog() -> List[Dict]:
     _ensure_dirs()
     payload = _load_json(CATALOG_ASSET_PATH, {"entries": []})
     entries = payload.get("entries", []) if isinstance(payload, dict) else []
+    practical_payload = _load_json(PRACTICAL_GUIDES_ASSET_PATH, {"entries": []})
+    practical_entries = practical_payload.get("entries", []) if isinstance(practical_payload, dict) else []
+    # Las guías incluidas viven en un archivo separado para poder ampliarlas sin
+    # convertir el catálogo de descargas remotas en un archivo inmanejable.
+    entries = [*entries, *practical_entries]
     state = _reconcile_state(load_state(), entries)
     merged = [_merge_status(entry, state) for entry in entries if isinstance(entry, dict) and entry.get("id")]
     _atomic_write_json(CATALOG_CACHE_PATH, {"generated_at": _now_label(), "entries": merged})
@@ -433,9 +439,28 @@ def _lesson_from_mediawiki(lesson: Dict) -> Dict:
 
 def _download_lesson(lesson: Dict) -> Dict:
     source_type = str(lesson.get("source_type", "mediawiki") or "mediawiki")
-    if source_type != "mediawiki":
-        raise ValueError(f"Tipo de lección no soportado: {source_type}")
-    return _lesson_from_mediawiki(lesson)
+    if source_type == "mediawiki":
+        return _lesson_from_mediawiki(lesson)
+    if source_type == "embedded":
+        text_body = str(lesson.get("text", "") or "").strip()
+        if not text_body:
+            raise ValueError("La lección incluida no tiene contenido.")
+        return {
+            "id": lesson.get("id", ""),
+            "title": lesson.get("title", lesson.get("id", "")),
+            "module_id": lesson.get("module_id", ""),
+            "module_title": lesson.get("module_title", ""),
+            "source_url": lesson.get("source_url", ""),
+            "downloaded_at": _now_label(),
+            "html": "",
+            "text": text_body,
+            "sections": lesson.get("sections", []) or [],
+            "word_count": len(text_body.split()),
+            "included_offline": True,
+            "safety": lesson.get("safety", ""),
+            "sources": lesson.get("sources", []) or [],
+        }
+    raise ValueError(f"Tipo de lección no soportado: {source_type}")
 
 
 def download_course(

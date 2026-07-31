@@ -8,8 +8,8 @@ class DashboardLicenseFlowTests(unittest.TestCase):
     def test_current_version_label_uses_runtime_version(self):
         app = dashboard.DashboardTLAMATINI.__new__(dashboard.DashboardTLAMATINI)
         app.update_checker = mock.Mock()
-        app.update_checker.local_state.return_value = {"current_version": "5.2.5"}
-        self.assertEqual(app._current_version_label(), "Versión 5.2.5")
+        app.update_checker.local_state.return_value = {"current_version": "5.2.6"}
+        self.assertEqual(app._current_version_label(), "Versión 5.2.6")
 
     def test_dashboard_license_request_uses_manual_format(self):
         app = dashboard.DashboardTLAMATINI.__new__(dashboard.DashboardTLAMATINI)

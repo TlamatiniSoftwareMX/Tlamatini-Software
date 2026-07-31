@@ -35,7 +35,7 @@ ESTRUCTURA_BASE: Dict[str, Any] = {
     "configuracion": {
         "nombre_sistema": "TLAMATINI IA",
         "modo_operacion": "local",
-        "version": "5.2.5",
+        "version": "5.2.6",
         "tema": {
             "color_principal": "#0F172A",
             "color_secundario": "#111827",

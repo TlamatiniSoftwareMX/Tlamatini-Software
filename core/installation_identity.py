@@ -6,7 +6,7 @@ from uuid import uuid4
 from core.local_license_store import load_installation_identity, save_installation_identity
 from core.memoria import obtener_seccion
 
-DEFAULT_APP_VERSION = "5.2.5"
+DEFAULT_APP_VERSION = "5.2.6"
 
 
 def _utcnow_iso() -> str:

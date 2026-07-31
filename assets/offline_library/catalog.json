@@ -394,6 +394,23 @@
       "tags": ["reparacion", "diy", "mantenimiento", "herramientas", "dispositivos"]
     },
     {
+      "id": "ifixit-en-all",
+      "name": "iFixit completo en inglés",
+      "language": "en",
+      "category": "Reparacion y DIY",
+      "content_type": "Practico",
+      "size_human": "3.3 GB",
+      "description": "Colección complementaria con el catálogo completo de guías visuales de desmontaje, diagnóstico, mantenimiento y reparación de equipos.",
+      "format": "zim",
+      "download_url": "https://download.kiwix.org/zim/ifixit/ifixit_en_all_2025-12.zim",
+      "filename": "ifixit_en_all_2025-12.zim",
+      "version": "2025-12",
+      "source": "Kiwix / iFixit",
+      "source_url": "https://download.kiwix.org/zim/ifixit/",
+      "reader_hint": "pesado",
+      "tags": ["repair", "teardown", "maintenance", "tools", "electronics", "appliances", "vehicles"]
+    },
+    {
       "id": "phet-es-all",
       "name": "PhET Simulaciones en espanol",
       "language": "es",

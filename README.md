@@ -1,4 +1,4 @@
-# TLAMATINI 5.2.5
+# TLAMATINI 5.2.6
 
 TLAMATINI es una aplicación de escritorio con herramientas de consulta,
 organización, mapas, cámara e inteligencia artificial local integrada.
@@ -13,8 +13,8 @@ y elige las instrucciones de tu sistema.
 Descarga en una misma carpeta:
 
 - Los 42 archivos llamados
-  `tlamatini-5.2.5-windows-installer.chunk-001-of-042` hasta
-  `tlamatini-5.2.5-windows-installer.chunk-042-of-042`.
+  `tlamatini-5.2.6-windows-installer.chunk-001-of-042` hasta
+  `tlamatini-5.2.6-windows-installer.chunk-042-of-042`.
 - `INSTALAR-TLAMATINI-WINDOWS.cmd`.
 - `INSTALAR-TLAMATINI-WINDOWS.ps1`.
 - `SHA256-WINDOWS-INSTALADOR.txt`.
@@ -27,8 +27,8 @@ el instalador y abrirá la instalación de TLAMATINI.
 Descarga en una misma carpeta:
 
 - Los 44 archivos llamados
-  `tlamatini-5.2.5-linux-amd64.chunk-001-of-044` hasta
-  `tlamatini-5.2.5-linux-amd64.chunk-044-of-044`.
+  `tlamatini-5.2.6-linux-amd64.chunk-001-of-044` hasta
+  `tlamatini-5.2.6-linux-amd64.chunk-044-of-044`.
 - `INSTALAR-TLAMATINI.sh`.
 
 ### Instalar en Linux

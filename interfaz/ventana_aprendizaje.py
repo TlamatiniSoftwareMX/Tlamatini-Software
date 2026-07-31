@@ -900,7 +900,7 @@ class VentanaAprendizaje:
         actions.pack(fill="x", padx=16, pady=(12, 16))
         download_btn = tk.Button(
             actions,
-            text="Descargar",
+            text="Instalar incluido" if item.get("format") == "embedded_course" else "Descargar",
             command=lambda course_id=item["id"]: self._download_by_id(course_id),
             bg=PALETA["accent"],
             fg="white",
@@ -1169,7 +1169,9 @@ class VentanaAprendizaje:
         elif selected_catalog and status in {"descargando", "instalando", "en_cola"}:
             self.btn_primary_download.configure(text="En preparación")
         else:
-            self.btn_primary_download.configure(text="Descargar")
+            self.btn_primary_download.configure(
+                text="Instalar incluido" if selected_catalog and selected_catalog.get("format") == "embedded_course" else "Descargar"
+            )
         self.btn_primary_download.configure(state=("normal" if selected_catalog and status not in {"descargando", "instalando", "en_cola", "listo", "instalado"} and not worker_busy else "disabled"))
         self.btn_primary_continue.configure(state=("normal" if selected_course and status in {"listo", "instalado"} else "disabled"))
         self.btn_primary_open.configure(state=("normal" if selected_installed else "disabled"))
@@ -1234,9 +1236,16 @@ class VentanaAprendizaje:
             self.queue.put({"event": "download_done", "course_id": course_id, "message": f"Curso listo: {item.get('name', course_id)}", "result": result})
 
         self.active_download_course_id = course_id
-        self.var_status.set(f"Descargando {item.get('name', course_id)}...")
+        included = item.get("format") == "embedded_course"
+        self.var_status.set(
+            f"Instalando contenido incluido: {item.get('name', course_id)}..."
+            if included else f"Descargando {item.get('name', course_id)}..."
+        )
         self.var_download_meta.set("0.0% · fase: preparando")
-        self.var_download_activity.set("Iniciando descarga y preparación del curso.")
+        self.var_download_activity.set(
+            "Copiando las guías incluidas; no se necesita internet."
+            if included else "Iniciando descarga y preparación del curso."
+        )
         self.var_progress.set(0.0)
         self._apply_download_payload({"course_id": course_id, "status": "en_cola", "progress": 0.0, "phase": "preparando"})
         self._run_worker(task, on_error_message=f"No se pudo descargar {item.get('name', course_id)}")

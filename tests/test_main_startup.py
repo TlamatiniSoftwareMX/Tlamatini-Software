@@ -41,15 +41,15 @@ class MainStartupTests(unittest.TestCase):
 
     def test_get_app_version_ignores_legacy_51_value(self):
         with mock.patch("core.installation_identity.obtener_seccion", return_value={"version": "5.1"}):
-            self.assertEqual(get_app_version(), "5.2.5")
+            self.assertEqual(get_app_version(), "5.2.6")
 
     def test_get_app_version_ignores_older_saved_value(self):
         with mock.patch("core.installation_identity.obtener_seccion", return_value={"version": "5.2.2"}):
-            self.assertEqual(get_app_version(), "5.2.5")
+            self.assertEqual(get_app_version(), "5.2.6")
 
     def test_get_app_version_allows_newer_saved_value(self):
-        with mock.patch("core.installation_identity.obtener_seccion", return_value={"version": "5.2.5"}):
-            self.assertEqual(get_app_version(), "5.2.5")
+        with mock.patch("core.installation_identity.obtener_seccion", return_value={"version": "5.2.6"}):
+            self.assertEqual(get_app_version(), "5.2.6")
 
 
 if __name__ == "__main__":

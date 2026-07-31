@@ -24,14 +24,14 @@ Ese zip es para soporte tecnico o instalaciones portables. No es la descarga pri
 
 Archivo recomendado para usuarios de Ubuntu, Debian, Linux Mint y derivados:
 
-- `tlamatini-5.2.5-amd64.deb`
+- `tlamatini-5.2.6-amd64.deb`
 
 El paquete Linux Full incluye el runtime de IA local y Gemma 3 dentro del instalador.
 
 Instalacion:
 
 ```bash
-sudo apt install ./tlamatini-5.2.5-amd64.deb
+sudo apt install ./tlamatini-5.2.6-amd64.deb
 ```
 
 Archivo alternativo:

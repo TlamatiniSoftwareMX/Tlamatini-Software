@@ -248,7 +248,7 @@ def _write_release_manifest(target: Path) -> None:
         "app": "TLAMATINI",
         "edition": "full",
         "platform": _host_platform_tag(),
-        "version": os.environ.get("TLAMATINI_APP_VERSION", "5.2.5"),
+        "version": os.environ.get("TLAMATINI_APP_VERSION", "5.2.6"),
         "ai_backend": "local",
         "primary_model": "gemma3:4b",
         "model_path": "embedded",
@@ -343,7 +343,7 @@ def _write_release_metadata() -> Path:
         "app": "TLAMATINI",
         "edition": "full",
         "platform": _host_platform_tag(),
-        "version": os.environ.get("TLAMATINI_APP_VERSION", "5.2.5"),
+        "version": os.environ.get("TLAMATINI_APP_VERSION", "5.2.6"),
     }
     checksums_json = DIST_DIR / "SHA256SUMS.json"
     if checksums_json.exists():

@@ -1,6 +1,6 @@
 {
   "name": "tlamatini",
-  "version": "5.2.5",
+  "version": "5.2.6",
   "description": "TLAMATINI es una aplicación de escritorio con módulos offline e inteligencia artificial local.",
   "main": "index.js",
   "directories": {
