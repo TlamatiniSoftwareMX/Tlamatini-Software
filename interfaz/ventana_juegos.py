@@ -200,7 +200,6 @@ class VentanaJuegos(tk.Toplevel):
                     ("★", "Última Carta", "Descarta por color o símbolo contra la computadora.", self._abrir_ultima_carta),
                     ("▦", "Sudoku", "Sudoku simple con validación local.", self._abrir_sudoku),
                     ("🂠", "Memoria", "Voltea cartas y encuentra parejas.", self._abrir_memoria),
-                    ("·—", "Misión Morse", "Descifra señales y forma palabras con puntos y rayas.", self._abrir_morse),
                 ],
             ),
             (
@@ -213,10 +212,11 @@ class VentanaJuegos(tk.Toplevel):
                 ],
             ),
             (
-                "Acción",
-                "Partidas rápidas con controles de teclado.",
+                "Acción y entrenamiento",
+                "Partidas rápidas y práctica de habilidades.",
                 [
                     ("⚔", "Duelo Arena", "Pelea contra un rival controlado por la computadora.", self._abrir_duelo),
+                    ("·—", "Misión Morse", "Descifra señales y forma palabras con puntos y rayas.", self._abrir_morse),
                 ],
             ),
         ]
