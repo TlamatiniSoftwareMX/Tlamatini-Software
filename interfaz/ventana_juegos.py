@@ -1,5 +1,6 @@
 import random
 import tkinter as tk
+import unicodedata
 from copy import deepcopy
 from tkinter import messagebox, ttk
 
@@ -89,6 +90,45 @@ SUDOKU_PUZZLES = [
     ),
 ]
 
+MORSE_CODE = {
+    "A": ".-", "B": "-...", "C": "-.-.", "D": "-..", "E": ".", "F": "..-.",
+    "G": "--.", "H": "....", "I": "..", "J": ".---", "K": "-.-", "L": ".-..",
+    "M": "--", "N": "-.", "O": "---", "P": ".--.", "Q": "--.-", "R": ".-.",
+    "S": "...", "T": "-", "U": "..-", "V": "...-", "W": ".--", "X": "-..-",
+    "Y": "-.--", "Z": "--..", "0": "-----", "1": ".----", "2": "..---",
+    "3": "...--", "4": "....-", "5": ".....", "6": "-....", "7": "--...",
+    "8": "---..", "9": "----.",
+}
+MORSE_WORDS = [
+    "AGUA", "AYUDA", "CASA", "CLAVE", "EQUIPO", "FARO", "LUZ", "MAPA", "NORTE",
+    "RADIO", "RED", "RUTA", "SALUD", "SEÑAL", "SOL", "TIERRA", "TREN", "VIDA",
+]
+
+
+def _normalize_morse_text(text):
+    decomposed = unicodedata.normalize("NFD", str(text or "").upper())
+    return "".join(char for char in decomposed if unicodedata.category(char) != "Mn")
+
+
+def encode_morse(text):
+    words = []
+    for word in _normalize_morse_text(text).split():
+        encoded = [MORSE_CODE[char] for char in word if char in MORSE_CODE]
+        if encoded:
+            words.append(" ".join(encoded))
+    return " / ".join(words)
+
+
+def decode_morse(code):
+    reverse = {value: key for key, value in MORSE_CODE.items()}
+    normalized = " ".join(str(code or "").replace("/", " / ").split())
+    words = []
+    for group in normalized.split(" / "):
+        letters = [reverse.get(symbol, "?") for symbol in group.split()]
+        if letters:
+            words.append("".join(letters))
+    return " ".join(words)
+
 
 def _log_juegos_warning(message: str):
     registrar_log("warning", message, "juegos")
@@ -160,6 +200,7 @@ class VentanaJuegos(tk.Toplevel):
                     ("★", "Última Carta", "Descarta por color o símbolo contra la computadora.", self._abrir_ultima_carta),
                     ("▦", "Sudoku", "Sudoku simple con validación local.", self._abrir_sudoku),
                     ("🂠", "Memoria", "Voltea cartas y encuentra parejas.", self._abrir_memoria),
+                    ("·—", "Misión Morse", "Descifra señales y forma palabras con puntos y rayas.", self._abrir_morse),
                 ],
             ),
             (
@@ -236,6 +277,9 @@ class VentanaJuegos(tk.Toplevel):
 
     def _abrir_duelo(self):
         ArenaDuelWindow(self.master_root, self)
+
+    def _abrir_morse(self):
+        MorseMissionWindow(self.master_root, self)
 
 
 class BoardGameWindow:
@@ -1306,6 +1350,142 @@ class ArenaDuelWindow:
         self.top.destroy()
 
 
+class MorseMissionWindow:
+    def __init__(self, master, focus_parent):
+        self.top = _open_game_window(master, focus_parent, "Misión Morse", rel_w=0.68, rel_h=0.82, min_w=920, min_h=720)
+        self.score = 0
+        self.streak = 0
+        self.round = 0
+        self.mode = "decode"
+        self.word = ""
+
+        header = tk.Frame(self.top, bg=UI_JUEGOS["bg"])
+        header.pack(fill="x", padx=22, pady=(20, 12))
+        tk.Label(header, text="Misión Morse", font=("Arial", 22, "bold"), bg=UI_JUEGOS["bg"], fg=UI_JUEGOS["text"]).pack(anchor="w")
+        tk.Label(
+            header,
+            text="Alterna entre recibir mensajes y construir palabras con punto y raya.",
+            font=("Arial", 10), bg=UI_JUEGOS["bg"], fg=UI_JUEGOS["text_dim"],
+        ).pack(anchor="w", pady=(4, 0))
+
+        body = tk.Frame(self.top, bg=UI_JUEGOS["bg"])
+        body.pack(fill="both", expand=True, padx=22, pady=(0, 18))
+        body.grid_columnconfigure(0, weight=3)
+        body.grid_columnconfigure(1, weight=2)
+        body.grid_rowconfigure(0, weight=1)
+
+        mission = _panel(body, "Reto actual", "Punto = señal corta · Raya = tres unidades")
+        mission.grid(row=0, column=0, sticky="nsew", padx=(0, 8))
+        reference = _panel(body, "Tabla de referencia", "Usa la tabla al aprender; intenta depender menos de ella con cada ronda.")
+        reference.grid(row=0, column=1, sticky="nsew", padx=(8, 0))
+
+        self.mode_var = tk.StringVar()
+        self.prompt_var = tk.StringVar()
+        self.status_var = tk.StringVar()
+        self.score_var = tk.StringVar()
+        tk.Label(mission, textvariable=self.mode_var, font=("Arial", 12, "bold"), bg=UI_JUEGOS["panel"], fg=UI_JUEGOS["accent"]).pack(anchor="w", padx=16, pady=(4, 8))
+        tk.Label(
+            mission, textvariable=self.prompt_var, font=("DejaVu Sans Mono", 22, "bold"),
+            bg=UI_JUEGOS["panel_alt"], fg=UI_JUEGOS["text"], justify="center", wraplength=500,
+            padx=16, pady=22,
+        ).pack(fill="x", padx=16, pady=(0, 12))
+
+        tk.Label(mission, text="Tu respuesta", font=("Arial", 10, "bold"), bg=UI_JUEGOS["panel"], fg=UI_JUEGOS["text_dim"]).pack(anchor="w", padx=16)
+        self.answer = tk.Entry(
+            mission, font=("DejaVu Sans Mono", 17, "bold"), bg="#07111f", fg=UI_JUEGOS["text"],
+            insertbackground="white", relief="flat", justify="center",
+        )
+        self.answer.pack(fill="x", padx=16, pady=(6, 10), ipady=10)
+        self.answer.bind("<Return>", lambda _event: self.check_answer())
+
+        symbols = tk.Frame(mission, bg=UI_JUEGOS["panel"])
+        symbols.pack(fill="x", padx=16, pady=(0, 10))
+        for label, value in (("Punto  ·", "."), ("Raya  —", "-"), ("Separar letra", " ")):
+            tk.Button(
+                symbols, text=label, command=lambda token=value: self._append_symbol(token),
+                bg=UI_JUEGOS["panel_alt"], fg=UI_JUEGOS["text"], relief="flat", padx=12, pady=8,
+            ).pack(side="left", padx=(0, 7))
+        tk.Button(symbols, text="Borrar", command=self._backspace, bg=UI_JUEGOS["danger"], fg="white", relief="flat", padx=12, pady=8).pack(side="right")
+
+        actions = tk.Frame(mission, bg=UI_JUEGOS["panel"])
+        actions.pack(fill="x", padx=16, pady=(0, 10))
+        tk.Button(actions, text="Comprobar", command=self.check_answer, bg=UI_JUEGOS["success"], fg="white", relief="flat", padx=15, pady=9, font=("Arial", 10, "bold")).pack(side="left")
+        tk.Button(actions, text="Pista", command=self.show_hint, bg=UI_JUEGOS["warning"], fg="#271400", relief="flat", padx=15, pady=9, font=("Arial", 10, "bold")).pack(side="left", padx=8)
+        tk.Button(actions, text="Siguiente", command=self.new_round, bg=UI_JUEGOS["accent"], fg="#05243a", relief="flat", padx=15, pady=9, font=("Arial", 10, "bold")).pack(side="right")
+
+        tk.Label(mission, textvariable=self.status_var, font=("Arial", 10), bg=UI_JUEGOS["panel"], fg=UI_JUEGOS["text_dim"], wraplength=520, justify="left").pack(anchor="w", padx=16, pady=(0, 7))
+        tk.Label(mission, textvariable=self.score_var, font=("Arial", 11, "bold"), bg=UI_JUEGOS["panel"], fg=UI_JUEGOS["accent"]).pack(anchor="w", padx=16, pady=(0, 16))
+
+        rows = ["A .-     B -...   C -.-.   D -..", "E .      F ..-.   G --.    H ....", "I ..     J .---   K -.-    L .-..", "M --     N -.     O ---    P .--.", "Q --.-   R .-.    S ...    T -", "U ..-    V ...-   W .--    X -..-", "Y -.--   Z --..", "1 .----  2 ..---  3 ...--", "4 ....-  5 .....  6 -....", "7 --...  8 ---..  9 ----.  0 -----"]
+        tk.Label(
+            reference, text="\n".join(rows), font=("DejaVu Sans Mono", 11), bg=UI_JUEGOS["panel"],
+            fg=UI_JUEGOS["text"], justify="left", anchor="nw",
+        ).pack(fill="both", expand=True, padx=16, pady=(4, 12))
+        tk.Label(
+            reference, text="Espacio: separa letras\nBarra /: separa palabras\nSOS: ... --- ...",
+            font=("Arial", 10, "bold"), bg=UI_JUEGOS["panel_alt"], fg=UI_JUEGOS["warning"],
+            justify="left", padx=12, pady=12,
+        ).pack(fill="x", padx=16, pady=(0, 16))
+
+        self.new_round()
+
+    def _append_symbol(self, token):
+        self.answer.insert("end", token)
+        self.answer.focus_set()
+
+    def _backspace(self):
+        value = self.answer.get()
+        self.answer.delete(0, "end")
+        self.answer.insert(0, value[:-1])
+        self.answer.focus_set()
+
+    def new_round(self):
+        self.round += 1
+        self.word = random.choice([word for word in MORSE_WORDS if word != self.word])
+        self.mode = "decode" if self.round % 2 else "encode"
+        self.answer.delete(0, "end")
+        if self.mode == "decode":
+            self.mode_var.set("RECEPCIÓN · Descifra la palabra")
+            self.prompt_var.set(encode_morse(self.word))
+            self.status_var.set("Escribe la palabra que representa la señal.")
+        else:
+            self.mode_var.set("TRANSMISIÓN · Construye la señal")
+            self.prompt_var.set(_normalize_morse_text(self.word))
+            self.status_var.set("Escribe puntos y rayas, separando cada letra con un espacio.")
+        self._update_score()
+        self.answer.focus_set()
+
+    def check_answer(self):
+        raw = self.answer.get().strip()
+        expected = _normalize_morse_text(self.word) if self.mode == "decode" else encode_morse(self.word)
+        actual = _normalize_morse_text(raw) if self.mode == "decode" else " ".join(raw.replace("/", " / ").split())
+        if actual == expected:
+            self.score += 10 + min(self.streak * 2, 10)
+            self.streak += 1
+            self.status_var.set(f"¡Correcto! {self.word} = {encode_morse(self.word)}")
+            self.top.after(850, self.new_round)
+        else:
+            self.streak = 0
+            self.status_var.set("Aún no coincide. Revisa cada letra y la separación; puedes pedir una pista.")
+        self._update_score()
+
+    def show_hint(self):
+        self.score = max(0, self.score - 2)
+        if self.mode == "decode":
+            self.status_var.set(f"Pista: empieza con {self.word[0]} ({encode_morse(self.word[0])}) y tiene {len(self.word)} letras.")
+        else:
+            first = _normalize_morse_text(self.word)[0]
+            self.status_var.set(f"Pista: {first} se codifica {MORSE_CODE[first]}. Separa todas las letras con espacios.")
+        self._update_score()
+
+    def _update_score(self):
+        self.score_var.set(f"Puntos: {self.score}   ·   Racha: {self.streak}   ·   Ronda: {self.round}")
+
+
 __all__ = [
     "VentanaJuegos",
+    "MorseMissionWindow",
+    "MORSE_CODE",
+    "encode_morse",
+    "decode_morse",
 ]

@@ -1,0 +1,77 @@
+{
+  "generated_at": "2026-08-01",
+  "entries": [
+    {
+      "id": "telegrafo-codigo-morse-es",
+      "name": "Telégrafo y código Morse",
+      "language": "es",
+      "category": "Comunicacion",
+      "level": "Básico a práctico",
+      "size_human": "Incluido offline",
+      "content_type": "Curso interactivo incluido",
+      "description": "Aprende el origen del telégrafo, el alfabeto Morse, el ritmo de transmisión y la composición de mensajes breves y claros.",
+      "format": "embedded_course",
+      "version": "2026.08",
+      "source": "TLAMATINI · UIT y práctica operativa",
+      "source_url": "https://www.itu.int/rec/R-REC-M.1677/",
+      "tags": ["morse", "telegrafo", "comunicacion", "radio", "señales", "alfabeto", "offline"],
+      "modules": [
+        {
+          "id": "fundamentos-morse",
+          "title": "Del telégrafo al ritmo Morse",
+          "lessons": [
+            {
+              "id": "telegrafo-y-morse",
+              "title": "El telégrafo y el código Morse",
+              "source_type": "embedded",
+              "source_url": "https://www.itu.int/rec/R-REC-M.1677/",
+              "sections": [{"line": "Telégrafo"}, {"line": "Código"}, {"line": "Uso actual"}],
+              "text": "El telégrafo eléctrico permitió enviar información mediante cambios breves y largos en una señal. El código Morse representa letras, números y signos con puntos y rayas; no depende de una voz clara y puede transmitirse con sonido, luz, radio o pulsos visibles.\n\nUn punto es una señal corta y una raya dura tres veces más. Morse no es un idioma: es una codificación. El texto debe prepararse antes de transmitir para reducir dudas y repeticiones.\n\nActualmente se usa para formación, radioafición, señalización y práctica de comunicaciones. No sustituye los procedimientos oficiales de emergencia ni autoriza a transmitir en frecuencias reguladas. Practica primero con luz, sonidos locales o el juego incluido en TLAMATINI."
+            },
+            {
+              "id": "tiempos-y-separacion",
+              "title": "Puntos, rayas y silencios",
+              "source_type": "embedded",
+              "sections": [{"line": "Unidad"}, {"line": "Separación"}, {"line": "Ritmo"}],
+              "text": "Toda la temporización Morse parte de una unidad. El punto dura una unidad; la raya, tres. Dentro de una letra se deja una unidad sin señal. Entre letras se dejan tres unidades y entre palabras siete.\n\nLa letra A se escucha punto-raya: una unidad activa, una de silencio y tres activas. SOS se forma con tres puntos, tres rayas y tres puntos, respetando las pausas entre letras. No se transmite como una sucesión atropellada.\n\nPractica golpeando una mesa: corto para punto, largo para raya. Mantén velocidad lenta y constante antes de acelerarte. El ritmo correcto importa más que la rapidez. Si pierdes una letra al recibir, deja un espacio y continúa; detenerte a adivinar hace que pierdas el resto del mensaje."
+            },
+            {
+              "id": "alfabeto-por-familias",
+              "title": "Aprender el alfabeto por familias",
+              "source_type": "embedded",
+              "sections": [{"line": "Primeras letras"}, {"line": "Familias"}, {"line": "Números"}],
+              "text": "Empieza con contrastes fáciles: E es punto, T es raya, I son dos puntos, A es punto-raya, N es raya-punto y M son dos rayas. Después amplía por familias de ritmo, no memorizando una tabla completa de una vez.\n\nLetras frecuentes: S es tres puntos; O, tres rayas; R, punto-raya-punto; K, raya-punto-raya; D, raya-punto-punto; U, punto-punto-raya. Los números siguen una progresión: 1 es punto y cuatro rayas; se agregan puntos hasta 5, que son cinco puntos; de 6 a 0 aumentan las rayas.\n\nHaz sesiones de diez minutos. Escucha o mira el patrón y responde con la letra completa. Evita contar puntos mentalmente: aprende el sonido y la forma rítmica como una sola unidad."
+            }
+          ]
+        },
+        {
+          "id": "mensajes-practicos",
+          "title": "Construir y recibir mensajes",
+          "lessons": [
+            {
+              "id": "codificar-palabras",
+              "title": "De letras a palabras",
+              "source_type": "embedded",
+              "sections": [{"line": "Preparar"}, {"line": "Codificar"}, {"line": "Revisar"}],
+              "text": "Para codificar una palabra, normalízala primero: escríbela en mayúsculas, evita adornos y separa claramente cada letra. CASA se convierte en raya-punto-raya-punto, punto-raya, tres puntos, punto-raya. En escritura se usa un espacio entre letras y una barra entre palabras.\n\nTrabaja en columnas: texto original, código y verificación inversa. Después de codificar, vuelve a descifrar tu resultado sin mirar el original. Así detectas letras omitidas o separaciones incorrectas.\n\nComienza con palabras cortas como SOL, AGUA, CASA, RADIO y AYUDA. Luego combina frases: PUNTO SEGURO o NECESITO AGUA. Los acentos se suelen normalizar a la letra base cuando el procedimiento usado no define caracteres extendidos. Nunca inventes abreviaturas en un mensaje importante sin acordarlas antes."
+            },
+            {
+              "id": "mensaje-operativo",
+              "title": "Mensaje breve y confirmación",
+              "source_type": "embedded",
+              "sections": [{"line": "Estructura"}, {"line": "Confirmar"}, {"line": "Bitácora"}],
+              "text": "Un mensaje operativo debe indicar destinatario, remitente, hora, ubicación, situación, necesidad y próxima acción. Redáctalo antes de tocar la llave o encender la luz. Usa frases cortas y datos verificables.\n\nTransmite grupos pequeños y deja tiempo para copiar. Los números, nombres y coordenadas se repiten. El receptor confirma repitiendo la parte crítica; decir solamente recibido no demuestra que el dato llegó bien. Si hay un error, se detiene el grupo y se vuelve a enviar con claridad.\n\nRegistra fecha, hora, canal o medio, remitente, destinatario y texto confirmado. Distingue hechos de rumores. No transmitas información personal innecesaria. SOS es una señal internacional de socorro y no debe usarse como juego en un medio real donde pueda movilizar ayuda."
+            },
+            {
+              "id": "practica-progresiva",
+              "title": "Plan de práctica y ejercicio final",
+              "source_type": "embedded",
+              "sections": [{"line": "Rutina"}, {"line": "Ejercicio"}, {"line": "Evaluación"}],
+              "text": "Practica cinco letras nuevas junto con cinco conocidas. Haz tres rondas: reconocer el patrón, producirlo y usarlo dentro de palabras. Cuando logres ocho de diez respuestas correctas sin contar símbolos, agrega letras nuevas.\n\nEjercicio final: prepara el mensaje EQUIPO DOS EN CASA. NECESITA AGUA. PROXIMO CONTACTO 18 HORAS. Codifícalo por palabras, verifica cada grupo y entrégalo a otra persona para que lo descifre. Comparen el resultado con el original y marquen errores de letra, ritmo o separación.\n\nEvalúa exactitud antes que velocidad. Una meta inicial razonable es recibir palabras cortas con al menos ochenta por ciento de aciertos. Usa Misión Morse en Juegos para alternar codificación y lectura. En comunicaciones reales respeta licencias, frecuencias, privacidad y procedimientos locales."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

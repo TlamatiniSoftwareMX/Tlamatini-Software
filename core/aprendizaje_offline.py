@@ -23,6 +23,7 @@ from core.texto import normalizar_texto
 
 CATALOG_ASSET_PATH = APP_DIR / "assets" / "offline_learning" / "catalog.json"
 PRACTICAL_GUIDES_ASSET_PATH = APP_DIR / "assets" / "offline_learning" / "practical_guides.json"
+MORSE_COURSE_ASSET_PATH = APP_DIR / "assets" / "offline_learning" / "morse_course.json"
 LOCAL_LEARNING_DIR = offline_learning_dir()
 CATALOG_DIR = LOCAL_LEARNING_DIR / "catalog"
 COURSES_DIR = LOCAL_LEARNING_DIR / "courses"
@@ -281,9 +282,11 @@ def load_catalog() -> List[Dict]:
     entries = payload.get("entries", []) if isinstance(payload, dict) else []
     practical_payload = _load_json(PRACTICAL_GUIDES_ASSET_PATH, {"entries": []})
     practical_entries = practical_payload.get("entries", []) if isinstance(practical_payload, dict) else []
+    morse_payload = _load_json(MORSE_COURSE_ASSET_PATH, {"entries": []})
+    morse_entries = morse_payload.get("entries", []) if isinstance(morse_payload, dict) else []
     # Las guías incluidas viven en un archivo separado para poder ampliarlas sin
     # convertir el catálogo de descargas remotas en un archivo inmanejable.
-    entries = [*entries, *practical_entries]
+    entries = [*entries, *practical_entries, *morse_entries]
     state = _reconcile_state(load_state(), entries)
     merged = [_merge_status(entry, state) for entry in entries if isinstance(entry, dict) and entry.get("id")]
     _atomic_write_json(CATALOG_CACHE_PATH, {"generated_at": _now_label(), "entries": merged})
