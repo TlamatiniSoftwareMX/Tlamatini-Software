@@ -124,6 +124,39 @@ def _validate_pmtiles_signature(path: Path) -> None:
         )
 
 
+def _configured_map_bounds(entry: Dict) -> List[float]:
+    """Return the catalog bounds used to request an extract, when available."""
+    explicit = entry.get("bounds")
+    if isinstance(explicit, (list, tuple)) and len(explicit) == 4:
+        return [float(value) for value in explicit]
+
+    generator = entry.get("generator") or {}
+    bbox = generator.get("bbox") or {}
+    bbox_keys = ("sw_lng", "sw_lat", "ne_lng", "ne_lat")
+    if all(isinstance(bbox.get(key), (int, float)) for key in bbox_keys):
+        return [float(bbox[key]) for key in bbox_keys]
+
+    coords = generator.get("coords") or []
+    valid_coords = [point for point in coords if isinstance(point, (list, tuple)) and len(point) >= 2]
+    if valid_coords:
+        longitudes = [float(point[0]) for point in valid_coords]
+        latitudes = [float(point[1]) for point in valid_coords]
+        return [min(longitudes), min(latitudes), max(longitudes), max(latitudes)]
+    return []
+
+
+def _reliable_map_bounds(entry: Dict, pmtiles_bounds) -> List[float]:
+    """Prefer catalog extract bounds over known-bad bounds emitted by BBBike."""
+    configured = _configured_map_bounds(entry)
+    if configured:
+        return configured
+    if isinstance(pmtiles_bounds, (list, tuple)) and len(pmtiles_bounds) == 4:
+        west, south, east, north = [float(value) for value in pmtiles_bounds]
+        if -180 <= west < east <= 180 and -90 <= south < north <= 90:
+            return [west, south, east, north]
+    return []
+
+
 def _merge_map(base: Dict, overlay: Dict) -> Dict:
     result = dict(base)
     result.update({k: v for k, v in overlay.items() if v is not None})
@@ -808,7 +841,7 @@ class OfflineMapsService:
             "catalog_id": entry["id"],
             "state": "installed",
             "viewer_mode": pmtiles_info.get("viewer_mode", "pmtiles_vector"),
-            "bounds": pmtiles_info.get("bounds", []),
+            "bounds": _reliable_map_bounds(entry, pmtiles_info.get("bounds", [])),
             "pmtiles_metadata": pmtiles_info.get("metadata", {}),
         }
         return installed

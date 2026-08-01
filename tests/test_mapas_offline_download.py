@@ -4,7 +4,12 @@ from pathlib import Path
 import pytest
 import requests
 
-from core.mapas_offline import OfflineMapsService, _validate_pmtiles_signature
+from core.mapas_offline import (
+    OfflineMapsService,
+    _configured_map_bounds,
+    _reliable_map_bounds,
+    _validate_pmtiles_signature,
+)
 
 
 class _FakeStreamResponse:
@@ -67,6 +72,38 @@ def test_builtin_catalog_contains_mexico_and_all_32_entities():
     assert len(state_maps) == 32
     assert all(item.get("schema") == "shortbread" for item in state_maps)
     assert all(item.get("generator", {}).get("kind") == "bbbike_extract" for item in state_maps)
+
+    for item in maps:
+        west, south, east, north = _configured_map_bounds(item)
+        assert -180 <= west < east <= 180
+        assert -90 <= south < north <= 90
+        assert west <= item["center_lon"] <= east
+        assert south <= item["center_lat"] <= north
+
+    xalapa = next(item for item in maps if item["id"] == "xalapa-veracruz")
+    assert _configured_map_bounds(xalapa) == [-97.25, 19.25, -96.55, 19.85]
+    assert xalapa["default_zoom"] == 10
+
+
+def test_catalog_bounds_replace_bbbike_zero_longitude_header():
+    entry = {
+        "center_lon": -96.9102,
+        "center_lat": 19.5438,
+        "generator": {
+            "bbox": {"sw_lng": -97.25, "sw_lat": 19.25, "ne_lng": -96.55, "ne_lat": 19.85}
+        },
+    }
+
+    assert _reliable_map_bounds(entry, [-97.05, 19.45, 0.0, 19.65]) == [
+        -97.25,
+        19.25,
+        -96.55,
+        19.85,
+    ]
+
+
+def test_valid_pmtiles_bounds_remain_available_without_catalog_bounds():
+    assert _reliable_map_bounds({}, [-100.0, 18.0, -96.0, 22.0]) == [-100.0, 18.0, -96.0, 22.0]
 
 
 def test_pmtiles_signature_rejects_incomplete_or_html_download(tmp_path):
