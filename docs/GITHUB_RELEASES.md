@@ -64,7 +64,8 @@ macOS:
 Descargas recomendadas para usuarios:
 
 - Windows: `TLAMATINI-Windows-Instalador-Full.exe`
-- Linux Debian/Ubuntu/Mint: `tlamatini-5.2.6-amd64.deb`
+- Linux Debian/Ubuntu/Mint: un comando con `INSTALAR-TLAMATINI.sh`, que descarga
+  y verifica automáticamente las partes publicadas.
 
 Los `.zip` y `.tar.gz` quedan como alternativas tecnicas/portables. Todos los paquetes incluyen:
 

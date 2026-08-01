@@ -22,16 +22,14 @@ Ese zip es para soporte tecnico o instalaciones portables. No es la descarga pri
 
 ## Linux
 
-Archivo recomendado para usuarios de Ubuntu, Debian, Linux Mint y derivados:
-
-- `tlamatini-5.2.6-amd64.deb`
+Instalacion recomendada para usuarios de Ubuntu, Debian, Linux Mint y derivados:
 
 El paquete Linux Full incluye el runtime de IA local y Gemma 3 dentro del instalador.
 
-Instalacion:
+Un solo comando descarga las partes publicadas, verifica el paquete y lo instala:
 
 ```bash
-sudo apt install ./tlamatini-5.2.6-amd64.deb
+curl -fsSL https://github.com/TlamatiniSoftwareMX/Tlamatini-Software/releases/latest/download/INSTALAR-TLAMATINI.sh | bash
 ```
 
 Archivo alternativo:

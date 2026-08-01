@@ -24,28 +24,21 @@ el instalador y abrirá la instalación de TLAMATINI.
 
 ## Linux
 
-Descarga en una misma carpeta:
-
-- Los 44 archivos llamados
-  `tlamatini-5.2.6-linux-amd64.chunk-001-of-044` hasta
-  `tlamatini-5.2.6-linux-amd64.chunk-044-of-044`.
-- `INSTALAR-TLAMATINI.sh`.
-
 ### Instalar en Linux
 
 TLAMATINI es compatible con Debian, Ubuntu y Linux Mint de 64 bits. Se
 recomiendan al menos 8 GB de memoria RAM y aproximadamente 5 GB de espacio
 libre durante la instalación.
 
-Abre una terminal en la carpeta donde guardaste los archivos y ejecuta:
+Abre una terminal y ejecuta este único comando:
 
 ```bash
-bash INSTALAR-TLAMATINI.sh
+curl -fsSL https://github.com/TlamatiniSoftwareMX/Tlamatini-Software/releases/latest/download/INSTALAR-TLAMATINI.sh | bash
 ```
 
-El instalador unirá y verificará automáticamente las 44 partes. Después
-solicitará tu contraseña de administrador e instalará TLAMATINI junto con sus
-dependencias.
+El instalador descargará, unirá y verificará automáticamente las 44 partes.
+Después solicitará tu contraseña de administrador e instalará TLAMATINI junto
+con sus dependencias.
 
 ## Abrir TLAMATINI
 
@@ -61,8 +54,8 @@ siguientes porque el modelo local se inicia por primera vez.
 
 ## Solución de problemas
 
-- Si falta una parte, confirma que los 44 fragmentos estén en la misma carpeta.
-- Si falla la verificación, vuelve a descargar el fragmento indicado.
+- Si se interrumpe la descarga, ejecuta nuevamente el mismo comando.
+- Si falla la verificación, vuelve a ejecutar el comando para descargar copias nuevas.
 - Si la cámara no abre, comprueba que esté conectada y que otra aplicación no
   la esté utilizando.
-- Conserva los fragmentos hasta que la instalación termine correctamente.
+- Los archivos temporales se eliminan automáticamente al terminar.
