@@ -112,6 +112,9 @@ def main() -> int:
             "_abrir_memoria",
             "_abrir_snake",
             "_abrir_tetris",
+            "_abrir_ultima_carta",
+            "_abrir_carrera",
+            "_abrir_duelo",
         ):
             before = set(root.winfo_children())
             getattr(menu, method_name)()

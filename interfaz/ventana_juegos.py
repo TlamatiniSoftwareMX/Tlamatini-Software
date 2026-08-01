@@ -138,8 +138,10 @@ class VentanaJuegos(tk.Toplevel):
 
         body = tk.Frame(self, bg=UI_JUEGOS["bg"])
         body.pack(fill="both", expand=True, padx=20, pady=(0, 20))
-        for col in range(3):
+        for col in range(2):
             body.grid_columnconfigure(col, weight=1, uniform="games")
+        for row in range(2):
+            body.grid_rowconfigure(row, weight=1, uniform="games_rows")
 
         categorias = [
             (
@@ -152,9 +154,10 @@ class VentanaJuegos(tk.Toplevel):
                 ],
             ),
             (
-                "Mentales",
-                "Juegos ligeros de memoria y lógica.",
+                "Cartas y lógica",
+                "Retos contra la computadora y juegos mentales.",
                 [
+                    ("★", "Última Carta", "Descarta por color o símbolo contra la computadora.", self._abrir_ultima_carta),
                     ("▦", "Sudoku", "Sudoku simple con validación local.", self._abrir_sudoku),
                     ("🂠", "Memoria", "Voltea cartas y encuentra parejas.", self._abrir_memoria),
                 ],
@@ -165,13 +168,22 @@ class VentanaJuegos(tk.Toplevel):
                 [
                     ("S", "Snake", "Control con flechas y colisiones.", self._abrir_snake),
                     ("T", "Tetris", "Piezas, líneas y caída automática.", self._abrir_tetris),
+                    ("🏎", "Carrera Neón", "Esquiva tráfico y aumenta tu velocidad.", self._abrir_carrera),
+                ],
+            ),
+            (
+                "Acción",
+                "Partidas rápidas con controles de teclado.",
+                [
+                    ("⚔", "Duelo Arena", "Pelea contra un rival controlado por la computadora.", self._abrir_duelo),
                 ],
             ),
         ]
 
-        for col, (title, subtitle, juegos) in enumerate(categorias):
+        for index, (title, subtitle, juegos) in enumerate(categorias):
+            row, col = divmod(index, 2)
             panel = _panel(body, title, subtitle)
-            panel.grid(row=0, column=col, sticky="nsew", padx=8, pady=0)
+            panel.grid(row=row, column=col, sticky="nsew", padx=8, pady=8)
             for icon, name, desc, callback in juegos:
                 card = tk.Frame(panel, bg=UI_JUEGOS["panel_alt"], highlightthickness=1, highlightbackground=UI_JUEGOS["border"], cursor="hand2")
                 card.pack(fill="x", padx=14, pady=(0, 10))
@@ -215,6 +227,15 @@ class VentanaJuegos(tk.Toplevel):
 
     def _abrir_tetris(self):
         TetrisWindow(self.master_root, self)
+
+    def _abrir_ultima_carta(self):
+        LastCardWindow(self.master_root, self)
+
+    def _abrir_carrera(self):
+        NeonRaceWindow(self.master_root, self)
+
+    def _abrir_duelo(self):
+        ArenaDuelWindow(self.master_root, self)
 
 
 class BoardGameWindow:
@@ -879,6 +900,409 @@ class TetrisWindow:
             except Exception as exc:
                 _log_juegos_warning(f"No se pudo cancelar el temporizador de Tetris al cerrar: {exc}")
             self.job = None
+        self.top.destroy()
+
+
+CARD_COLORS = {
+    "Rojo": "#ef4444",
+    "Azul": "#3b82f6",
+    "Verde": "#22c55e",
+    "Amarillo": "#eab308",
+}
+
+
+def _card_playable(card, top_card):
+    return card[0] == top_card[0] or card[1] == top_card[1]
+
+
+class LastCardWindow:
+    def __init__(self, master, focus_parent):
+        self.top = _open_game_window(master, focus_parent, "Última Carta", rel_w=0.68, rel_h=0.72, min_w=920, min_h=700)
+        self.job = None
+        self.deck = []
+        self.player = []
+        self.computer = []
+        self.discard = []
+        self.player_turn = True
+        self.finished = False
+        self._crear_ui()
+        self.top.protocol("WM_DELETE_WINDOW", self.close)
+        self.reset()
+
+    def _crear_ui(self):
+        header = tk.Frame(self.top, bg=UI_JUEGOS["bg"])
+        header.pack(fill="x", padx=18, pady=(16, 10))
+        tk.Label(header, text="Última Carta", font=("Arial", 21, "bold"), bg=UI_JUEGOS["bg"], fg=UI_JUEGOS["text"]).pack(anchor="w")
+        tk.Label(header, text="Juega una carta del mismo color o símbolo. Gana quien se quede sin cartas.", font=("Arial", 10), bg=UI_JUEGOS["bg"], fg=UI_JUEGOS["text_dim"]).pack(anchor="w", pady=(4, 0))
+
+        table = tk.Frame(self.top, bg="#064e3b", highlightthickness=1, highlightbackground=UI_JUEGOS["border"])
+        table.pack(fill="both", expand=True, padx=18, pady=(0, 12))
+        self.computer_var = tk.StringVar(value="")
+        tk.Label(table, textvariable=self.computer_var, font=("Arial", 12, "bold"), bg="#064e3b", fg="white").pack(pady=(22, 18))
+        center = tk.Frame(table, bg="#064e3b")
+        center.pack(expand=True)
+        self.top_card = tk.Label(center, text="", width=8, height=4, font=("Arial", 18, "bold"), relief="raised", bd=3)
+        self.top_card.pack(side="left", padx=16)
+        self.draw_btn = tk.Button(center, text="Robar\ncarta", width=9, height=4, font=("Arial", 11, "bold"), bg=UI_JUEGOS["panel_alt"], fg=UI_JUEGOS["text"], relief="flat", command=self.draw_card)
+        self.draw_btn.pack(side="left", padx=16)
+        self.hand_frame = tk.Frame(table, bg="#064e3b")
+        self.hand_frame.pack(fill="x", padx=16, pady=(20, 16))
+
+        footer = tk.Frame(self.top, bg=UI_JUEGOS["bg"])
+        footer.pack(fill="x", padx=18, pady=(0, 16))
+        self.status = tk.StringVar(value="")
+        tk.Label(footer, textvariable=self.status, font=("Arial", 10), bg=UI_JUEGOS["bg"], fg=UI_JUEGOS["text_dim"]).pack(side="left")
+        tk.Button(footer, text="Nueva partida", font=("Arial", 10, "bold"), bg=UI_JUEGOS["accent"], fg="#05243a", relief="flat", command=self.reset).pack(side="right")
+
+    def _new_deck(self):
+        cards = []
+        for color in CARD_COLORS:
+            cards.extend((color, str(value)) for value in range(10))
+            cards.extend((color, action) for action in ("Salta", "+2"))
+        return cards * 2
+
+    def reset(self):
+        if self.job:
+            try:
+                self.top.after_cancel(self.job)
+            except Exception:
+                pass
+            self.job = None
+        self.deck = self._new_deck()
+        random.shuffle(self.deck)
+        self.player = [self.deck.pop() for _ in range(7)]
+        self.computer = [self.deck.pop() for _ in range(7)]
+        first = self.deck.pop()
+        while first[1] in {"Salta", "+2"}:
+            self.deck.insert(0, first)
+            first = self.deck.pop()
+        self.discard = [first]
+        self.player_turn = True
+        self.finished = False
+        self.status.set("Tu turno: selecciona una carta o roba.")
+        self.draw()
+
+    def _refill_deck(self):
+        if self.deck or len(self.discard) <= 1:
+            return
+        top = self.discard.pop()
+        self.deck = self.discard
+        random.shuffle(self.deck)
+        self.discard = [top]
+
+    def _take(self, hand, amount=1):
+        for _ in range(amount):
+            self._refill_deck()
+            if self.deck:
+                hand.append(self.deck.pop())
+
+    def draw(self):
+        card = self.discard[-1]
+        self.top_card.configure(text=card[1], bg=CARD_COLORS[card[0]], fg="white")
+        self.computer_var.set(f"Computadora: {len(self.computer)} carta(s)")
+        for widget in self.hand_frame.winfo_children():
+            widget.destroy()
+        for index, item in enumerate(self.player):
+            state = "normal" if self.player_turn and not self.finished and _card_playable(item, card) else "disabled"
+            button = tk.Button(
+                self.hand_frame,
+                text=f"{item[1]}\n{item[0]}",
+                width=9,
+                height=3,
+                font=("Arial", 9, "bold"),
+                bg=CARD_COLORS[item[0]],
+                fg="white",
+                disabledforeground="#cbd5e1",
+                relief="raised",
+                command=lambda i=index: self.play(i),
+                state=state,
+            )
+            row, column = divmod(index, 8)
+            button.grid(row=row, column=column, padx=3, pady=3, sticky="ew")
+            self.hand_frame.grid_columnconfigure(column, weight=1)
+        self.draw_btn.configure(state="normal" if self.player_turn and not self.finished else "disabled")
+
+    def play(self, index):
+        if not self.player_turn or self.finished or not (0 <= index < len(self.player)):
+            return
+        card = self.player[index]
+        if not _card_playable(card, self.discard[-1]):
+            return
+        self.player.pop(index)
+        self.discard.append(card)
+        if not self.player:
+            self._finish("¡Ganaste la partida!")
+            return
+        if len(self.player) == 1:
+            self.status.set("¡Última carta!")
+        if card[1] == "+2":
+            self._take(self.computer, 2)
+        self.player_turn = card[1] == "Salta"
+        self.draw()
+        if self.player_turn:
+            self.status.set("Saltaste el turno de la computadora. Juegas otra vez.")
+        else:
+            self.status.set("Turno de la computadora...")
+            self.job = self.top.after(650, self._computer_turn)
+
+    def draw_card(self):
+        if not self.player_turn or self.finished:
+            return
+        self._take(self.player)
+        self.player_turn = False
+        self.status.set("Robaste una carta. Turno de la computadora...")
+        self.draw()
+        self.job = self.top.after(650, self._computer_turn)
+
+    def _computer_turn(self):
+        self.job = None
+        if self.finished or not self.top.winfo_exists():
+            return
+        playable = [index for index, card in enumerate(self.computer) if _card_playable(card, self.discard[-1])]
+        if not playable:
+            self._take(self.computer)
+            playable = [index for index, card in enumerate(self.computer) if _card_playable(card, self.discard[-1])]
+        if playable:
+            index = random.choice(playable)
+            card = self.computer.pop(index)
+            self.discard.append(card)
+            if not self.computer:
+                self._finish("La computadora ganó. ¡Inténtalo de nuevo!")
+                return
+            if card[1] == "+2":
+                self._take(self.player, 2)
+            if card[1] == "Salta":
+                self.status.set("La computadora saltó tu turno.")
+                self.draw()
+                self.job = self.top.after(650, self._computer_turn)
+                return
+        self.player_turn = True
+        self.status.set("Tu turno: selecciona una carta o roba.")
+        self.draw()
+
+    def _finish(self, text):
+        self.finished = True
+        self.status.set(text)
+        self.draw()
+        messagebox.showinfo("Última Carta", text, parent=self.top)
+
+    def close(self):
+        if self.job:
+            try:
+                self.top.after_cancel(self.job)
+            except Exception:
+                pass
+        self.top.destroy()
+
+
+class NeonRaceWindow:
+    WIDTH = 520
+    HEIGHT = 620
+    LANES = (130, 260, 390)
+
+    def __init__(self, master, focus_parent):
+        self.top = _open_game_window(master, focus_parent, "Carrera Neón", rel_w=0.58, rel_h=0.78, min_w=800, min_h=760)
+        self.canvas = tk.Canvas(self.top, width=self.WIDTH, height=self.HEIGHT, bg="#020617", highlightthickness=1, highlightbackground=UI_JUEGOS["border"])
+        self.canvas.pack(padx=16, pady=(16, 8))
+        footer = tk.Frame(self.top, bg=UI_JUEGOS["bg"])
+        footer.pack(fill="x", padx=16, pady=(0, 16))
+        self.status = tk.StringVar(value="")
+        tk.Label(footer, textvariable=self.status, font=("Arial", 10), bg=UI_JUEGOS["bg"], fg=UI_JUEGOS["text_dim"]).pack(side="left")
+        tk.Button(footer, text="Reiniciar", font=("Arial", 10, "bold"), bg=UI_JUEGOS["accent"], fg="#05243a", relief="flat", command=self.reset).pack(side="right")
+        self.top.bind("<Left>", lambda _event: self.move(-1))
+        self.top.bind("<Right>", lambda _event: self.move(1))
+        self.top.bind("<a>", lambda _event: self.move(-1))
+        self.top.bind("<d>", lambda _event: self.move(1))
+        self.top.protocol("WM_DELETE_WINDOW", self.close)
+        self.job = None
+        self.reset()
+
+    def reset(self):
+        if self.job:
+            try:
+                self.top.after_cancel(self.job)
+            except Exception:
+                pass
+        self.lane = 1
+        self.traffic = []
+        self.score = 0
+        self.frame = 0
+        self.running = True
+        self.draw()
+        self.tick()
+
+    def move(self, direction):
+        if self.running:
+            self.lane = max(0, min(2, self.lane + direction))
+            self.draw()
+
+    def tick(self):
+        if not self.running or not self.top.winfo_exists():
+            return
+        self.frame += 1
+        speed = min(15, 7 + self.score // 12)
+        if self.frame % max(18, 38 - self.score // 4) == 0:
+            available = [lane for lane in range(3) if not any(car[0] == lane and car[1] < 150 for car in self.traffic)]
+            if available:
+                self.traffic.append([random.choice(available), -90, random.choice(("#f43f5e", "#a855f7", "#f59e0b"))])
+        for car in self.traffic:
+            car[1] += speed
+        passed = [car for car in self.traffic if car[1] > self.HEIGHT]
+        self.score += len(passed)
+        self.traffic = [car for car in self.traffic if car[1] <= self.HEIGHT]
+        player_x = self.LANES[self.lane]
+        for lane, y, _color in self.traffic:
+            if lane == self.lane and y + 80 >= 520 and y <= 600:
+                self.running = False
+                self.status.set(f"Choque. Puntaje final: {self.score}")
+                self.draw()
+                return
+        self.draw()
+        self.status.set(f"Puntaje: {self.score}  |  Velocidad: {speed}  |  Flechas o A/D")
+        self.job = self.top.after(45, self.tick)
+
+    def draw(self):
+        self.canvas.delete("all")
+        self.canvas.create_rectangle(55, 0, 465, self.HEIGHT, fill="#111827", outline="#38bdf8", width=4)
+        offset = (self.frame * 12) % 80
+        for x in (195, 325):
+            for y in range(-80, self.HEIGHT + 80, 80):
+                self.canvas.create_rectangle(x - 4, y + offset, x + 4, y + 42 + offset, fill="#e2e8f0", outline="")
+        for lane, y, color in self.traffic:
+            self._car(self.LANES[lane], y, color)
+        self._car(self.LANES[self.lane], 520, UI_JUEGOS["accent"])
+
+    def _car(self, x, y, color):
+        self.canvas.create_rectangle(x - 34, y, x + 34, y + 78, fill=color, outline="#f8fafc", width=2)
+        self.canvas.create_rectangle(x - 22, y + 12, x + 22, y + 35, fill="#0f172a", outline="")
+        for dx in (-39, 39):
+            self.canvas.create_rectangle(x + dx - 4, y + 12, x + dx + 4, y + 30, fill="#020617", outline="")
+            self.canvas.create_rectangle(x + dx - 4, y + 52, x + dx + 4, y + 70, fill="#020617", outline="")
+
+    def close(self):
+        self.running = False
+        if self.job:
+            try:
+                self.top.after_cancel(self.job)
+            except Exception:
+                pass
+        self.top.destroy()
+
+
+class ArenaDuelWindow:
+    WIDTH = 760
+    HEIGHT = 460
+
+    def __init__(self, master, focus_parent):
+        self.top = _open_game_window(master, focus_parent, "Duelo Arena", rel_w=0.7, rel_h=0.7, min_w=940, min_h=680)
+        header = tk.Frame(self.top, bg=UI_JUEGOS["bg"])
+        header.pack(fill="x", padx=16, pady=(14, 8))
+        tk.Label(header, text="Duelo Arena", font=("Arial", 20, "bold"), bg=UI_JUEGOS["bg"], fg=UI_JUEGOS["text"]).pack(anchor="w")
+        tk.Label(header, text="A/D: moverte · W: saltar · F: golpear · derrota al rival de la computadora", font=("Arial", 10), bg=UI_JUEGOS["bg"], fg=UI_JUEGOS["text_dim"]).pack(anchor="w")
+        self.canvas = tk.Canvas(self.top, width=self.WIDTH, height=self.HEIGHT, bg="#172554", highlightthickness=1, highlightbackground=UI_JUEGOS["border"])
+        self.canvas.pack(padx=16, pady=(0, 8))
+        footer = tk.Frame(self.top, bg=UI_JUEGOS["bg"])
+        footer.pack(fill="x", padx=16, pady=(0, 16))
+        self.status = tk.StringVar(value="")
+        tk.Label(footer, textvariable=self.status, font=("Arial", 10), bg=UI_JUEGOS["bg"], fg=UI_JUEGOS["text_dim"]).pack(side="left")
+        tk.Button(footer, text="Reiniciar", font=("Arial", 10, "bold"), bg=UI_JUEGOS["accent"], fg="#05243a", relief="flat", command=self.reset).pack(side="right")
+        self.keys = set()
+        for key in ("a", "d", "w", "f"):
+            self.top.bind(f"<KeyPress-{key}>", lambda _event, value=key: self.key_down(value))
+            self.top.bind(f"<KeyRelease-{key}>", lambda _event, value=key: self.keys.discard(value))
+        self.top.protocol("WM_DELETE_WINDOW", self.close)
+        self.job = None
+        self.reset()
+
+    def reset(self):
+        if self.job:
+            try:
+                self.top.after_cancel(self.job)
+            except Exception:
+                pass
+        self.player = {"x": 130.0, "y": 370.0, "vy": 0.0, "health": 100, "attack": 0, "cooldown": 0}
+        self.enemy = {"x": 630.0, "y": 370.0, "vy": 0.0, "health": 100, "attack": 0, "cooldown": 0}
+        self.keys.clear()
+        self.running = True
+        self.status.set("¡Comienza el duelo!")
+        self.draw()
+        self.tick()
+
+    def key_down(self, key):
+        if not self.running:
+            return
+        self.keys.add(key)
+        if key == "w" and self.player["y"] >= 370:
+            self.player["vy"] = -15
+        if key == "f" and self.player["cooldown"] <= 0:
+            self.player["attack"] = 8
+            self.player["cooldown"] = 18
+
+    def tick(self):
+        if not self.running or not self.top.winfo_exists():
+            return
+        if "a" in self.keys:
+            self.player["x"] -= 6
+        if "d" in self.keys:
+            self.player["x"] += 6
+        self.player["x"] = max(35, min(self.WIDTH - 35, self.player["x"]))
+        distance = self.player["x"] - self.enemy["x"]
+        if abs(distance) > 82:
+            self.enemy["x"] += 3.2 if distance > 0 else -3.2
+        elif self.enemy["cooldown"] <= 0 and random.random() < 0.08:
+            self.enemy["attack"] = 8
+            self.enemy["cooldown"] = 22
+        for fighter in (self.player, self.enemy):
+            fighter["y"] += fighter["vy"]
+            fighter["vy"] += 1.0
+            if fighter["y"] >= 370:
+                fighter["y"] = 370
+                fighter["vy"] = 0
+            fighter["attack"] = max(0, fighter["attack"] - 1)
+            fighter["cooldown"] = max(0, fighter["cooldown"] - 1)
+        if self.player["attack"] == 5 and abs(distance) < 92 and abs(self.player["y"] - self.enemy["y"]) < 65:
+            self.enemy["health"] = max(0, self.enemy["health"] - random.randint(8, 14))
+            self.enemy["x"] += 20 if distance < 0 else -20
+        if self.enemy["attack"] == 5 and abs(distance) < 92 and abs(self.player["y"] - self.enemy["y"]) < 65:
+            self.player["health"] = max(0, self.player["health"] - random.randint(6, 12))
+            self.player["x"] += 20 if distance > 0 else -20
+        if self.player["health"] <= 0 or self.enemy["health"] <= 0:
+            self.running = False
+            text = "¡Ganaste el duelo!" if self.enemy["health"] <= 0 else "El rival ganó. ¡Revancha!"
+            self.status.set(text)
+            self.draw()
+            messagebox.showinfo("Duelo Arena", text, parent=self.top)
+            return
+        self.status.set(f"Tu energía: {self.player['health']}  |  Rival: {self.enemy['health']}")
+        self.draw()
+        self.job = self.top.after(35, self.tick)
+
+    def draw(self):
+        self.canvas.delete("all")
+        self.canvas.create_rectangle(0, 420, self.WIDTH, self.HEIGHT, fill="#713f12", outline="")
+        self.canvas.create_rectangle(20, 18, 320, 42, fill="#450a0a", outline="#f8fafc")
+        self.canvas.create_rectangle(20, 18, 20 + 3 * self.player["health"], 42, fill=UI_JUEGOS["success"], outline="")
+        self.canvas.create_rectangle(440, 18, 740, 42, fill="#450a0a", outline="#f8fafc")
+        self.canvas.create_rectangle(740 - 3 * self.enemy["health"], 18, 740, 42, fill=UI_JUEGOS["danger"], outline="")
+        self._fighter(self.player, UI_JUEGOS["accent"], facing=1 if self.enemy["x"] > self.player["x"] else -1)
+        self._fighter(self.enemy, UI_JUEGOS["danger"], facing=1 if self.player["x"] > self.enemy["x"] else -1)
+
+    def _fighter(self, fighter, color, facing):
+        x, y = fighter["x"], fighter["y"]
+        self.canvas.create_oval(x - 18, y - 62, x + 18, y - 26, fill="#f1c27d", outline="#0f172a", width=2)
+        self.canvas.create_rectangle(x - 22, y - 28, x + 22, y + 28, fill=color, outline="#f8fafc", width=2)
+        self.canvas.create_line(x - 12, y + 28, x - 22, y + 50, fill="#f8fafc", width=7)
+        self.canvas.create_line(x + 12, y + 28, x + 22, y + 50, fill="#f8fafc", width=7)
+        reach = 62 if fighter["attack"] else 34
+        self.canvas.create_line(x, y - 12, x + facing * reach, y - 8, fill="#f1c27d", width=9)
+
+    def close(self):
+        self.running = False
+        if self.job:
+            try:
+                self.top.after_cancel(self.job)
+            except Exception:
+                pass
         self.top.destroy()
 
 
