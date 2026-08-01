@@ -1,7 +1,15 @@
 import random
+import math
+import shutil
+import subprocess
+import sys
+import tempfile
+import time
 import tkinter as tk
 import unicodedata
+import wave
 from copy import deepcopy
+from pathlib import Path
 from tkinter import messagebox, ttk
 
 from core.logs import registrar_log
@@ -128,6 +136,91 @@ def decode_morse(code):
         if letters:
             words.append("".join(letters))
     return " ".join(words)
+
+
+def classify_morse_press(duration_seconds, dash_threshold=0.28):
+    return "-" if float(duration_seconds) >= float(dash_threshold) else "."
+
+
+class TelegraphTone:
+    """Play a local continuous sidetone while the telegraph key is held."""
+
+    def __init__(self, widget, frequency=650):
+        self.widget = widget
+        self.frequency = int(frequency)
+        self.process = None
+        self.player = self._find_player()
+        self.wav_path = Path(tempfile.gettempdir()) / "tlamatini-morse-tone.wav"
+        self._ensure_wave_file()
+
+    @staticmethod
+    def _find_player():
+        if sys.platform.startswith("win"):
+            return "winsound"
+        for candidate in (("paplay",), ("pw-play",), ("aplay", "-q"), ("afplay",)):
+            executable = shutil.which(candidate[0])
+            if executable:
+                return (executable, *candidate[1:])
+        return None
+
+    def _ensure_wave_file(self):
+        if self.wav_path.exists() and self.wav_path.stat().st_size > 1000:
+            return
+        sample_rate = 11025
+        amplitude = 10500
+        duration_seconds = 8
+        with wave.open(str(self.wav_path), "wb") as wav_file:
+            wav_file.setnchannels(1)
+            wav_file.setsampwidth(2)
+            wav_file.setframerate(sample_rate)
+            frames = bytearray()
+            fade_samples = int(sample_rate * 0.01)
+            total = sample_rate * duration_seconds
+            for index in range(total):
+                envelope = min(1.0, index / max(1, fade_samples), (total - index) / max(1, fade_samples))
+                value = int(amplitude * envelope * math.sin(2 * math.pi * self.frequency * index / sample_rate))
+                frames.extend(value.to_bytes(2, byteorder="little", signed=True))
+            wav_file.writeframes(frames)
+
+    def start(self):
+        self.stop()
+        if self.player == "winsound":
+            try:
+                import winsound
+
+                winsound.PlaySound(str(self.wav_path), winsound.SND_FILENAME | winsound.SND_ASYNC | winsound.SND_LOOP)
+                return
+            except Exception:
+                pass
+        elif self.player:
+            try:
+                self.process = subprocess.Popen(
+                    [*self.player, str(self.wav_path)],
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL,
+                )
+                return
+            except Exception:
+                self.process = None
+        try:
+            self.widget.bell()
+        except Exception:
+            pass
+
+    def stop(self):
+        if self.player == "winsound":
+            try:
+                import winsound
+
+                winsound.PlaySound(None, winsound.SND_PURGE)
+            except Exception:
+                pass
+        if self.process and self.process.poll() is None:
+            try:
+                self.process.terminate()
+            except Exception:
+                pass
+        self.process = None
 
 
 def _log_juegos_warning(message: str):
@@ -1351,20 +1444,33 @@ class ArenaDuelWindow:
 
 
 class MorseMissionWindow:
+    DASH_THRESHOLD = 0.28
+    LETTER_GAP_MS = 720
+    WORD_GAP_MS = 1650
+
     def __init__(self, master, focus_parent):
         self.top = _open_game_window(master, focus_parent, "Misión Morse", rel_w=0.68, rel_h=0.82, min_w=920, min_h=720)
         self.score = 0
         self.streak = 0
         self.round = 0
-        self.mode = "decode"
         self.word = ""
+        self.current_signal = ""
+        self.received_letters = []
+        self.space_is_down = False
+        self.ignore_release = False
+        self.key_down_at = 0.0
+        self.letter_job = None
+        self.word_job = None
+        self.release_job = None
+        self.round_done = False
+        self.tone = TelegraphTone(self.top)
 
         header = tk.Frame(self.top, bg=UI_JUEGOS["bg"])
         header.pack(fill="x", padx=22, pady=(20, 12))
         tk.Label(header, text="Misión Morse", font=("Arial", 22, "bold"), bg=UI_JUEGOS["bg"], fg=UI_JUEGOS["text"]).pack(anchor="w")
         tk.Label(
             header,
-            text="Alterna entre recibir mensajes y construir palabras con punto y raya.",
+            text="Tu barra espaciadora es la llave del telégrafo. Escucha el tono y transmite la palabra.",
             font=("Arial", 10), bg=UI_JUEGOS["bg"], fg=UI_JUEGOS["text_dim"],
         ).pack(anchor="w", pady=(4, 0))
 
@@ -1374,44 +1480,39 @@ class MorseMissionWindow:
         body.grid_columnconfigure(1, weight=2)
         body.grid_rowconfigure(0, weight=1)
 
-        mission = _panel(body, "Reto actual", "Punto = señal corta · Raya = tres unidades")
+        mission = _panel(body, "Llave telegráfica", "Toque corto = punto · Mantener = raya · Pausa = separar letra")
         mission.grid(row=0, column=0, sticky="nsew", padx=(0, 8))
         reference = _panel(body, "Tabla de referencia", "Usa la tabla al aprender; intenta depender menos de ella con cada ronda.")
         reference.grid(row=0, column=1, sticky="nsew", padx=(8, 0))
 
-        self.mode_var = tk.StringVar()
         self.prompt_var = tk.StringVar()
+        self.live_signal_var = tk.StringVar()
+        self.decoded_var = tk.StringVar()
+        self.key_state_var = tk.StringVar(value="LLAVE LIBRE")
         self.status_var = tk.StringVar()
         self.score_var = tk.StringVar()
-        tk.Label(mission, textvariable=self.mode_var, font=("Arial", 12, "bold"), bg=UI_JUEGOS["panel"], fg=UI_JUEGOS["accent"]).pack(anchor="w", padx=16, pady=(4, 8))
+        tk.Label(mission, text="TRANSMITE ESTA PALABRA", font=("Arial", 12, "bold"), bg=UI_JUEGOS["panel"], fg=UI_JUEGOS["accent"]).pack(anchor="w", padx=16, pady=(4, 8))
         tk.Label(
-            mission, textvariable=self.prompt_var, font=("DejaVu Sans Mono", 22, "bold"),
+            mission, textvariable=self.prompt_var, font=("DejaVu Sans Mono", 27, "bold"),
             bg=UI_JUEGOS["panel_alt"], fg=UI_JUEGOS["text"], justify="center", wraplength=500,
             padx=16, pady=22,
         ).pack(fill="x", padx=16, pady=(0, 12))
 
-        tk.Label(mission, text="Tu respuesta", font=("Arial", 10, "bold"), bg=UI_JUEGOS["panel"], fg=UI_JUEGOS["text_dim"]).pack(anchor="w", padx=16)
-        self.answer = tk.Entry(
-            mission, font=("DejaVu Sans Mono", 17, "bold"), bg="#07111f", fg=UI_JUEGOS["text"],
-            insertbackground="white", relief="flat", justify="center",
+        self.key_display = tk.Label(
+            mission, textvariable=self.key_state_var, font=("Arial", 15, "bold"),
+            bg="#07111f", fg=UI_JUEGOS["text_dim"], padx=16, pady=15,
         )
-        self.answer.pack(fill="x", padx=16, pady=(6, 10), ipady=10)
-        self.answer.bind("<Return>", lambda _event: self.check_answer())
-
-        symbols = tk.Frame(mission, bg=UI_JUEGOS["panel"])
-        symbols.pack(fill="x", padx=16, pady=(0, 10))
-        for label, value in (("Punto  ·", "."), ("Raya  —", "-"), ("Separar letra", " ")):
-            tk.Button(
-                symbols, text=label, command=lambda token=value: self._append_symbol(token),
-                bg=UI_JUEGOS["panel_alt"], fg=UI_JUEGOS["text"], relief="flat", padx=12, pady=8,
-            ).pack(side="left", padx=(0, 7))
-        tk.Button(symbols, text="Borrar", command=self._backspace, bg=UI_JUEGOS["danger"], fg="white", relief="flat", padx=12, pady=8).pack(side="right")
-
-        actions = tk.Frame(mission, bg=UI_JUEGOS["panel"])
-        actions.pack(fill="x", padx=16, pady=(0, 10))
-        tk.Button(actions, text="Comprobar", command=self.check_answer, bg=UI_JUEGOS["success"], fg="white", relief="flat", padx=15, pady=9, font=("Arial", 10, "bold")).pack(side="left")
-        tk.Button(actions, text="Pista", command=self.show_hint, bg=UI_JUEGOS["warning"], fg="#271400", relief="flat", padx=15, pady=9, font=("Arial", 10, "bold")).pack(side="left", padx=8)
-        tk.Button(actions, text="Siguiente", command=self.new_round, bg=UI_JUEGOS["accent"], fg="#05243a", relief="flat", padx=15, pady=9, font=("Arial", 10, "bold")).pack(side="right")
+        self.key_display.pack(fill="x", padx=16, pady=(0, 10))
+        tk.Label(mission, text="Señal actual", font=("Arial", 10, "bold"), bg=UI_JUEGOS["panel"], fg=UI_JUEGOS["text_dim"]).pack(anchor="w", padx=16)
+        tk.Label(
+            mission, textvariable=self.live_signal_var, font=("DejaVu Sans Mono", 22, "bold"),
+            bg=UI_JUEGOS["panel"], fg=UI_JUEGOS["warning"], anchor="w",
+        ).pack(fill="x", padx=16, pady=(2, 8))
+        tk.Label(mission, text="Letras interpretadas", font=("Arial", 10, "bold"), bg=UI_JUEGOS["panel"], fg=UI_JUEGOS["text_dim"]).pack(anchor="w", padx=16)
+        tk.Label(
+            mission, textvariable=self.decoded_var, font=("DejaVu Sans Mono", 19, "bold"),
+            bg=UI_JUEGOS["panel_alt"], fg=UI_JUEGOS["success"], anchor="w", padx=12, pady=10,
+        ).pack(fill="x", padx=16, pady=(3, 10))
 
         tk.Label(mission, textvariable=self.status_var, font=("Arial", 10), bg=UI_JUEGOS["panel"], fg=UI_JUEGOS["text_dim"], wraplength=520, justify="left").pack(anchor="w", padx=16, pady=(0, 7))
         tk.Label(mission, textvariable=self.score_var, font=("Arial", 11, "bold"), bg=UI_JUEGOS["panel"], fg=UI_JUEGOS["accent"]).pack(anchor="w", padx=16, pady=(0, 16))
@@ -1422,64 +1523,137 @@ class MorseMissionWindow:
             fg=UI_JUEGOS["text"], justify="left", anchor="nw",
         ).pack(fill="both", expand=True, padx=16, pady=(4, 12))
         tk.Label(
-            reference, text="Espacio: separa letras\nBarra /: separa palabras\nSOS: ... --- ...",
+            reference, text="Toque < 0.28 s: PUNTO\nMantener ≥ 0.28 s: RAYA\nPausa 0.72 s: nueva letra\nPausa 1.65 s: validar palabra",
             font=("Arial", 10, "bold"), bg=UI_JUEGOS["panel_alt"], fg=UI_JUEGOS["warning"],
             justify="left", padx=12, pady=12,
         ).pack(fill="x", padx=16, pady=(0, 16))
 
+        self.top.bind_all("<KeyPress-space>", self._space_pressed)
+        self.top.bind_all("<KeyRelease-space>", self._space_released)
+        self.top.protocol("WM_DELETE_WINDOW", self.close)
         self.new_round()
 
-    def _append_symbol(self, token):
-        self.answer.insert("end", token)
-        self.answer.focus_set()
-
-    def _backspace(self):
-        value = self.answer.get()
-        self.answer.delete(0, "end")
-        self.answer.insert(0, value[:-1])
-        self.answer.focus_set()
-
     def new_round(self):
+        self._cancel_gap_jobs()
         self.round += 1
         self.word = random.choice([word for word in MORSE_WORDS if word != self.word])
-        self.mode = "decode" if self.round % 2 else "encode"
-        self.answer.delete(0, "end")
-        if self.mode == "decode":
-            self.mode_var.set("RECEPCIÓN · Descifra la palabra")
-            self.prompt_var.set(encode_morse(self.word))
-            self.status_var.set("Escribe la palabra que representa la señal.")
-        else:
-            self.mode_var.set("TRANSMISIÓN · Construye la señal")
-            self.prompt_var.set(_normalize_morse_text(self.word))
-            self.status_var.set("Escribe puntos y rayas, separando cada letra con un espacio.")
+        self.current_signal = ""
+        self.received_letters = []
+        self.round_done = False
+        self.prompt_var.set(_normalize_morse_text(self.word))
+        self.live_signal_var.set("· · ·")
+        self.decoded_var.set("—")
+        self.status_var.set("Pulsa Espacio para comenzar. El tono sonará mientras mantengas presionada la llave.")
         self._update_score()
-        self.answer.focus_set()
 
-    def check_answer(self):
-        raw = self.answer.get().strip()
-        expected = _normalize_morse_text(self.word) if self.mode == "decode" else encode_morse(self.word)
-        actual = _normalize_morse_text(raw) if self.mode == "decode" else " ".join(raw.replace("/", " / ").split())
+    def _space_pressed(self, _event=None):
+        if self.release_job:
+            try:
+                self.top.after_cancel(self.release_job)
+            except Exception:
+                pass
+            self.release_job = None
+            return "break"
+        if self.space_is_down:
+            return "break"
+        if self.round_done:
+            self.ignore_release = True
+            self.new_round()
+            return "break"
+        self._cancel_gap_jobs()
+        self.space_is_down = True
+        self.key_down_at = time.monotonic()
+        self.key_state_var.set("TRANSMITIENDO ●")
+        self.key_display.configure(bg="#0c4a6e", fg="white")
+        self.tone.start()
+        return "break"
+
+    def _space_released(self, _event=None):
+        if self.release_job:
+            return "break"
+        # X11 puede emitir Release/Press artificiales al repetir una tecla.
+        # La breve espera permite cancelar ese Release si llega otro Press.
+        self.release_job = self.top.after(35, self._finalize_space_release)
+        return "break"
+
+    def _finalize_space_release(self):
+        self.release_job = None
+        if self.ignore_release:
+            self.ignore_release = False
+            self.space_is_down = False
+            self.tone.stop()
+            return
+        if not self.space_is_down:
+            return
+        duration = max(0.0, time.monotonic() - self.key_down_at)
+        self.space_is_down = False
+        self.tone.stop()
+        symbol = classify_morse_press(duration, self.DASH_THRESHOLD)
+        self.current_signal += symbol
+        label = "PUNTO" if symbol == "." else "RAYA"
+        self.key_state_var.set(f"{label}  ·  {duration:.2f} s")
+        self.key_display.configure(bg="#07111f", fg=UI_JUEGOS["accent"])
+        self._refresh_transmission()
+        self.letter_job = self.top.after(self.LETTER_GAP_MS, self._finish_letter)
+        self.word_job = self.top.after(self.WORD_GAP_MS, self._finish_word)
+
+    def _finish_letter(self):
+        self.letter_job = None
+        if not self.current_signal:
+            return
+        letter = decode_morse(self.current_signal)
+        self.received_letters.append(letter)
+        self.current_signal = ""
+        self._refresh_transmission()
+        self.status_var.set(f"Letra recibida: {letter}. Continúa con Espacio o espera para validar.")
+
+    def _finish_word(self):
+        self.word_job = None
+        self._finish_letter()
+        if not self.received_letters or self.round_done:
+            return
+        actual = "".join(self.received_letters)
+        expected = _normalize_morse_text(self.word)
+        self.round_done = True
         if actual == expected:
             self.score += 10 + min(self.streak * 2, 10)
             self.streak += 1
-            self.status_var.set(f"¡Correcto! {self.word} = {encode_morse(self.word)}")
-            self.top.after(850, self.new_round)
+            self.status_var.set(f"¡Transmisión correcta! {self.word} = {encode_morse(self.word)}. Pulsa Espacio para la siguiente ronda.")
+            self.key_display.configure(bg="#14532d", fg="white")
         else:
             self.streak = 0
-            self.status_var.set("Aún no coincide. Revisa cada letra y la separación; puedes pedir una pista.")
+            self.status_var.set(f"Recibido: {actual}. Esperado: {expected}. Pulsa Espacio para intentarlo con otra palabra.")
+            self.key_display.configure(bg="#7f1d1d", fg="white")
         self._update_score()
 
-    def show_hint(self):
-        self.score = max(0, self.score - 2)
-        if self.mode == "decode":
-            self.status_var.set(f"Pista: empieza con {self.word[0]} ({encode_morse(self.word[0])}) y tiene {len(self.word)} letras.")
-        else:
-            first = _normalize_morse_text(self.word)[0]
-            self.status_var.set(f"Pista: {first} se codifica {MORSE_CODE[first]}. Separa todas las letras con espacios.")
-        self._update_score()
+    def _refresh_transmission(self):
+        finished = " ".join(encode_morse(letter) if letter != "?" else "?" for letter in self.received_letters)
+        live = " ".join(part for part in (finished, self.current_signal) if part)
+        self.live_signal_var.set(live or "· · ·")
+        decoded = "".join(self.received_letters)
+        if self.current_signal:
+            decoded += "_"
+        self.decoded_var.set(decoded or "—")
+
+    def _cancel_gap_jobs(self):
+        for attribute in ("letter_job", "word_job", "release_job"):
+            job = getattr(self, attribute, None)
+            if job:
+                try:
+                    self.top.after_cancel(job)
+                except Exception:
+                    pass
+                setattr(self, attribute, None)
 
     def _update_score(self):
         self.score_var.set(f"Puntos: {self.score}   ·   Racha: {self.streak}   ·   Ronda: {self.round}")
+
+    def close(self):
+        self._cancel_gap_jobs()
+        self.tone.stop()
+        self.top.unbind_all("<KeyPress-space>")
+        self.top.unbind_all("<KeyRelease-space>")
+        self.top.destroy()
 
 
 __all__ = [
@@ -1488,4 +1662,6 @@ __all__ = [
     "MORSE_CODE",
     "encode_morse",
     "decode_morse",
+    "classify_morse_press",
+    "TelegraphTone",
 ]

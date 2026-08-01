@@ -2,6 +2,7 @@ from interfaz.ventana_juegos import (
     CARD_COLORS,
     LastCardWindow,
     _card_playable,
+    classify_morse_press,
     decode_morse,
     encode_morse,
 )
@@ -34,3 +35,10 @@ def test_morse_decodes_words_and_unknown_symbols():
     assert decode_morse(".- --. ..- .-") == "AGUA"
     assert decode_morse("... --- ... / .----") == "SOS 1"
     assert decode_morse("......") == "?"
+
+
+def test_telegraph_key_distinguishes_dot_and_dash_by_duration():
+    assert classify_morse_press(0.08) == "."
+    assert classify_morse_press(0.279) == "."
+    assert classify_morse_press(0.28) == "-"
+    assert classify_morse_press(0.9) == "-"
