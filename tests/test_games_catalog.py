@@ -5,6 +5,7 @@ from interfaz.ventana_juegos import (
     classify_morse_press,
     decode_morse,
     encode_morse,
+    evaluate_morse_prefix,
 )
 
 
@@ -42,3 +43,11 @@ def test_telegraph_key_distinguishes_dot_and_dash_by_duration():
     assert classify_morse_press(0.279) == "."
     assert classify_morse_press(0.28) == "-"
     assert classify_morse_press(0.9) == "-"
+
+
+def test_morse_letter_advances_by_prefix_not_by_waiting():
+    assert evaluate_morse_prefix("", ".-.") == "prefix"
+    assert evaluate_morse_prefix(".", ".-.") == "prefix"
+    assert evaluate_morse_prefix(".-", ".-.") == "prefix"
+    assert evaluate_morse_prefix(".-.", ".-.") == "complete"
+    assert evaluate_morse_prefix("..", ".-.") == "invalid"

@@ -142,6 +142,16 @@ def classify_morse_press(duration_seconds, dash_threshold=0.28):
     return "-" if float(duration_seconds) >= float(dash_threshold) else "."
 
 
+def evaluate_morse_prefix(signal, expected):
+    signal = str(signal or "")
+    expected = str(expected or "")
+    if signal == expected:
+        return "complete"
+    if expected.startswith(signal):
+        return "prefix"
+    return "invalid"
+
+
 class TelegraphTone:
     """Play a local continuous sidetone while the telegraph key is held."""
 
@@ -1445,8 +1455,6 @@ class ArenaDuelWindow:
 
 class MorseMissionWindow:
     DASH_THRESHOLD = 0.28
-    LETTER_GAP_MS = 720
-    WORD_GAP_MS = 1650
 
     def __init__(self, master, focus_parent):
         self.top = _open_game_window(master, focus_parent, "Misión Morse", rel_w=0.68, rel_h=0.82, min_w=920, min_h=720)
@@ -1459,8 +1467,6 @@ class MorseMissionWindow:
         self.space_is_down = False
         self.ignore_release = False
         self.key_down_at = 0.0
-        self.letter_job = None
-        self.word_job = None
         self.release_job = None
         self.round_done = False
         self.tone = TelegraphTone(self.top)
@@ -1480,7 +1486,7 @@ class MorseMissionWindow:
         body.grid_columnconfigure(1, weight=2)
         body.grid_rowconfigure(0, weight=1)
 
-        mission = _panel(body, "Llave telegráfica", "Toque corto = punto · Mantener = raya · Pausa = separar letra")
+        mission = _panel(body, "Llave telegráfica", "Toque corto = punto · Mantener = raya · Sin límite de tiempo")
         mission.grid(row=0, column=0, sticky="nsew", padx=(0, 8))
         reference = _panel(body, "Tabla de referencia", "Usa la tabla al aprender; intenta depender menos de ella con cada ronda.")
         reference.grid(row=0, column=1, sticky="nsew", padx=(8, 0))
@@ -1523,7 +1529,7 @@ class MorseMissionWindow:
             fg=UI_JUEGOS["text"], justify="left", anchor="nw",
         ).pack(fill="both", expand=True, padx=16, pady=(4, 12))
         tk.Label(
-            reference, text="Toque < 0.28 s: PUNTO\nMantener ≥ 0.28 s: RAYA\nPausa 0.72 s: nueva letra\nPausa 1.65 s: validar palabra",
+            reference, text="Toque < 0.28 s: PUNTO\nMantener ≥ 0.28 s: RAYA\nLa letra avanza al completarse\nPuedes pausar cuanto necesites",
             font=("Arial", 10, "bold"), bg=UI_JUEGOS["panel_alt"], fg=UI_JUEGOS["warning"],
             justify="left", padx=12, pady=12,
         ).pack(fill="x", padx=16, pady=(0, 16))
@@ -1534,7 +1540,7 @@ class MorseMissionWindow:
         self.new_round()
 
     def new_round(self):
-        self._cancel_gap_jobs()
+        self._cancel_release_job()
         self.round += 1
         self.word = random.choice([word for word in MORSE_WORDS if word != self.word])
         self.current_signal = ""
@@ -1543,7 +1549,10 @@ class MorseMissionWindow:
         self.prompt_var.set(_normalize_morse_text(self.word))
         self.live_signal_var.set("· · ·")
         self.decoded_var.set("—")
+        self.key_state_var.set("LLAVE LIBRE")
+        self.key_display.configure(bg="#07111f", fg=UI_JUEGOS["text_dim"])
         self.status_var.set("Pulsa Espacio para comenzar. El tono sonará mientras mantengas presionada la llave.")
+        self._refresh_prompt()
         self._update_score()
 
     def _space_pressed(self, _event=None):
@@ -1560,7 +1569,7 @@ class MorseMissionWindow:
             self.ignore_release = True
             self.new_round()
             return "break"
-        self._cancel_gap_jobs()
+        self._cancel_release_job()
         self.space_is_down = True
         self.key_down_at = time.monotonic()
         self.key_state_var.set("TRANSMITIENDO ●")
@@ -1594,37 +1603,55 @@ class MorseMissionWindow:
         self.key_state_var.set(f"{label}  ·  {duration:.2f} s")
         self.key_display.configure(bg="#07111f", fg=UI_JUEGOS["accent"])
         self._refresh_transmission()
-        self.letter_job = self.top.after(self.LETTER_GAP_MS, self._finish_letter)
-        self.word_job = self.top.after(self.WORD_GAP_MS, self._finish_word)
+        self._evaluate_current_letter()
 
-    def _finish_letter(self):
-        self.letter_job = None
-        if not self.current_signal:
+    def _evaluate_current_letter(self):
+        if self.round_done:
             return
-        letter = decode_morse(self.current_signal)
-        self.received_letters.append(letter)
+        target_word = _normalize_morse_text(self.word)
+        letter_index = len(self.received_letters)
+        if letter_index >= len(target_word):
+            return
+        expected_letter = target_word[letter_index]
+        expected_signal = MORSE_CODE[expected_letter]
+        result = evaluate_morse_prefix(self.current_signal, expected_signal)
+        if result == "prefix":
+            self.status_var.set(f"Letra {letter_index + 1}/{len(target_word)} en curso. Puedes tomarte el tiempo que necesites.")
+            return
+        if result == "invalid":
+            attempted = self.current_signal
+            self.current_signal = ""
+            self.streak = 0
+            self.status_var.set(f"La secuencia {attempted} no corresponde a {expected_letter}. Intenta nuevamente esa letra.")
+            self.key_display.configure(bg="#7f1d1d", fg="white")
+            self._refresh_transmission()
+            self._update_score()
+            return
+
+        self.received_letters.append(expected_letter)
         self.current_signal = ""
         self._refresh_transmission()
-        self.status_var.set(f"Letra recibida: {letter}. Continúa con Espacio o espera para validar.")
-
-    def _finish_word(self):
-        self.word_job = None
-        self._finish_letter()
-        if not self.received_letters or self.round_done:
-            return
-        actual = "".join(self.received_letters)
-        expected = _normalize_morse_text(self.word)
-        self.round_done = True
-        if actual == expected:
+        self._refresh_prompt()
+        if len(self.received_letters) == len(target_word):
+            self.round_done = True
             self.score += 10 + min(self.streak * 2, 10)
             self.streak += 1
             self.status_var.set(f"¡Transmisión correcta! {self.word} = {encode_morse(self.word)}. Pulsa Espacio para la siguiente ronda.")
             self.key_display.configure(bg="#14532d", fg="white")
         else:
-            self.streak = 0
-            self.status_var.set(f"Recibido: {actual}. Esperado: {expected}. Pulsa Espacio para intentarlo con otra palabra.")
-            self.key_display.configure(bg="#7f1d1d", fg="white")
+            next_letter = target_word[len(self.received_letters)]
+            self.status_var.set(f"¡Letra {expected_letter} correcta! Ahora transmite {next_letter}. Sin prisa.")
+            self.key_display.configure(bg="#07111f", fg=UI_JUEGOS["success"])
         self._update_score()
+
+    def _refresh_prompt(self):
+        target = _normalize_morse_text(self.word)
+        index = len(self.received_letters)
+        if index >= len(target):
+            self.prompt_var.set(target)
+            return
+        marked = " ".join(f"[{letter}]" if position == index else letter for position, letter in enumerate(target))
+        self.prompt_var.set(marked)
 
     def _refresh_transmission(self):
         finished = " ".join(encode_morse(letter) if letter != "?" else "?" for letter in self.received_letters)
@@ -1635,21 +1662,19 @@ class MorseMissionWindow:
             decoded += "_"
         self.decoded_var.set(decoded or "—")
 
-    def _cancel_gap_jobs(self):
-        for attribute in ("letter_job", "word_job", "release_job"):
-            job = getattr(self, attribute, None)
-            if job:
-                try:
-                    self.top.after_cancel(job)
-                except Exception:
-                    pass
-                setattr(self, attribute, None)
+    def _cancel_release_job(self):
+        if self.release_job:
+            try:
+                self.top.after_cancel(self.release_job)
+            except Exception:
+                pass
+            self.release_job = None
 
     def _update_score(self):
         self.score_var.set(f"Puntos: {self.score}   ·   Racha: {self.streak}   ·   Ronda: {self.round}")
 
     def close(self):
-        self._cancel_gap_jobs()
+        self._cancel_release_job()
         self.tone.stop()
         self.top.unbind_all("<KeyPress-space>")
         self.top.unbind_all("<KeyRelease-space>")
@@ -1663,5 +1688,6 @@ __all__ = [
     "encode_morse",
     "decode_morse",
     "classify_morse_press",
+    "evaluate_morse_prefix",
     "TelegraphTone",
 ]
