@@ -4,7 +4,7 @@ set -eu
 REPOSITORY="TlamatiniSoftwareMX/Tlamatini-Software"
 VERSION="5.2.6"
 PARTS="44"
-EXPECTED_SHA256="855ab747766cc87679d81f276d23f4ecf810fcd4e51955bcafccc6971ed8d556"
+EXPECTED_SHA256="85c3c6333064986219c8963774e5eb84e8fd41f495cde4f8a9cf58e01e913177"
 RELEASE_BASE_URL="https://github.com/${REPOSITORY}/releases/download/v${VERSION}"
 WORK_DIR=$(mktemp -d "${TMPDIR:-/tmp}/tlamatini-install.XXXXXX")
 OUTPUT="${WORK_DIR}/tlamatini-${VERSION}-amd64.deb"
