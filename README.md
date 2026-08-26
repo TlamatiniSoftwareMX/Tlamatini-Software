@@ -10,17 +10,12 @@ y elige las instrucciones de tu sistema.
 
 ## Windows
 
-Descarga en una misma carpeta:
+Descarga únicamente `INSTALAR-TLAMATINI-WINDOWS.cmd` desde la última Release
+y haz doble clic. El asistente descarga automáticamente todas las partes,
+reanuda las partes ya verificadas si se interrumpe la conexión, reconstruye el
+instalador y solicita el permiso de Windows sólo al iniciar la instalación.
 
-- Los 42 archivos llamados
-  `tlamatini-5.2.6-windows-installer.chunk-001-of-042` hasta
-  `tlamatini-5.2.6-windows-installer.chunk-042-of-042`.
-- `INSTALAR-TLAMATINI-WINDOWS.cmd`.
-- `INSTALAR-TLAMATINI-WINDOWS.ps1`.
-- `SHA256-WINDOWS-INSTALADOR.txt`.
-
-Haz doble clic en `INSTALAR-TLAMATINI-WINDOWS.cmd`. El asistente comprobará
-el instalador y abrirá la instalación de TLAMATINI.
+No descargues las partes manualmente: son archivos internos del instalador.
 
 ## Linux
 

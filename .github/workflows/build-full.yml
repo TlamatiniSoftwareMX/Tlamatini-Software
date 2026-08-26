@@ -2,6 +2,9 @@ name: Build Full
 
 on:
   workflow_dispatch:
+  push:
+    tags:
+      - "v*"
 
 permissions:
   contents: write
@@ -34,11 +37,11 @@ jobs:
             artifact_name: TLAMATINI-Windows
             build_command: powershell -ExecutionPolicy Bypass -File scripts/build_full_release_windows.ps1
             final_files: |
-              dist/TLAMATINI-Windows-Instalador-Full.exe
-              dist/TLAMATINI-full-windows-x86_64.zip
-              dist/SHA256SUMS-windows.txt
-              dist/SHA256SUMS-windows.json
-              dist/release_metadata-windows.json
+              dist/tlamatini-*-windows-installer.chunk-*-of-*
+              dist/INSTALAR-TLAMATINI-WINDOWS.cmd
+              dist/INSTALAR-TLAMATINI-WINDOWS.ps1
+              dist/SHA256-WINDOWS-INSTALADOR.txt
+              dist/SHA256-WINDOWS-PARTES.txt
           - os: macos-latest
             platform: macos
             artifact_name: TLAMATINI-macOS
@@ -117,6 +120,12 @@ jobs:
         shell: powershell
         run: |
           & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "installer\windows\TLAMATINI_full.iss"
+
+      - name: Preparar instalador Windows de un clic
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          python scripts\split_windows_installer.py dist\TLAMATINI-Windows-Instalador-Full.exe dist
 
       - name: Verify release bundle on Linux/macOS
         if: runner.os != 'Windows'

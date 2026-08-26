@@ -49,10 +49,11 @@ Linux:
 
 Windows:
 
-- `TLAMATINI-Windows-Instalador-Full.exe`
-- `TLAMATINI-full-windows-x86_64.zip`
-- `SHA256SUMS-windows.txt`
-- `release_metadata-windows.json`
+- `INSTALAR-TLAMATINI-WINDOWS.cmd` (único archivo para usuarios)
+- `INSTALAR-TLAMATINI-WINDOWS.ps1` (descargado automáticamente por el CMD)
+- fragmentos `tlamatini-*-windows-installer.chunk-*-of-*`
+- `SHA256-WINDOWS-INSTALADOR.txt`
+- `SHA256-WINDOWS-PARTES.txt`
 
 macOS:
 
@@ -63,7 +64,8 @@ macOS:
 
 Descargas recomendadas para usuarios:
 
-- Windows: `TLAMATINI-Windows-Instalador-Full.exe`
+- Windows: `INSTALAR-TLAMATINI-WINDOWS.cmd`. El usuario descarga sólo este
+  archivo; el proceso automático obtiene y verifica las partes publicadas.
 - Linux Debian/Ubuntu/Mint: un comando con `INSTALAR-TLAMATINI.sh`, que descarga
   y verifica automáticamente las partes publicadas.
 

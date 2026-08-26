@@ -10,15 +10,17 @@ https://github.com/TlamatiniSoftwareMX/Tlamatini-Software/releases/latest
 
 Archivo recomendado para usuarios:
 
-- `TLAMATINI-Windows-Instalador-Full.exe`
+- `INSTALAR-TLAMATINI-WINDOWS.cmd`
 
-El usuario solo debe descargar ese archivo, abrirlo y seguir el instalador.
+El usuario sólo descarga este archivo y hace doble clic. El asistente obtiene
+automáticamente las partes de la release, puede continuar una descarga
+interrumpida, las verifica y abre el instalador final.
 
-Archivo alternativo:
+Archivos de soporte técnico:
 
-- `TLAMATINI-full-windows-x86_64.zip`
+- fragmentos `tlamatini-*-windows-installer.chunk-*-of-*`
 
-Ese zip es para soporte tecnico o instalaciones portables. No es la descarga principal para usuarios normales.
+No son la descarga principal: el usuario normal no debe bajarlos manualmente.
 
 ## Linux
 

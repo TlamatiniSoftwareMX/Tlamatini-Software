@@ -1,23 +1,24 @@
 TLAMATINI 5.2.6 para Windows
 ============================
 
-Descarga en una misma carpeta:
-
-1. Los 42 fragmentos del instalador, desde
-   tlamatini-5.2.6-windows-installer.chunk-001-of-042 hasta
-   tlamatini-5.2.6-windows-installer.chunk-042-of-042.
-2. INSTALAR-TLAMATINI-WINDOWS.cmd
-3. INSTALAR-TLAMATINI-WINDOWS.ps1
-4. SHA256-WINDOWS-INSTALADOR.txt
+Descarga únicamente `INSTALAR-TLAMATINI-WINDOWS.cmd` desde la última Release.
 
 Instalación
 -----------
 
-Haz doble clic en INSTALAR-TLAMATINI-WINDOWS.cmd.
+Haz doble clic en INSTALAR-TLAMATINI-WINDOWS.cmd. El asistente descarga en
+segundo plano las partes necesarias desde GitHub, verifica cada una, arma el
+instalador y lo abre. Si se corta Internet, ejecuta el mismo archivo otra vez:
+las partes que ya se verificaron se reutilizan automáticamente.
 
-El asistente unirá los 42 fragmentos, comprobará el instalador y abrirá la
-instalación de TLAMATINI. Conserva todos los archivos en la misma carpeta
-hasta que la instalación termine.
+El usuario no necesita descargar ni conservar los fragmentos manualmente.
+
+Instalación sin Internet (USB)
+------------------------------
+
+Para instalar sin Internet, copia a la USB `TLAMATINI-Windows-Instalador-Full.exe`
+e `INSTALAR-TLAMATINI-WINDOWS.cmd` en la misma carpeta. Al abrir el CMD,
+detectará el instalador local y lo iniciará sin descargar nada.
 
 Requisitos recomendados
 -----------------------
