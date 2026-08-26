@@ -85,6 +85,7 @@ DEFAULT_MISTRAL_URL = (
     "Mistral-7B-Instruct-v0.3-Q4_K_M.gguf?download=true"
 )
 LLAMA_CPP_RELEASE_API = "https://api.github.com/repos/ggml-org/llama.cpp/releases/latest"
+LLAMA_CPP_RELEASES_API = "https://api.github.com/repos/ggml-org/llama.cpp/releases?per_page=20"
 
 
 def _default_boot_model() -> str:
@@ -644,23 +645,36 @@ def _runtime_archive_score(name: str) -> int:
 def _latest_runtime_asset_url() -> Tuple[str, str]:
     try:
         with _safe_request(LLAMA_CPP_RELEASE_API) as response:
-            data = json.loads(response.read().decode("utf-8"))
+            latest_release = json.loads(response.read().decode("utf-8"))
+        with _safe_request(LLAMA_CPP_RELEASES_API) as response:
+            recent_releases = json.loads(response.read().decode("utf-8"))
     except Exception as exc:
         raise RuntimeError(f"No se pudo consultar releases de llama.cpp: {exc}") from exc
 
-    assets = data.get("assets", []) or []
-    candidatos = []
-    for asset in assets:
-        name = str(asset.get("name", ""))
-        url = str(asset.get("browser_download_url", ""))
-        if not name or not url:
+    # La etiqueta "latest" puede ser una release de metadatos sin binarios.
+    # Se revisa primero y después se buscan releases recientes hasta hallar un
+    # runtime compatible para la plataforma actual.
+    releases = [latest_release]
+    if isinstance(recent_releases, list):
+        releases.extend(recent_releases)
+    seen_tags = set()
+    for release in releases:
+        if not isinstance(release, dict):
             continue
-        if _platform_asset_matches(name):
-            candidatos.append((name, url))
-    if candidatos:
-        candidatos.sort(key=lambda item: _runtime_archive_score(item[0]), reverse=True)
-        name, url = candidatos[0]
-        return url, name
+        tag = str(release.get("tag_name", ""))
+        if tag in seen_tags:
+            continue
+        seen_tags.add(tag)
+        candidatos = []
+        for asset in release.get("assets", []) or []:
+            name = str(asset.get("name", ""))
+            url = str(asset.get("browser_download_url", ""))
+            if name and url and _platform_asset_matches(name):
+                candidatos.append((name, url))
+        if candidatos:
+            candidatos.sort(key=lambda item: _runtime_archive_score(item[0]), reverse=True)
+            name, url = candidatos[0]
+            return url, name
     raise RuntimeError("No encontré un binario precompilado compatible de llama.cpp para esta plataforma.")
 
 
