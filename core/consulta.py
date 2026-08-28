@@ -487,19 +487,45 @@ def transmitir_consulta_local_rapida(
     proveedor = obtener_local_llm_provider()
     config_efectiva = config or LocalLLMConfig(max_tokens=512, timeout=120, context_window=1024)
     partes: List[str] = []
-    for chunk in proveedor.generate_stream(
-        prompt=_prompt_respuesta_rapida(pregunta_original),
-        system_prompt="Eres TLAMATINI. Responde de forma directa y útil a la pregunta del usuario.",
-        config=config_efectiva,
-    ):
-        if not chunk:
-            continue
-        partes.append(chunk)
-        if on_chunk is not None:
-            on_chunk(chunk)
-    respuesta = "".join(partes).strip()
+    try:
+        for chunk in proveedor.generate_stream(
+            prompt=_prompt_respuesta_rapida(pregunta_original),
+            system_prompt="Eres TLAMATINI. Responde de forma directa y útil a la pregunta del usuario.",
+            config=config_efectiva,
+        ):
+            if not chunk:
+                continue
+            partes.append(chunk)
+            if on_chunk is not None:
+                on_chunk(chunk)
+        respuesta = "".join(partes).strip()
+    except Exception as exc:
+        # La consulta debe seguir siendo útil aunque el runtime de IA esté
+        # apagado o no exista Ollama: la biblioteca local es el respaldo
+        # determinista y evita mostrar un error técnico al usuario.
+        registrar_log("warning", f"IA local no disponible; se usa búsqueda documental: {exc}", "consulta")
+        resultados = buscar_fragmentos(pregunta_original, limite=8)
+        respuesta = _formatear_resultados(
+            pregunta_original=pregunta_original,
+            pregunta_usada=pregunta_original,
+            dominio="",
+            subdominio="",
+            resultados=resultados,
+        ).strip()
+        if on_chunk is not None and respuesta:
+            on_chunk(respuesta)
     if not respuesta:
-        raise RuntimeError("La IA local no devolvió contenido.")
+        registrar_log("warning", "La IA local no devolvió contenido; se usa búsqueda documental.", "consulta")
+        resultados = buscar_fragmentos(pregunta_original, limite=8)
+        respuesta = _formatear_resultados(
+            pregunta_original=pregunta_original,
+            pregunta_usada=pregunta_original,
+            dominio="",
+            subdominio="",
+            resultados=resultados,
+        ).strip()
+        if on_chunk is not None and respuesta:
+            on_chunk(respuesta)
 
     _actualizar_contexto_directo(
         pregunta_original=pregunta_original,

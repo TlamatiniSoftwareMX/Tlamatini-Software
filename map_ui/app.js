@@ -2266,11 +2266,13 @@ function bindUI() {
     if (!state.map || !state.config?.mapa) {
       return;
     }
-    state.map.flyTo({
-      center: [state.config.mapa.centerLon, state.config.mapa.centerLat],
-      zoom: state.config.preferences.last_zoom || state.config.mapa.zoomInicial,
-      speed: 0.8,
-    });
+    if (!fitConfiguredMapBounds(state.map, state.config.mapa)) {
+      state.map.flyTo({
+        center: [state.config.mapa.centerLon, state.config.mapa.centerLat],
+        zoom: state.config.preferences.last_zoom || state.config.mapa.zoomInicial,
+        speed: 0.8,
+      });
+    }
   };
   measureToggleBtn.onclick = () => {
     const enabled = !state.config.preferences.measurement_enabled;
@@ -2434,6 +2436,21 @@ function hideEmpty() {
   emptyStateEl.classList.add("hidden");
 }
 
+function configuredMapBounds(mapData) {
+  const bounds = mapData?.bounds;
+  if (!Array.isArray(bounds) || bounds.length !== 4) return null;
+  const [west, south, east, north] = bounds.map(Number);
+  if (![west, south, east, north].every(Number.isFinite) || west >= east || south >= north) return null;
+  return [[west, south], [east, north]];
+}
+
+function fitConfiguredMapBounds(map, mapData) {
+  const bounds = configuredMapBounds(mapData);
+  if (!bounds) return false;
+  map.fitBounds(bounds, { padding: 42, duration: 0, maxZoom: Math.max(0, Number(mapData.zoomInicial || 0)) });
+  return true;
+}
+
 async function loadRuntime(force = false) {
   try {
     const config = await fetchJson("/runtime/runtime_config.json");
@@ -2480,6 +2497,7 @@ async function loadRuntime(force = false) {
       });
       state.map.addControl(new maplibregl.NavigationControl({ visualizePitch: false }), "top-right");
       state.map.on("load", () => {
+        fitConfiguredMapBounds(state.map, config.mapa);
         applyVisibilityFromPreferences();
         bindOverlayClicks();
         updateMeasurement();
@@ -2569,10 +2587,12 @@ async function loadRuntime(force = false) {
       state.map.setStyle(buildStyle(config));
       state.map.once("styledata", () => {
         if (changedMap) {
-          state.map.jumpTo({
-            center: [config.mapa.centerLon, config.mapa.centerLat],
-            zoom: config.mapa.zoomInicial,
-          });
+          if (!fitConfiguredMapBounds(state.map, config.mapa)) {
+            state.map.jumpTo({
+              center: [config.mapa.centerLon, config.mapa.centerLat],
+              zoom: config.mapa.zoomInicial,
+            });
+          }
         }
         applyVisibilityFromPreferences();
         bindOverlayClicks();
