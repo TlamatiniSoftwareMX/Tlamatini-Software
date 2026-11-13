@@ -23,7 +23,9 @@ jobs:
         run: |
           $published = Join-Path $env:TEMP 'TLAMATINI-instalar.ps1'
           Invoke-WebRequest -UseBasicParsing 'https://github.com/TlamatiniSoftwareMX/Tlamatini-Software/releases/download/ediciones-2026-11-13/INSTALAR-TLAMATINI-EDICIONES.ps1' -OutFile $published
-          if ((Get-FileHash $published).Hash -ne (Get-FileHash .\scripts\INSTALAR-TLAMATINI-EDICIONES.ps1).Hash) { throw 'Published script differs from tested source' }
+          $actual = [IO.File]::ReadAllText($published).Replace("`r`n", "`n")
+          $source = [IO.File]::ReadAllText((Resolve-Path .\scripts\INSTALAR-TLAMATINI-EDICIONES.ps1)).Replace("`r`n", "`n")
+          if ($actual -cne $source) { throw 'Published script differs from tested source' }
           foreach ($edition in @('sin-ia', 'ia-4gb', 'ia-8gb')) {
             powershell.exe -NoProfile -ExecutionPolicy Bypass -File $published -Edicion $edition -Verificar
             if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
