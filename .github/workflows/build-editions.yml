@@ -1,0 +1,49 @@
+name: Build Windows editions sequentially
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  windows:
+    runs-on: windows-latest
+    strategy:
+      max-parallel: 1
+      fail-fast: false
+      matrix:
+        edition: [no-ai, ai-4gb]
+    env:
+      OMP_NUM_THREADS: '1'
+      OPENBLAS_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install desktop build dependencies
+        run: python -m pip install pyinstaller pillow requests pmtiles tkinterdnd2 cryptography numpy opencv-python PyMuPDF pytesseract
+      - name: Download small model
+        if: matrix.edition == 'ai-4gb'
+        shell: powershell
+        run: |
+          New-Item -ItemType Directory -Force local_ai/downloads/editions | Out-Null
+          curl.exe -fL --retry 3 -o local_ai/downloads/editions/gemma-3-1b-it-Q4_K_M.gguf https://huggingface.co/ggml-org/gemma-3-1b-it-GGUF/resolve/main/gemma-3-1b-it-Q4_K_M.gguf
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Build one edition without loading AI
+        run: python scripts/build_edition.py ${{ matrix.edition }}
+      - name: Install Inno Setup
+        run: choco install innosetup -y --no-progress
+      - name: Build installer
+        shell: powershell
+        run: |
+          & 'C:\Program Files (x86)\Inno Setup 6\ISCC.exe' /DEdition=${{ matrix.edition }} installer/windows/TLAMATINI_edition.iss
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Get-FileHash dist/TLAMATINI-Windows-${{ matrix.edition }}-5.2.6-Instalador.exe -Algorithm SHA256 | Format-List | Out-File dist/SHA256-${{ matrix.edition }}.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: TLAMATINI-Windows-${{ matrix.edition }}
+          path: |
+            dist/TLAMATINI-Windows-${{ matrix.edition }}-5.2.6-Instalador.exe
+            dist/SHA256-${{ matrix.edition }}.txt
+          if-no-files-found: error
+          retention-days: 14

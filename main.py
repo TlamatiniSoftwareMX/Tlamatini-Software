@@ -6,6 +6,7 @@ import sys
 import traceback
 from pathlib import Path
 
+from core.edition import ai_disabled, edition_name
 from core.ai_bootstrap import bootstrap_ollama_model
 from core.model_router import canonical_model_id
 from core.ollama_local import configured_ollama_host, stop_local_ollama
@@ -58,6 +59,33 @@ def _bundled_local_ai_available() -> bool:
 
 
 def _apply_cli_overrides(args: argparse.Namespace) -> None:
+    if edition_name() == "ai-4gb":
+        args.safe, args.fast, args.with_mistral = True, False, False
+        os.environ.update({
+            "TLAMATINI_AI_BACKEND": "local",
+            "TLAMATINI_AI_BOOT_MODEL": "gemma3",
+            "TLAMATINI_PRIMARY_MODEL": "gemma3",
+            "TLAMATINI_LOCAL_LLM_MODEL": "gemma3:1b",
+            "TLAMATINI_AI_AUTO_PULL": "0",
+            "TLAMATINI_AI_STOP_ON_EXIT": "1",
+            "TLAMATINI_ENABLE_MISTRAL": "0",
+            "TLAMATINI_AI_THREADS": "2",
+            "TLAMATINI_AI_THREADS_BATCH": "2",
+            "TLAMATINI_AI_BATCH_SIZE": "64",
+            "TLAMATINI_AI_UBATCH_SIZE": "32",
+            "TLAMATINI_AI_PARALLEL": "1",
+            "TLAMATINI_AI_CACHE_RAM": "0",
+            "TLAMATINI_AI_ACCELERATOR": "cpu",
+            "TLAMATINI_AI_GPU_LAYERS": "0",
+            "TLAMATINI_LOCAL_LLM_CONTEXT": "1024",
+            "TLAMATINI_LOCAL_LLM_MAX_TOKENS": "256",
+        })
+    if ai_disabled():
+        args.no_ai = True
+    if args.no_ai:
+        os.environ["TLAMATINI_AI_BACKEND"] = "disabled"
+        os.environ["TLAMATINI_AI_AUTO_PULL"] = "0"
+        os.environ["TLAMATINI_AI_AUTOSTART"] = "0"
     if args.safe:
         os.environ["TLAMATINI_AI_PROFILE"] = "safe"
     elif args.fast:

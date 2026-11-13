@@ -1,6 +1,7 @@
 # -*- mode: python ; coding: utf-8 -*-
 from pathlib import Path
 import os
+import json
 import sys
 
 from PyInstaller.utils.hooks import collect_data_files, collect_submodules
@@ -32,7 +33,13 @@ def pick_icon() -> str | None:
     return None
 
 
-datas = []
+edition = os.environ.get("TLAMATINI_EDITION", "full")
+if edition not in {"full", "no-ai", "ai-4gb"}:
+    raise ValueError(f"Edición desconocida: {edition}")
+edition_dir = PROJECT_ROOT / "build" / "edition"
+edition_dir.mkdir(parents=True, exist_ok=True)
+(edition_dir / "edition.json").write_text(json.dumps({"edition": edition}), encoding="utf-8")
+datas = [(str(edition_dir / "edition.json"), ".")]
 datas += optional_tree("assets", "assets")
 datas += optional_tree("map_ui", "map_ui")
 datas += optional_tree("public_license_key.pem", ".")

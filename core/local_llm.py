@@ -5,6 +5,8 @@ import urllib.request
 from dataclasses import dataclass, field
 from typing import Iterator, Optional, Tuple
 
+from core.edition import ai_disabled
+
 from core.ai_engine import (
     MODEL_ROUTE_CLASSIFICATION,
     MODEL_ROUTE_DOCUMENTS,
@@ -210,7 +212,17 @@ class OllamaProvider(LocalLLMProvider):
             raise RuntimeError(f"No se pudo generar respuesta con Ollama: {exc}") from exc
 
 
+class DisabledAIProvider(LocalLLMProvider):
+    def is_available(self) -> Tuple[bool, str]:
+        return False, "Esta edición de TLAMATINI funciona sin IA."
+
+    def generate(self, prompt: str, system_prompt: str = "", config: Optional[LocalLLMConfig] = None) -> str:
+        raise RuntimeError("Esta edición de TLAMATINI funciona sin IA.")
+
+
 def obtener_local_llm_provider() -> LocalLLMProvider:
+    if ai_disabled() or _default_backend() == "disabled":
+        return DisabledAIProvider()
     if _default_backend() == "ollama":
         return OllamaProvider()
     return TlamatiniLocalProvider()

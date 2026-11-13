@@ -13,6 +13,7 @@ def canonical_model_id(model: Optional[str]) -> str:
     aliases: Dict[str, str] = {
         "gemma3": "gemma3",
         "gemma3:4b": "gemma3",
+        "gemma3:1b": "gemma3",
         "gemma3:latest": "gemma3",
         "llama3": "llama3",
         "llama3:latest": "llama3",
@@ -61,6 +62,7 @@ def resolve_model(model: Optional[str] = None, route: str = MODEL_ROUTE_GENERAL)
     aliases: Dict[str, str] = {
         "gemma3:latest": "gemma3",
         "gemma3:4b": "gemma3",
+        "gemma3:1b": "gemma3",
         "llama3:latest": "llama3",
         "mistral:latest": "mistral",
         "chat": primary_model(),

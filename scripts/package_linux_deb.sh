@@ -2,12 +2,18 @@
 set -eu
 cd "$(dirname "$0")/.."
 
-if [ ! -f dist/tlamatini_full/TLAMATINI ]; then
-  echo "Falta dist/tlamatini_full/TLAMATINI"
+EDITION="${TLAMATINI_EDITION:-full}"
+case "$EDITION" in
+  full|ai-4gb|no-ai) ;;
+  *) echo "Edición inválida: $EDITION"; exit 1 ;;
+esac
+BUNDLE="${TLAMATINI_BUNDLE_DIR:-dist/tlamatini_full}"
+if [ ! -f "$BUNDLE/TLAMATINI" ]; then
+  echo "Falta $BUNDLE/TLAMATINI"
   exit 1
 fi
 
-ROOT=pkg_deb
+ROOT="pkg_deb_${EDITION}"
 VERSION="${TLAMATINI_PACKAGE_VERSION:-${TLAMATINI_APP_VERSION:-5.2.6}}"
 COMPRESSION="${TLAMATINI_DEB_COMPRESSION:-none}"
 rm -rf "$ROOT"
@@ -18,10 +24,12 @@ mkdir -p \
   "$ROOT/usr/share/pixmaps" \
   "$ROOT/usr/share/icons/hicolor/256x256/apps" \
   "$ROOT/usr/bin"
-cp dist/tlamatini_full/TLAMATINI "$ROOT/opt/tlamatini/TLAMATINI"
-if [ -d dist/tlamatini_full/local_ai ]; then
-  cp -a dist/tlamatini_full/local_ai "$ROOT/opt/tlamatini/local_ai"
-elif [ -d local_ai ]; then
+cp "$BUNDLE/TLAMATINI" "$ROOT/opt/tlamatini/TLAMATINI"
+if [ "$EDITION" = no-ai ]; then
+  : # No models, runtimes or AI configuration in this edition.
+elif [ -d "$BUNDLE/local_ai" ]; then
+  cp -a "$BUNDLE/local_ai" "$ROOT/opt/tlamatini/local_ai"
+elif [ "$EDITION" = full ] && [ -d local_ai ]; then
   mkdir -p "$ROOT/opt/tlamatini/local_ai"
   for item in config runtime models; do
     if [ -e "local_ai/$item" ]; then
@@ -68,7 +76,12 @@ EOF
 
 sed -i "s/__TLAMATINI_VERSION__/$VERSION/" "$ROOT/DEBIAN/control"
 
-DEB_PATH="dist/tlamatini-${VERSION}-amd64.deb"
+if [ "$EDITION" = no-ai ]; then
+  sed -i 's/con IA local integrada/sin IA/' "$ROOT/DEBIAN/control"
+fi
+SUFFIX=""
+if [ "$EDITION" != full ]; then SUFFIX="-${EDITION}"; fi
+DEB_PATH="dist/tlamatini-${VERSION}${SUFFIX}-amd64.deb"
 TEMP_DEB_PATH="${DEB_PATH}.building"
 rm -f "$TEMP_DEB_PATH"
 dpkg-deb "-Z${COMPRESSION}" --root-owner-group --build "$ROOT" "$TEMP_DEB_PATH"

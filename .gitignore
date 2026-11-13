@@ -42,3 +42,6 @@ local_ai/docs_pipeline/
 
 .agents/
 .codex
+
+# Staging directories for separate installers
+pkg_deb_*/
