@@ -33,7 +33,7 @@ class EditionInstallerTests(unittest.TestCase):
             payload = b'complete installer'
             item = dict(expected(payload), url='https://example.invalid/installer')
             path.write_bytes(payload)
-            with mock.patch.object(installer.urllib.request, 'urlopen') as network:
+            with mock.patch.object(installer.subprocess, 'run') as network:
                 installer.download_file(item, path)
                 network.assert_not_called()
             path.write_bytes(b'corrupt installer!')
@@ -44,7 +44,9 @@ class EditionInstallerTests(unittest.TestCase):
             path = Path(tmp) / 'installer.deb'
             path.write_bytes(b'previous')
             item = dict(expected(b'expected'), url='https://example.invalid/installer')
-            with mock.patch.object(installer.urllib.request, 'urlopen', return_value=io.BytesIO(b'tampered')):
+            def corrupted_download(*args, **kwargs):
+                path.with_name(path.name + '.download').write_bytes(b'tampered')
+            with mock.patch.object(installer.subprocess, 'run', side_effect=corrupted_download):
                 with self.assertRaises(RuntimeError):
                     installer.download_file(item, path)
             self.assertEqual(path.read_bytes(), b'previous')
@@ -52,15 +54,13 @@ class EditionInstallerTests(unittest.TestCase):
 
     def test_valid_download_streams_and_is_verified(self):
         payload = b'x' * (3 * 1024 * 1024)
-        class Stream(io.BytesIO):
-            def read(self, size=-1):
-                if size < 0:
-                    raise AssertionError('Installer must not load the complete download into memory')
-                return super().read(size)
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / 'installer.deb'
             item = dict(expected(payload), url='https://example.invalid/installer')
-            with mock.patch.object(installer.urllib.request, 'urlopen', return_value=Stream(payload)):
+            def valid_download(*args, **kwargs):
+                with path.with_name(path.name + '.download').open('wb') as stream:
+                    stream.write(payload)
+            with mock.patch.object(installer.subprocess, 'run', side_effect=valid_download), mock.patch.object(Path, 'read_bytes', side_effect=AssertionError('No whole-file loading allowed')):
                 installer.download_file(item, path)
             self.assertTrue(installer.valid_file(path, item))
 

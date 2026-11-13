@@ -18,7 +18,6 @@ import platform
 import shutil
 import subprocess
 import sys
-import urllib.request
 
 CATALOG_URL = 'https://github.com/TlamatiniSoftwareMX/Tlamatini-Software/releases/download/ediciones-2026-11-13/INSTALADORES-SEIS-EDICIONES.json'
 BLOCK = 1024 * 1024
@@ -39,18 +38,10 @@ def download_file(item, path):
         print('Ya descargado y verificado:', path.name, flush=True)
         return
     temporary = path.with_name(path.name + '.download')
-    digest = hashlib.sha256()
-    count = 0
-    request = urllib.request.Request(item['url'], headers={'User-Agent': 'TLAMATINI-Installer'})
     try:
-        with urllib.request.urlopen(request, timeout=90) as source, temporary.open('wb') as output:
-            while chunk := source.read(BLOCK):
-                count += len(chunk)
-                if count > item['size_bytes']:
-                    raise RuntimeError('El archivo recibido es mayor de lo esperado.')
-                output.write(chunk)
-                digest.update(chunk)
-        if count != item['size_bytes'] or digest.hexdigest() != item['sha256']:
+        subprocess.run(['curl', '-fL', '--retry', '4', '--retry-delay', '2',
+                        '--connect-timeout', '30', '--output', str(temporary), item['url']], check=True)
+        if not valid_file(temporary, item):
             raise RuntimeError('La descarga no pasó la verificación SHA-256: ' + path.name)
         temporary.replace(path)
     except Exception:
@@ -82,8 +73,8 @@ def assemble_files(paths, output, expected):
 
 def read_catalog(location):
     if location.startswith('https://'):
-        with urllib.request.urlopen(location, timeout=30) as response:
-            return json.load(response)
+        data = subprocess.check_output(['curl', '-fsSL', '--retry', '3', '--connect-timeout', '30', location])
+        return json.loads(data.decode('utf-8'))
     return json.loads(Path(location).read_text(encoding='utf-8'))
 
 
