@@ -19,7 +19,10 @@
           "size_bytes": 130652352,
           "sha256": "cea66fed55ab4fd4cff75b9365fcc87a21d1ecb54968a88d43144e396fc469bd"
         }
-      ]
+      ],
+      "installed_executable_sha256": "bd11cbaaa8233b47cdb2a313f79c75c03153d4978b57dabacda66bd87ed90757",
+      "installed_executable_size_bytes": 130454152,
+      "minimum_glibc": "2.38"
     },
     "linux-ia-4gb": {
       "platform": "linux",
@@ -38,7 +41,10 @@
           "size_bytes": 1000540352,
           "sha256": "934728b3250eae7a33c5e6882ec25c45498452bcf1498ea5505ffde0e9cc2eb7"
         }
-      ]
+      ],
+      "installed_executable_sha256": "0b30e9986e69f17d7f9c6d1f0b80a2ee4c00d051f70652fc302587f144eda46b",
+      "installed_executable_size_bytes": 130455320,
+      "minimum_glibc": "2.38"
     },
     "windows-sin-ia": {
       "platform": "windows",
@@ -352,273 +358,276 @@
       "model": "Gemma 3 4B Q4_K_M",
       "filename": "tlamatini-5.2.6-amd64.deb",
       "size_bytes": 2684201152,
-      "sha256": "855ab747766cc87679d81f276d23f4ecf810fcd4e51955bcafccc6971ed8d556",
+      "sha256": "85c3c6333064986219c8963774e5eb84e8fd41f495cde4f8a9cf58e01e913177",
       "downloads": [
         {
           "name": "tlamatini-5.2.6-linux-amd64.chunk-001-of-044",
           "url": "https://github.com/TlamatiniSoftwareMX/Tlamatini-Software/releases/download/v5.2.6/tlamatini-5.2.6-linux-amd64.chunk-001-of-044",
           "size_bytes": 61004572,
-          "sha256": "98d42908f3e30651cf5247fb8e9330f1e08addc14c877ea6ddbee6258b652d59"
+          "sha256": "753e4145feba29befc1a034f2091d1f62adfd40e317240a7798b72ad2ff69eb5"
         },
         {
           "name": "tlamatini-5.2.6-linux-amd64.chunk-002-of-044",
           "url": "https://github.com/TlamatiniSoftwareMX/Tlamatini-Software/releases/download/v5.2.6/tlamatini-5.2.6-linux-amd64.chunk-002-of-044",
           "size_bytes": 61004572,
-          "sha256": "4052fdde6a2bc192dc6b0c0baa5c4c7439c625e5e5307af6b3da5f15ab6d7e6a"
+          "sha256": "d23bf7252039e7c836810a3ca5788d02edc123cd7c98e6479388b84ebcbcdd55"
         },
         {
           "name": "tlamatini-5.2.6-linux-amd64.chunk-003-of-044",
           "url": "https://github.com/TlamatiniSoftwareMX/Tlamatini-Software/releases/download/v5.2.6/tlamatini-5.2.6-linux-amd64.chunk-003-of-044",
           "size_bytes": 61004572,
-          "sha256": "3d717bc28b690d876d04b90fdebb64ff9d3c8c03b04dabefeb88b88f083e5a69"
+          "sha256": "62420abb63db7a269b852499f798869416ee2e25c1fa9df1112fa75178833c5a"
         },
         {
           "name": "tlamatini-5.2.6-linux-amd64.chunk-004-of-044",
           "url": "https://github.com/TlamatiniSoftwareMX/Tlamatini-Software/releases/download/v5.2.6/tlamatini-5.2.6-linux-amd64.chunk-004-of-044",
           "size_bytes": 61004572,
-          "sha256": "1a099ab7237fb2c85fedb24393bf7901d2fb153c2069f40080e2f9b446d49d28"
+          "sha256": "238aec32a7b7dc5f479a04d9d2096a6ad8fa709b440f485088a24ad5e7894af4"
         },
         {
           "name": "tlamatini-5.2.6-linux-amd64.chunk-005-of-044",
           "url": "https://github.com/TlamatiniSoftwareMX/Tlamatini-Software/releases/download/v5.2.6/tlamatini-5.2.6-linux-amd64.chunk-005-of-044",
           "size_bytes": 61004572,
-          "sha256": "d981d33dbb756fe6ec69a0f97bde728fd33596d0a4f8e8670548059ed4122544"
+          "sha256": "ad9bc4809e9a8e3db1503a8ca29e38b5bf927cdf70be3c2565c5479edad43f78"
         },
         {
           "name": "tlamatini-5.2.6-linux-amd64.chunk-006-of-044",
           "url": "https://github.com/TlamatiniSoftwareMX/Tlamatini-Software/releases/download/v5.2.6/tlamatini-5.2.6-linux-amd64.chunk-006-of-044",
           "size_bytes": 61004572,
-          "sha256": "c1caf85c880ca14719a56aa7e35a008ea4e01f5daa57e11063acb33b384e3fa5"
+          "sha256": "7d536e453aca67b83172b06f408a28c6c1e1ea3264b3d0578200eed278cd175a"
         },
         {
           "name": "tlamatini-5.2.6-linux-amd64.chunk-007-of-044",
           "url": "https://github.com/TlamatiniSoftwareMX/Tlamatini-Software/releases/download/v5.2.6/tlamatini-5.2.6-linux-amd64.chunk-007-of-044",
           "size_bytes": 61004572,
-          "sha256": "cd1ca1b5cfeb3bfbceec1f1e24e04d3989a749ffeae9e98a375af81a19e2d0b2"
+          "sha256": "5c1570c5a6911d2802f25e941680e3c5a0d68c7f870eb55fefdf7fa5f046a513"
         },
         {
           "name": "tlamatini-5.2.6-linux-amd64.chunk-008-of-044",
           "url": "https://github.com/TlamatiniSoftwareMX/Tlamatini-Software/releases/download/v5.2.6/tlamatini-5.2.6-linux-amd64.chunk-008-of-044",
           "size_bytes": 61004572,
-          "sha256": "81d245439535a3c314fbaace3d0ade18deb46579e0f512a6b6ff0ee07713c6c3"
+          "sha256": "f54511b6a2c6a748725d9901dddb62fcfbc6d5d3e4243cecb1aae4550f4434b3"
         },
         {
           "name": "tlamatini-5.2.6-linux-amd64.chunk-009-of-044",
           "url": "https://github.com/TlamatiniSoftwareMX/Tlamatini-Software/releases/download/v5.2.6/tlamatini-5.2.6-linux-amd64.chunk-009-of-044",
           "size_bytes": 61004572,
-          "sha256": "2cb9d093e14e21c541ec7a8778a8d0dcee064830cbedf56ba615798879fba932"
+          "sha256": "4592ada9d58193c2cee4516962683bb6f1d7664b620cf187119608d3442d8aea"
         },
         {
           "name": "tlamatini-5.2.6-linux-amd64.chunk-010-of-044",
           "url": "https://github.com/TlamatiniSoftwareMX/Tlamatini-Software/releases/download/v5.2.6/tlamatini-5.2.6-linux-amd64.chunk-010-of-044",
           "size_bytes": 61004572,
-          "sha256": "4ee07cf0cadae9903696e0a6a83d54ccf2b1e7405eecf2be7f941072b0656683"
+          "sha256": "3681cd710542528d3c900fd06038e264430340c086e8bde84747ba47f18f133a"
         },
         {
           "name": "tlamatini-5.2.6-linux-amd64.chunk-011-of-044",
           "url": "https://github.com/TlamatiniSoftwareMX/Tlamatini-Software/releases/download/v5.2.6/tlamatini-5.2.6-linux-amd64.chunk-011-of-044",
           "size_bytes": 61004572,
-          "sha256": "740efc21f7b7e2f1ce3cc367d622c554f39deec91c58a03de380e339933544a8"
+          "sha256": "4099e1c40bcc3c4bf5a1b877c76edc509c111210f05b079b09cd14c7a8fb0c9b"
         },
         {
           "name": "tlamatini-5.2.6-linux-amd64.chunk-012-of-044",
           "url": "https://github.com/TlamatiniSoftwareMX/Tlamatini-Software/releases/download/v5.2.6/tlamatini-5.2.6-linux-amd64.chunk-012-of-044",
           "size_bytes": 61004572,
-          "sha256": "b47089ade101e7bb776a38b3e9016fbf6b49f0ac63ddc5461e5c3ddcddce7026"
+          "sha256": "32255354c01b0f0fca775407f4ae46428b189ed163315c5b7ab279c29d5fd782"
         },
         {
           "name": "tlamatini-5.2.6-linux-amd64.chunk-013-of-044",
           "url": "https://github.com/TlamatiniSoftwareMX/Tlamatini-Software/releases/download/v5.2.6/tlamatini-5.2.6-linux-amd64.chunk-013-of-044",
           "size_bytes": 61004572,
-          "sha256": "ffdcffc05a3f952d0540cffb8fcb599eb690eac899df6c1324ae6a2bf226e3cc"
+          "sha256": "5b9316054e75700b9c56774f29dbbfb932ccd531b3c683187a51fd011e661a09"
         },
         {
           "name": "tlamatini-5.2.6-linux-amd64.chunk-014-of-044",
           "url": "https://github.com/TlamatiniSoftwareMX/Tlamatini-Software/releases/download/v5.2.6/tlamatini-5.2.6-linux-amd64.chunk-014-of-044",
           "size_bytes": 61004572,
-          "sha256": "8797aafec01af2a34eea516414129e5d24f9fc69fc7e1ff93597551dd3c1798b"
+          "sha256": "50800dc7bac392040d832a6846173630193033ec57db95e4d15bea27c7a6c784"
         },
         {
           "name": "tlamatini-5.2.6-linux-amd64.chunk-015-of-044",
           "url": "https://github.com/TlamatiniSoftwareMX/Tlamatini-Software/releases/download/v5.2.6/tlamatini-5.2.6-linux-amd64.chunk-015-of-044",
           "size_bytes": 61004572,
-          "sha256": "06fb473914531cf11bdb032db810d056e6862ecb87d9b6e40f00564690aeeb30"
+          "sha256": "b3a441075755e267c60173e6c76cf36cdab37ec41e86161aedab6b1de5d3d5a2"
         },
         {
           "name": "tlamatini-5.2.6-linux-amd64.chunk-016-of-044",
           "url": "https://github.com/TlamatiniSoftwareMX/Tlamatini-Software/releases/download/v5.2.6/tlamatini-5.2.6-linux-amd64.chunk-016-of-044",
           "size_bytes": 61004572,
-          "sha256": "83d51290016bd23814a0f1968f5b52a40812ca0f295257d00fd5995f34b1ce19"
+          "sha256": "1fc69a19bc5d0164719812f8978d0b7c1e5e213ef1e900074ffe95ace4d612ab"
         },
         {
           "name": "tlamatini-5.2.6-linux-amd64.chunk-017-of-044",
           "url": "https://github.com/TlamatiniSoftwareMX/Tlamatini-Software/releases/download/v5.2.6/tlamatini-5.2.6-linux-amd64.chunk-017-of-044",
           "size_bytes": 61004572,
-          "sha256": "bf7d08ec7d9bf5dac42d796441bfeeda344d998f5797ed8c9606451a07f317a5"
+          "sha256": "7135b490cf283c33cfaac7995b26e4b06598770c995684df93fad1ee0d7307f7"
         },
         {
           "name": "tlamatini-5.2.6-linux-amd64.chunk-018-of-044",
           "url": "https://github.com/TlamatiniSoftwareMX/Tlamatini-Software/releases/download/v5.2.6/tlamatini-5.2.6-linux-amd64.chunk-018-of-044",
           "size_bytes": 61004572,
-          "sha256": "2455100f92ea8b51c3d366fb9e85530b912e1ea380e86f451088d4e2d28b1f40"
+          "sha256": "846f67c0fe3fda762fc8013ce3844869919e1f253412df762c6e5f0986ec99f1"
         },
         {
           "name": "tlamatini-5.2.6-linux-amd64.chunk-019-of-044",
           "url": "https://github.com/TlamatiniSoftwareMX/Tlamatini-Software/releases/download/v5.2.6/tlamatini-5.2.6-linux-amd64.chunk-019-of-044",
           "size_bytes": 61004572,
-          "sha256": "00c736ddeff859627ac2dadb0e0db15870f8d7371048ce9ec5bb30a6b0958eee"
+          "sha256": "4255aa7c205d0cf0421e8dc9ca195343634d890891b1f05f139cdf426ab28193"
         },
         {
           "name": "tlamatini-5.2.6-linux-amd64.chunk-020-of-044",
           "url": "https://github.com/TlamatiniSoftwareMX/Tlamatini-Software/releases/download/v5.2.6/tlamatini-5.2.6-linux-amd64.chunk-020-of-044",
           "size_bytes": 61004572,
-          "sha256": "2b6ce13ed411cec3faae1fb8a6a69cbf6b3abdd2130dab865ea643fae3ee10d6"
+          "sha256": "75eb0f1862a4108b8ffa3930fe1819c6077df14c3ebd207862536585d108fca0"
         },
         {
           "name": "tlamatini-5.2.6-linux-amd64.chunk-021-of-044",
           "url": "https://github.com/TlamatiniSoftwareMX/Tlamatini-Software/releases/download/v5.2.6/tlamatini-5.2.6-linux-amd64.chunk-021-of-044",
           "size_bytes": 61004572,
-          "sha256": "793d810bba5f692e52e994d8df4254a36061974ce1ed63db9f81349148b9430b"
+          "sha256": "f29bcb5853fa80e95aa61e72abbc430a7e22cc5afb44ceaf7d089a9a9b5860dd"
         },
         {
           "name": "tlamatini-5.2.6-linux-amd64.chunk-022-of-044",
           "url": "https://github.com/TlamatiniSoftwareMX/Tlamatini-Software/releases/download/v5.2.6/tlamatini-5.2.6-linux-amd64.chunk-022-of-044",
           "size_bytes": 61004572,
-          "sha256": "c9fd6ad2e75f7baa5712eea7c448898ddeae0b1ef9329fb9ba1775f4e347c3a2"
+          "sha256": "2dec32931e33779cad03d3b3db24482f127051342a5e681402e7323e0e092e1e"
         },
         {
           "name": "tlamatini-5.2.6-linux-amd64.chunk-023-of-044",
           "url": "https://github.com/TlamatiniSoftwareMX/Tlamatini-Software/releases/download/v5.2.6/tlamatini-5.2.6-linux-amd64.chunk-023-of-044",
           "size_bytes": 61004572,
-          "sha256": "e4a4daa9701da8f85e44a2672508d3e9b7d4e0f7f413c93a4146e26131a88343"
+          "sha256": "b0e31613851f72b1fe429bc76b126cfe7f40e25cbde4820b7618a13dd778d454"
         },
         {
           "name": "tlamatini-5.2.6-linux-amd64.chunk-024-of-044",
           "url": "https://github.com/TlamatiniSoftwareMX/Tlamatini-Software/releases/download/v5.2.6/tlamatini-5.2.6-linux-amd64.chunk-024-of-044",
           "size_bytes": 61004572,
-          "sha256": "05eed42a46966d8133d58643a643c6c5843d98deddcda3e97d371db7758813cc"
+          "sha256": "52643ae90043cc6693c1585cf7dfef15863cd6d3e67852db8e8ce46c913b711a"
         },
         {
           "name": "tlamatini-5.2.6-linux-amd64.chunk-025-of-044",
           "url": "https://github.com/TlamatiniSoftwareMX/Tlamatini-Software/releases/download/v5.2.6/tlamatini-5.2.6-linux-amd64.chunk-025-of-044",
           "size_bytes": 61004572,
-          "sha256": "72cd2a79a55d718813c1919fc3394ccd4b8cfa26209f7b1c6d69ab5e54eb7f91"
+          "sha256": "de0a6f20d6b924b485983f6bbe0c00a95caafdbae458d21d8fb8efb834e5b16f"
         },
         {
           "name": "tlamatini-5.2.6-linux-amd64.chunk-026-of-044",
           "url": "https://github.com/TlamatiniSoftwareMX/Tlamatini-Software/releases/download/v5.2.6/tlamatini-5.2.6-linux-amd64.chunk-026-of-044",
           "size_bytes": 61004572,
-          "sha256": "c2dd92bda541ff2a7744620453c48b532240944029fd98d096838e6687836175"
+          "sha256": "c7c773251533acea7dfcbc45d314a933653a13aef20478a9ddd1c4c99c326073"
         },
         {
           "name": "tlamatini-5.2.6-linux-amd64.chunk-027-of-044",
           "url": "https://github.com/TlamatiniSoftwareMX/Tlamatini-Software/releases/download/v5.2.6/tlamatini-5.2.6-linux-amd64.chunk-027-of-044",
           "size_bytes": 61004572,
-          "sha256": "bfd80f895f30b119ece93cba3a0432d46c6419a82ddbb251fb0dc4cf1a99ed78"
+          "sha256": "59daefeaae340ddd966a8920ba8aa4061548ed805b82cb1d9a57430b93df7628"
         },
         {
           "name": "tlamatini-5.2.6-linux-amd64.chunk-028-of-044",
           "url": "https://github.com/TlamatiniSoftwareMX/Tlamatini-Software/releases/download/v5.2.6/tlamatini-5.2.6-linux-amd64.chunk-028-of-044",
           "size_bytes": 61004572,
-          "sha256": "2a4bb6df7cca95c0506371519010f466229a2d62ecea6169858fc8fd15146505"
+          "sha256": "3782e564eda712f6eb9d798ebd14500e7f2f09f4931fc960f394199b81eccf2d"
         },
         {
           "name": "tlamatini-5.2.6-linux-amd64.chunk-029-of-044",
           "url": "https://github.com/TlamatiniSoftwareMX/Tlamatini-Software/releases/download/v5.2.6/tlamatini-5.2.6-linux-amd64.chunk-029-of-044",
           "size_bytes": 61004572,
-          "sha256": "d054f7bf302d856320b24e0d96ef54e94ebfc4be068de383cb4b05c58bc48e09"
+          "sha256": "d805fc312fba4f27f71e6e0ef632ebbd68df6ed09a9c750e65810c2dd8cd3d3f"
         },
         {
           "name": "tlamatini-5.2.6-linux-amd64.chunk-030-of-044",
           "url": "https://github.com/TlamatiniSoftwareMX/Tlamatini-Software/releases/download/v5.2.6/tlamatini-5.2.6-linux-amd64.chunk-030-of-044",
           "size_bytes": 61004572,
-          "sha256": "6f46d8a4639220d43522f6bb66138a3f43f259ef889be6a49f02947623428af3"
+          "sha256": "2e4d72d058fd91425ec3c26a9373337f6aced21bfb8cae71d37e60f3d0adbab2"
         },
         {
           "name": "tlamatini-5.2.6-linux-amd64.chunk-031-of-044",
           "url": "https://github.com/TlamatiniSoftwareMX/Tlamatini-Software/releases/download/v5.2.6/tlamatini-5.2.6-linux-amd64.chunk-031-of-044",
           "size_bytes": 61004572,
-          "sha256": "60e072c105bd4d1126f955800bf30f5e75654b29600cc4940ed47361ecfa30d1"
+          "sha256": "a2dc295a996ac3422c6bc2951a9c2d3947e6abdb71cf522cb1b3eae6d2a6208d"
         },
         {
           "name": "tlamatini-5.2.6-linux-amd64.chunk-032-of-044",
           "url": "https://github.com/TlamatiniSoftwareMX/Tlamatini-Software/releases/download/v5.2.6/tlamatini-5.2.6-linux-amd64.chunk-032-of-044",
           "size_bytes": 61004572,
-          "sha256": "aa20b7d40178d8132e029874adf0f736ad2615bb524ba7f03187800df24d67d8"
+          "sha256": "6f645053a8aa5da347014759eaa7bb7fc4335e58d25b08b178d388455c97a728"
         },
         {
           "name": "tlamatini-5.2.6-linux-amd64.chunk-033-of-044",
           "url": "https://github.com/TlamatiniSoftwareMX/Tlamatini-Software/releases/download/v5.2.6/tlamatini-5.2.6-linux-amd64.chunk-033-of-044",
           "size_bytes": 61004572,
-          "sha256": "c2f29a23f1cec41673662064bdb92794ff4f6e35a6c31623e9f256826283ec6d"
+          "sha256": "26aab1a3a106a837464a6d0643d560c2035c08b07362e95c84d830357e31b06b"
         },
         {
           "name": "tlamatini-5.2.6-linux-amd64.chunk-034-of-044",
           "url": "https://github.com/TlamatiniSoftwareMX/Tlamatini-Software/releases/download/v5.2.6/tlamatini-5.2.6-linux-amd64.chunk-034-of-044",
           "size_bytes": 61004572,
-          "sha256": "bb673e95572b1bfe8f40a5a12a7f97f4a89b9e284e3d2cb8d4170436599e2391"
+          "sha256": "637917f792f0902bdc746ae05592731c52ca632a32124e7f5f0e24f78bf73c01"
         },
         {
           "name": "tlamatini-5.2.6-linux-amd64.chunk-035-of-044",
           "url": "https://github.com/TlamatiniSoftwareMX/Tlamatini-Software/releases/download/v5.2.6/tlamatini-5.2.6-linux-amd64.chunk-035-of-044",
           "size_bytes": 61004572,
-          "sha256": "62ff7636eabc47b498db89fb75c23ad02a9291fa527d56dfce6bb8dea4bb7ea9"
+          "sha256": "ebf23f20f5588814f8cc0e29b8ab81a053eab1c07385d3eaf284bccdb8af973b"
         },
         {
           "name": "tlamatini-5.2.6-linux-amd64.chunk-036-of-044",
           "url": "https://github.com/TlamatiniSoftwareMX/Tlamatini-Software/releases/download/v5.2.6/tlamatini-5.2.6-linux-amd64.chunk-036-of-044",
           "size_bytes": 61004572,
-          "sha256": "c357d6b00cbff25198ba033a82c7e920cc516d89b20029235f5b2834094ab241"
+          "sha256": "e02cfba35bfb9c178109bfdc8b298c8b6e574d97807f5ff2b46a00c5e577fc4d"
         },
         {
           "name": "tlamatini-5.2.6-linux-amd64.chunk-037-of-044",
           "url": "https://github.com/TlamatiniSoftwareMX/Tlamatini-Software/releases/download/v5.2.6/tlamatini-5.2.6-linux-amd64.chunk-037-of-044",
           "size_bytes": 61004572,
-          "sha256": "c4486d9313459d90ab848e9277cac5eef7b3b69c50f4bdeb31ffae59ef2172c9"
+          "sha256": "7d890119997b0e6ddb020c22c1f9e1b2e6b9c91d1a5589cac818af5cdee856cc"
         },
         {
           "name": "tlamatini-5.2.6-linux-amd64.chunk-038-of-044",
           "url": "https://github.com/TlamatiniSoftwareMX/Tlamatini-Software/releases/download/v5.2.6/tlamatini-5.2.6-linux-amd64.chunk-038-of-044",
           "size_bytes": 61004572,
-          "sha256": "b450182d4a8f97a483323065c96178e7ff23e9c01f1107d1859b0c57ce13f9e8"
+          "sha256": "d3730c3b110db1003702ccc97decbe9204fa745a5b4800bcd78a642c7ccbd2fd"
         },
         {
           "name": "tlamatini-5.2.6-linux-amd64.chunk-039-of-044",
           "url": "https://github.com/TlamatiniSoftwareMX/Tlamatini-Software/releases/download/v5.2.6/tlamatini-5.2.6-linux-amd64.chunk-039-of-044",
           "size_bytes": 61004572,
-          "sha256": "914cd0faf1728460755120d3fdbab63ad493c3971435d7556bef210bbf14beee"
+          "sha256": "207ff8e1c84882a93b3006444a49036bd374048a547b60c2ed6d60aaeb13ef9c"
         },
         {
           "name": "tlamatini-5.2.6-linux-amd64.chunk-040-of-044",
           "url": "https://github.com/TlamatiniSoftwareMX/Tlamatini-Software/releases/download/v5.2.6/tlamatini-5.2.6-linux-amd64.chunk-040-of-044",
           "size_bytes": 61004572,
-          "sha256": "e740cacdfe12027f7884bf742f1c1f29c9224a8bc0107ddf9c7284a160ae22e9"
+          "sha256": "aa331a01a7d1cf0bb3a0585d5449e9b84ed0dd3932cdf9035ce2ddf2da9bce45"
         },
         {
           "name": "tlamatini-5.2.6-linux-amd64.chunk-041-of-044",
           "url": "https://github.com/TlamatiniSoftwareMX/Tlamatini-Software/releases/download/v5.2.6/tlamatini-5.2.6-linux-amd64.chunk-041-of-044",
           "size_bytes": 61004572,
-          "sha256": "68b03bd1f57a8cecd1da9e02fa1ca6d10da88d73574daea53cd68a03da694e22"
+          "sha256": "12911876232045d6c7ed4197fb7b57b8b1b65ac317e264df4d657b9d817d6247"
         },
         {
           "name": "tlamatini-5.2.6-linux-amd64.chunk-042-of-044",
           "url": "https://github.com/TlamatiniSoftwareMX/Tlamatini-Software/releases/download/v5.2.6/tlamatini-5.2.6-linux-amd64.chunk-042-of-044",
           "size_bytes": 61004572,
-          "sha256": "07e4d49cd4d65aba452a8d1baafed8f4af7bf3712ebe90e16112735ca7699c86"
+          "sha256": "875df774072f4b01539260481f12f665283ffb926b50455ead8fc9e41fbbffe1"
         },
         {
           "name": "tlamatini-5.2.6-linux-amd64.chunk-043-of-044",
           "url": "https://github.com/TlamatiniSoftwareMX/Tlamatini-Software/releases/download/v5.2.6/tlamatini-5.2.6-linux-amd64.chunk-043-of-044",
           "size_bytes": 61004572,
-          "sha256": "d28d474d53cf3e413a923d83155cd8c75aa9708ed707db329689ce46d887c8b1"
+          "sha256": "286929b61617803872c2022e6041a7cb3fa83029f5d144b6cf53917ff9ce814d"
         },
         {
           "name": "tlamatini-5.2.6-linux-amd64.chunk-044-of-044",
           "url": "https://github.com/TlamatiniSoftwareMX/Tlamatini-Software/releases/download/v5.2.6/tlamatini-5.2.6-linux-amd64.chunk-044-of-044",
           "size_bytes": 61004556,
-          "sha256": "a278cac9aa0b8142d3535eda1cae500e0a285538c60b8b385292676e77e81ead"
+          "sha256": "36221056e762207f8298adc9a39e8a00110f0f1045f0e358091c641fbc052efd"
         }
-      ]
+      ],
+      "installed_executable_sha256": "cdfaf279bf4ef7e5c622497ecf439069d22ea075c5c8bf99650b9b571bdcc8ed",
+      "installed_executable_size_bytes": 130418528,
+      "minimum_glibc": "2.38"
     }
   }
 }

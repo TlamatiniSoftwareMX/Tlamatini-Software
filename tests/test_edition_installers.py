@@ -84,3 +84,23 @@ class EditionInstallerTests(unittest.TestCase):
         catalog['editions']['linux-sin-ia']['downloads'][0]['name'] = '../outside.deb'
         with self.assertRaises(RuntimeError):
             installer.select_edition(catalog, 'sin-ia')
+
+    def test_install_explicitly_replaces_same_revision_and_allows_selected_variant(self):
+        with mock.patch.object(installer.os, 'geteuid', return_value=0), mock.patch.object(installer.subprocess, 'run') as run:
+            installer.install_package(Path('/tmp/selected.deb'), {})
+            command = run.call_args.args[0]
+            self.assertIn('--reinstall', command)
+            self.assertIn('--allow-downgrades', command)
+            self.assertEqual(command[-1], '/tmp/selected.deb')
+
+    def test_install_does_not_claim_success_with_wrong_executable(self):
+        with mock.patch.object(installer.os, 'geteuid', return_value=0), mock.patch.object(installer.subprocess, 'run'), mock.patch.object(installer, 'valid_file', return_value=False):
+            with self.assertRaises(RuntimeError):
+                installer.install_package(Path('/tmp/selected.deb'), {'installed_executable_sha256': 'bad', 'installed_executable_size_bytes': 1})
+
+    def test_unsupported_glibc_is_rejected_before_install(self):
+        with mock.patch.object(installer.platform, 'libc_ver', return_value=('glibc', '2.35')):
+            with self.assertRaises(RuntimeError):
+                installer.check_compatibility({'minimum_glibc': '2.38'})
+        with mock.patch.object(installer.platform, 'libc_ver', return_value=('glibc', '2.39')):
+            installer.check_compatibility({'minimum_glibc': '2.38'})
