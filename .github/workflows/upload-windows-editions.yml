@@ -1,0 +1,31 @@
+name: Upload existing Windows installers sequentially
+on:
+  workflow_call:
+permissions:
+  contents: write
+  actions: read
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Transfer existing installers one at a time
+        shell: bash
+        run: |
+          set -euo pipefail
+          for edition in no-ai ai-4gb; do
+            folder="artifacts/$edition"
+            gh run download 43461037585 --repo TlamatiniSoftwareMX/Tlamatini-Software --name "TLAMATINI-Windows-$edition" --dir "$folder"
+            EDITION="$edition" python3 - <<'PY'
+          import hashlib, os
+          from pathlib import Path
+          edition=os.environ['EDITION']
+          expected={'no-ai':'1598fa034f7548079a605cf6d63e2918a0baa4a2f19aa131cc95374ec66894e2','ai-4gb':'05f41da14236bb440816e910765dde286268477bc34029d3e19891cac4c2001b'}
+          path=next(Path('artifacts',edition).glob('*.exe'))
+          with path.open('rb') as stream:
+              assert hashlib.file_digest(stream,'sha256').hexdigest()==expected[edition]
+          print('SHA-256 verified:',path)
+          PY
+            gh release upload ediciones-2026-11-13 "$folder/TLAMATINI-Windows-$edition-5.2.6-Instalador.exe" --repo TlamatiniSoftwareMX/Tlamatini-Software --clobber
+          done
