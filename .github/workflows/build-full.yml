@@ -2,6 +2,12 @@ name: Build Full
 
 on:
   workflow_dispatch:
+    inputs:
+      mode:
+        description: Paquetes a generar
+        type: choice
+        options: [full, windows-editions]
+        default: full
   push:
     tags:
       - "v*"
@@ -17,7 +23,13 @@ env:
   CLIENT_DEPS: pyinstaller pillow requests pmtiles tkinterdnd2 cryptography numpy opencv-python PyMuPDF pytesseract
 
 jobs:
+  windows-editions:
+    if: github.event_name == 'workflow_dispatch' && inputs.mode == 'windows-editions'
+    uses: ./.github/workflows/build-editions.yml
+    permissions:
+      contents: read
   build:
+    if: github.event_name != 'workflow_dispatch' || inputs.mode != 'windows-editions'
     strategy:
       fail-fast: false
       matrix:
