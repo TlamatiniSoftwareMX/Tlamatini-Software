@@ -6,7 +6,7 @@ on:
       mode:
         description: Paquetes a generar
         type: choice
-        options: [full, windows-editions, upload-windows, verify-installers]
+        options: [full, windows-editions, upload-windows, verify-installers, audit-editions]
         default: full
   push:
     tags:
@@ -23,6 +23,11 @@ env:
   CLIENT_DEPS: pyinstaller pillow requests pmtiles tkinterdnd2 cryptography numpy opencv-python PyMuPDF pytesseract
 
 jobs:
+  audit-editions:
+    if: github.event_name == 'workflow_dispatch' && inputs.mode == 'audit-editions'
+    uses: ./.github/workflows/audit-editions.yml
+    permissions:
+      contents: read
   verify-installers:
     if: github.event_name == 'workflow_dispatch' && inputs.mode == 'verify-installers'
     uses: ./.github/workflows/verify-installers.yml

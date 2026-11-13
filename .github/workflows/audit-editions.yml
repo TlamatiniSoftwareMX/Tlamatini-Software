@@ -1,0 +1,79 @@
+name: Audit six published editions sequentially
+on:
+  workflow_call:
+permissions:
+  contents: read
+jobs:
+  linux:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install audit tools
+        run: |
+          python -m pip install pyinstaller psutil pillow
+          sudo apt-get update -qq
+          sudo apt-get install -y xvfb xdotool imagemagick
+      - name: Download published Linux command
+        run: curl -fsSL --retry 3 https://github.com/TlamatiniSoftwareMX/Tlamatini-Software/releases/download/ediciones-2026-11-13/INSTALAR-TLAMATINI-EDICIONES.sh -o /tmp/published-linux.sh
+      - name: Audit three Linux installations sequentially, including edition changes
+        shell: bash
+        run: |
+          for edition in sin-ia ia-4gb ia-8gb; do
+            folder="$RUNNER_TEMP/download-$edition"
+            code=0
+            bash /tmp/published-linux.sh "$edition" --carpeta "$folder" > "$RUNNER_TEMP/install-$edition.log" 2>&1 || code=$?
+            mkdir -p audit-results/linux-$edition
+            cp "$RUNNER_TEMP/install-$edition.log" audit-results/linux-$edition/install.log
+            xvfb-run -a python scripts/audit/inspect_installed_edition.py --edition "$edition" --root /opt/tlamatini --output audit-results --install-code "$code"
+            rm -rf "$folder"
+          done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: audit-linux
+          path: audit-results/
+          retention-days: 14
+  windows:
+    needs: linux
+    if: always()
+    runs-on: windows-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install audit tools
+        run: python -m pip install pyinstaller psutil pillow
+      - name: Audit three Windows downloads and installations sequentially
+        shell: powershell
+        run: |
+          $script = Join-Path $env:TEMP 'published-windows.ps1'
+          Invoke-WebRequest -UseBasicParsing 'https://github.com/TlamatiniSoftwareMX/Tlamatini-Software/releases/download/ediciones-2026-11-13/INSTALAR-TLAMATINI-EDICIONES.ps1' -OutFile $script
+          foreach ($edition in @('sin-ia','ia-4gb','ia-8gb')) {
+            $folder = Join-Path $env:RUNNER_TEMP "download-$edition"
+            $installed = Join-Path $env:RUNNER_TEMP "installed-$edition"
+            $resultFolder = "audit-results/windows-$edition"
+            New-Item -ItemType Directory -Force $resultFolder | Out-Null
+            $code = 0
+            try {
+              powershell.exe -NoProfile -ExecutionPolicy Bypass -File $script -Edicion $edition -SoloDescargar -Carpeta $folder 2>&1 | Tee-Object "$resultFolder/download.log"
+              if ($LASTEXITCODE -ne 0) { throw 'Published download command failed' }
+              $exe = (Get-ChildItem "$folder/*.exe" | Select-Object -First 1).FullName
+              $process = Start-Process -FilePath $exe -ArgumentList @('/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/SP-',"/DIR=$installed","/LOG=$env:RUNNER_TEMP/inno-$edition.log") -Wait -PassThru
+              $code = $process.ExitCode
+            } catch { Write-Host $_; $code = 1 }
+            python scripts/audit/inspect_installed_edition.py --edition $edition --root $installed --output audit-results --install-code $code
+            if (Test-Path "$env:RUNNER_TEMP/inno-$edition.log") { Copy-Item "$env:RUNNER_TEMP/inno-$edition.log" "$resultFolder/install.log" }
+            Remove-Item -LiteralPath $folder,$installed -Recurse -Force -ErrorAction SilentlyContinue
+          }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: audit-windows
+          path: audit-results/
+          retention-days: 14
