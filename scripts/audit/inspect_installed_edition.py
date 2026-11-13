@@ -59,14 +59,60 @@ def windows_text(pids):
     return results
 
 
+def close_gui(process, window_names):
+    try:
+        parent = psutil.Process(process.pid)
+        children = parent.children(recursive=True)
+    except psutil.Error:
+        return []
+    runtimes = [child for child in children if 'llama-server' in child.name().lower()]
+    pids = {process.pid} | {child.pid for child in children}
+    if sys.platform == 'win32':
+        import ctypes
+        user32 = ctypes.windll.user32
+        callback_type = ctypes.WINFUNCTYPE(ctypes.c_bool, ctypes.c_void_p, ctypes.c_void_p)
+        def close(handle, _):
+            pid = ctypes.c_ulong()
+            user32.GetWindowThreadProcessId(handle, ctypes.byref(pid))
+            if pid.value in pids and user32.IsWindowVisible(handle):
+                user32.PostMessageW(handle, 0x0010, 0, 0)
+            return True
+        user32.EnumWindows(callback_type(close), 0)
+    else:
+        from Xlib import X, display, protocol
+        connection = display.Display()
+        ids = subprocess.run(['xdotool','search','--onlyvisible','--name','TLAMATINI'], capture_output=True,text=True).stdout.split()
+        for handle in ids:
+            window = connection.create_resource_object('window', int(handle))
+            message = protocol.event.ClientMessage(window=window, client_type=connection.intern_atom('WM_PROTOCOLS'), data=(32,[connection.intern_atom('WM_DELETE_WINDOW'),X.CurrentTime,0,0,0]))
+            window.send_event(message, event_mask=0)
+        connection.flush()
+    deadline = time.monotonic() + 8
+    while time.monotonic() < deadline:
+        if process.poll() is not None:
+            break
+        time.sleep(0.25)
+    time.sleep(1)
+    remaining = [child.pid for child in runtimes if child.is_running() and child.status() != psutil.STATUS_ZOMBIE]
+    for child in runtimes:
+        try: child.terminate()
+        except psutil.Error: pass
+    return remaining
+
+
 def gui_smoke(executable, folder, env):
     logfile = folder / 'gui.log'
     result = {}
     with logfile.open('w', encoding='utf-8') as log:
-        process = subprocess.Popen([str(executable), '--no-ai'], stdout=log, stderr=subprocess.STDOUT, env=env, cwd=executable.parent)
+        process = subprocess.Popen([str(executable)], stdout=log, stderr=subprocess.STDOUT, env=env, cwd=executable.parent)
         try:
             time.sleep(18)
             result['alive_after_18_seconds'] = process.poll() is None
+            try:
+                tracked = [psutil.Process(process.pid)] + psutil.Process(process.pid).children(recursive=True)
+                result['process_tree_rss_bytes'] = sum(item.memory_info().rss for item in tracked)
+            except psutil.Error:
+                pass
             if sys.platform == 'win32':
                 pids = {process.pid}
                 try: pids.update(c.pid for c in psutil.Process(process.pid).children(recursive=True))
@@ -85,8 +131,13 @@ def gui_smoke(executable, folder, env):
                 result['windows'] = names
                 subprocess.run(['import', '-window', 'root', str(folder / 'gui.png')], timeout=15, check=False)
         finally:
+            try:
+                result['runtime_pids_remaining_after_window_close'] = close_gui(process, result.get('windows', []))
+            except Exception as error:
+                result['close_probe_error'] = str(error)
             stop_tree(process)
     text = logfile.read_text(encoding='utf-8', errors='replace')
+    result['mode'] = 'default startup, no AI override'
     result['fatal_output'] = any(value in text.lower() for value in ['traceback (most recent call last)', 'error fatal de arranque', 'failed to execute script'])
     result['success'] = result['alive_after_18_seconds'] and bool(result.get('windows')) and not result['fatal_output']
     if any('no se pudo iniciar' in title.lower() or 'error fatal' in title.lower() for title in result.get('windows', [])):
@@ -166,7 +217,7 @@ def main():
     args = parser.parse_args()
     platform = 'windows' if sys.platform == 'win32' else 'linux'
     expected = json.loads(Path('installer/ediciones.json').read_text(encoding='utf-8'))['editions'][platform+'-'+args.edition]
-    folder = args.output / (platform+'-'+args.edition); folder.mkdir(parents=True, exist_ok=True)
+    folder = (args.output / (platform+'-'+args.edition)).resolve(); folder.mkdir(parents=True, exist_ok=True)
     report = {'platform': platform, 'edition': args.edition, 'install_exit_code': args.install_code, 'expected': expected, 'checks': {}, 'warnings': []}
     executable = args.root / ('TLAMATINI.exe' if platform == 'windows' else 'TLAMATINI')
     try:
@@ -175,9 +226,13 @@ def main():
         archive = CArchiveReader(str(executable))
         names = [name for name in archive.toc if name.lower().endswith('.pyz')]
         modules = archive.open_embedded_archive(names[0]).toc
-        report['feature_modules'] = {name: name in modules for name in ['tkinter','PIL','numpy','cv2','cryptography','requests','pmtiles','tkinterdnd2','fitz','pymupdf','pytesseract']}
+        report['feature_modules'] = {name: name in modules or any(entry.startswith(name.replace('.', '/') + '/') for entry in archive.toc) for name in ['tkinter','PIL','numpy','cv2','cryptography','requests','pmtiles','tkinterdnd2','fitz','pymupdf','pypdf','pytesseract']}
+        report['external_ocr_runtime'] = __import__('shutil').which('tesseract')
+        report['packaged_ocr_runtime'] = [str(path.relative_to(args.root)) for name in ['tesseract.exe','tesseract'] for path in args.root.rglob(name) if path.is_file()]
+        if report['feature_modules']['pytesseract'] and not report['packaged_ocr_runtime']:
+            report['warnings'].append('OCR needs an external Tesseract installation; engine is not bundled')
         for name, feature in [('fitz','PDF'),('pytesseract','OCR'),('cv2','camera')]:
-            if name not in modules and (name != 'fitz' or 'pymupdf' not in modules): report['warnings'].append(feature+' module missing from executable')
+            if not report['feature_modules'][name] and (name != 'fitz' or not (report['feature_modules']['pymupdf'] or report['feature_modules']['pypdf'])): report['warnings'].append(feature+' module missing from executable')
         if 'edition.json' in archive.toc:
             marker = json.loads(archive.extract('edition.json'))
             report['embedded_edition'] = marker
@@ -201,7 +256,10 @@ def main():
         if args.edition != 'sin-ia':
             report['runtime'] = runtime_smoke(args.root, folder, expected)
             report['checks']['runtime'] = report['runtime']['success']
+        if report.get('gui', {}).get('runtime_pids_remaining_after_window_close'):
+            report['warnings'].append('AI runtime stays in memory after closing the application window')
         report['success'] = all(report['checks'].values())
+        report['feature_complete'] = bool(report['feature_modules'].get('fitz') or report['feature_modules'].get('pymupdf')) and bool(report['feature_modules'].get('pytesseract')) and bool(report.get('packaged_ocr_runtime'))
     except Exception as error:
         report.update(success=False,error=str(error))
     (folder / 'audit.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')

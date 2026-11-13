@@ -92,6 +92,28 @@ def select_edition(catalog, edition):
     return item
 
 
+def check_compatibility(item):
+    minimum = item.get('minimum_glibc')
+    if not minimum:
+        return
+    family, version = platform.libc_ver()
+    def parts(value):
+        return tuple(int(part) for part in value.split('.'))
+    if family != 'glibc' or not version or parts(version) < parts(minimum):
+        raise RuntimeError('Esta edición necesita glibc ' + minimum + ' o superior. Tu sistema tiene ' + (version or 'una versión no identificada') + '. Actualiza tu distribución Linux antes de instalar.')
+
+
+def install_package(output, item):
+    command = ['apt-get', 'install', '--reinstall', '--allow-downgrades', '-y', str(output.resolve())]
+    if os.geteuid() != 0:
+        command.insert(0, 'sudo')
+    subprocess.run(command, check=True)
+    if item.get('installed_executable_sha256'):
+        expected = {'size_bytes': item['installed_executable_size_bytes'], 'sha256': item['installed_executable_sha256']}
+        if not valid_file(Path('/opt/tlamatini/TLAMATINI'), expected):
+            raise RuntimeError('La aplicación instalada no coincide con la edición elegida. No se confirmó la instalación.')
+
+
 def main():
     parser = argparse.ArgumentParser(description='Instala una edición de TLAMATINI en Linux de 64 bits.')
     parser.add_argument('edicion', choices=['sin-ia', 'ia-4gb', 'ia-8gb'])
@@ -111,6 +133,8 @@ def main():
         raise RuntimeError('Esta edición necesita Linux de 64 bits amd64/x86_64.')
     if not shutil.which('apt'):
         raise RuntimeError('Usa este instalador en Debian, Ubuntu o Linux Mint con apt.')
+    if not args.solo_descargar:
+        check_compatibility(item)
     folder = args.carpeta or Path.home() / 'Downloads' / 'TLAMATINI' / args.edicion
     folder.mkdir(parents=True, exist_ok=True)
     output = folder / item['filename']
@@ -138,10 +162,7 @@ def main():
             pass
     print('Instalador completo y verificado:', output, flush=True)
     if not args.solo_descargar:
-        command = ['apt', 'install', '-y', str(output.resolve())]
-        if os.geteuid() != 0:
-            command.insert(0, 'sudo')
-        subprocess.run(command, check=True)
+        install_package(output, item)
         print('Instalación terminada. Abre TLAMATINI desde el menú de aplicaciones o escribe: tlamatini')
     return 0
 

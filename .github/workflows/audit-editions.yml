@@ -14,7 +14,7 @@ jobs:
           python-version: '3.12'
       - name: Install audit tools
         run: |
-          python -m pip install pyinstaller psutil pillow
+          python -m pip install pyinstaller psutil pillow python-xlib
           sudo apt-get update -qq
           sudo apt-get install -y xvfb xdotool imagemagick
       - name: Download published Linux command
@@ -37,6 +37,8 @@ jobs:
           name: audit-linux
           path: audit-results/
           retention-days: 14
+      - name: Validate core installation and startup results
+        run: python -c "import pathlib,json; items=[json.loads(p.read_text()) for p in pathlib.Path('audit-results').rglob('audit.json')]; assert len(items)==3 and all(x['success'] for x in items), [(x['edition'],x.get('error'),x.get('checks')) for x in items]"
   windows:
     needs: linux
     if: always()
@@ -77,3 +79,5 @@ jobs:
           name: audit-windows
           path: audit-results/
           retention-days: 14
+      - name: Validate core installation and startup results
+        run: python -c "import pathlib,json; items=[json.loads(p.read_text(encoding='utf-8')) for p in pathlib.Path('audit-results').rglob('audit.json')]; assert len(items)==3 and all(x['success'] for x in items), [(x['edition'],x.get('error'),x.get('checks')) for x in items]"
