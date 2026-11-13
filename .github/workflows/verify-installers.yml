@@ -1,0 +1,20 @@
+name: Verify installation commands
+on:
+  workflow_call:
+permissions:
+  contents: read
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test Windows PowerShell installer without installing applications
+        shell: powershell
+        run: .\tests\verify_edition_installer.ps1
+      - name: Verify all three selections without downloading payloads
+        shell: powershell
+        run: |
+          foreach ($edition in @('sin-ia', 'ia-4gb', 'ia-8gb')) {
+            & .\scripts\INSTALAR-TLAMATINI-EDICIONES.ps1 -Edicion $edition -Catalogo .\installer\ediciones.json -Verificar
+            if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }

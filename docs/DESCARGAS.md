@@ -1,52 +1,109 @@
-# Descargas para usuarios
+# TLAMATINI — descarga e instalación
 
-Usa GitHub Releases como pagina publica de descargas:
+TLAMATINI es una aplicación de escritorio con herramientas de consulta, organización, mapas y cámara. Puedes elegir una edición con inteligencia artificial local o una edición sin IA.
 
-```text
-https://github.com/TlamatiniSoftwareMX/Tlamatini-Software/releases/latest
+## Elige tu edición
+
+| Sistema de 64 bits | Versión de TLAMATINI | Inteligencia artificial incluida | RAM recomendada |
+| --- | --- | --- | --- |
+| Windows | 5.2.6 | Gemma 3 4B | 8 GB |
+| Windows | 5.2.6 | Gemma 3 1B | 4 GB |
+| Windows | 5.2.6 sin IA | — | — |
+| Linux | 5.2.6 | Gemma 3 4B | 8 GB |
+| Linux | 5.2.6 | Gemma 3 1B | 4 GB |
+| Linux | 5.2.6 sin IA | — | — |
+
+La RAM es la memoria total de tu computadora. Gemma 3 1B es el modelo pequeño para la edición destinada a 4 GB; Gemma 3 4B es el modelo de la edición para la que se recomiendan 8 GB. Los nombres 1B y 4B identifican el tamaño del modelo, no los GB de RAM.
+
+Elige **una edición por computadora**. Las variantes instalan la misma aplicación. El modelo de IA viene incluido y funciona localmente después de la instalación. Para descargar e instalar necesitas conexión a Internet.
+
+Los valores de RAM son recomendaciones: aún está pendiente comprobar el consumo de toda la aplicación en equipos reales de 4 GB. Las ediciones sin IA no descargan ni inician modelos.
+
+## Windows: cómo abrir PowerShell
+
+1. Abre **Inicio** y escribe **Windows PowerShell**.
+2. Abre **Windows PowerShell**.
+3. Elige uno de los tres bloques siguientes, copia **todo el bloque**, pégalo en PowerShell y presiona **Enter**.
+4. Espera a que termine la descarga. Cuando Windows solicite permiso, acepta para abrir el asistente y sigue sus pasos.
+
+El comando descarga todo, verifica los archivos y abre el instalador. Al terminar queda **un archivo EXE completo** en `%USERPROFILE%\Downloads\TLAMATINI\`, dentro de la carpeta de la edición elegida. Las partes temporales se unen y eliminan automáticamente; no tienes que descargarlas una por una.
+
+### Windows 5.2.6 — Gemma 3 4B — RAM recomendada: 8 GB
+
+```powershell
+$ErrorActionPreference = 'Stop'; [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+$archivo = Join-Path $env:TEMP 'TLAMATINI-instalar.ps1'
+Invoke-WebRequest -UseBasicParsing 'https://github.com/TlamatiniSoftwareMX/Tlamatini-Software/releases/download/ediciones-2026-11-13/INSTALAR-TLAMATINI-EDICIONES.ps1' -OutFile $archivo
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File $archivo -Edicion ia-8gb
 ```
 
-## Windows
+### Windows 5.2.6 — Gemma 3 1B — RAM recomendada: 4 GB
 
-Archivo recomendado para usuarios:
+```powershell
+$ErrorActionPreference = 'Stop'; [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+$archivo = Join-Path $env:TEMP 'TLAMATINI-instalar.ps1'
+Invoke-WebRequest -UseBasicParsing 'https://github.com/TlamatiniSoftwareMX/Tlamatini-Software/releases/download/ediciones-2026-11-13/INSTALAR-TLAMATINI-EDICIONES.ps1' -OutFile $archivo
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File $archivo -Edicion ia-4gb
+```
 
-- `INSTALAR-TLAMATINI-WINDOWS.cmd`
+### Windows 5.2.6 sin IA
 
-El usuario sólo descarga este archivo y hace doble clic. El asistente obtiene
-automáticamente las partes de la release, puede continuar una descarga
-interrumpida, las verifica y abre el instalador final.
+```powershell
+$ErrorActionPreference = 'Stop'; [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+$archivo = Join-Path $env:TEMP 'TLAMATINI-instalar.ps1'
+Invoke-WebRequest -UseBasicParsing 'https://github.com/TlamatiniSoftwareMX/Tlamatini-Software/releases/download/ediciones-2026-11-13/INSTALAR-TLAMATINI-EDICIONES.ps1' -OutFile $archivo
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File $archivo -Edicion sin-ia
+```
 
-Archivos de soporte técnico:
+## Linux: cómo abrir la terminal
 
-- fragmentos `tlamatini-*-windows-installer.chunk-*-of-*`
+Estas ediciones usan paquetes **DEB para Linux amd64/x86_64 de 64 bits**, en sistemas con `apt`, como Ubuntu, Debian y Linux Mint.
 
-No son la descarga principal: el usuario normal no debe bajarlos manualmente.
+1. Abre **Terminal** desde el menú de aplicaciones; en Ubuntu y Linux Mint también puedes usar **Ctrl + Alt + T**.
+2. Elige **un solo comando** de los tres siguientes, pégalo y presiona **Enter**.
+3. Si solicita tu contraseña, escríbela y presiona **Enter**. Es normal que no se muestren caracteres mientras la escribes.
 
-## Linux
+El comando descarga y verifica el instalador completo e inicia su instalación con `apt`. Si necesita partes, las obtiene y une automáticamente. El archivo DEB completo queda en `~/Downloads/TLAMATINI/`, dentro de la carpeta de la edición elegida.
 
-Instalacion recomendada para usuarios de Ubuntu, Debian, Linux Mint y derivados:
-
-El paquete Linux Full incluye el runtime de IA local y Gemma 3 dentro del instalador.
-
-Un solo comando descarga las partes publicadas, verifica el paquete y lo instala:
+### Linux 5.2.6 — Gemma 3 4B — RAM recomendada: 8 GB
 
 ```bash
-curl -fsSL https://github.com/TlamatiniSoftwareMX/Tlamatini-Software/releases/latest/download/INSTALAR-TLAMATINI.sh | bash
+curl -fsSL https://github.com/TlamatiniSoftwareMX/Tlamatini-Software/releases/download/ediciones-2026-11-13/INSTALAR-TLAMATINI-EDICIONES.sh | bash -s -- ia-8gb
 ```
 
-Archivo alternativo:
+### Linux 5.2.6 — Gemma 3 1B — RAM recomendada: 4 GB
 
-- `TLAMATINI-full-linux-x86_64.tar.gz`
+```bash
+curl -fsSL https://github.com/TlamatiniSoftwareMX/Tlamatini-Software/releases/download/ediciones-2026-11-13/INSTALAR-TLAMATINI-EDICIONES.sh | bash -s -- ia-4gb
+```
 
-Ese paquete es para distribuciones que no usan `.deb` o para soporte tecnico.
+### Linux 5.2.6 sin IA
 
-## Verificacion
+```bash
+curl -fsSL https://github.com/TlamatiniSoftwareMX/Tlamatini-Software/releases/download/ediciones-2026-11-13/INSTALAR-TLAMATINI-EDICIONES.sh | bash -s -- sin-ia
+```
 
-Publica siempre estos archivos junto a los instaladores:
+## Después de instalar
 
-- `SHA256SUMS-linux.txt`
-- `SHA256SUMS-windows.txt`
-- `release_metadata-linux.json`
-- `release_metadata-windows.json`
+- **Windows:** abre **Inicio**, busca **TLAMATINI** y ábrelo.
+- **Linux:** busca **TLAMATINI** en el menú de aplicaciones o escribe `tlamatini` en la terminal.
 
-No subas instaladores grandes con `git add`. Los instaladores van como archivos de GitHub Release, no dentro del historial del repositorio.
+## Si la descarga se interrumpe
+
+Vuelve a ejecutar el mismo bloque o comando. El descargador reutiliza los archivos completos cuya verificación sea correcta. El instalador solo se abre después de verificar el archivo final.
+
+Si Linux muestra `curl: command not found`, instala curl y vuelve a ejecutar el comando de tu edición:
+
+```bash
+sudo apt update && sudo apt install -y curl
+```
+
+Si falta Python 3, el descargador Linux lo prepara automáticamente. Si indica que una verificación SHA-256 falló, no se instala ese archivo: vuelve a ejecutar el mismo comando.
+
+Conviene disponer de 12 GB libres durante la instalación con Gemma 3 4B, 4 GB con Gemma 3 1B o 1 GB sin IA, para la descarga, los temporales y la aplicación.
+
+## Archivos y verificación
+
+Las seis opciones y estas mismas instrucciones también están en [GitHub Releases](https://github.com/TlamatiniSoftwareMX/Tlamatini-Software/releases/latest). Los fragmentos visibles en Assets son archivos que el descargador administra automáticamente.
+
+Los paquetes Linux con Gemma 3 1B y sin IA llevan la revisión `5.2.6-6`; la versión de la aplicación es `5.2.6` en las seis opciones. Las cuatro ediciones publicadas el 13 de noviembre se compilaron de forma nativa y sus SHA-256 están verificados. La prueba breve del runtime Linux con Gemma 3 1B respondió correctamente; están pendientes las pruebas gráficas y de consumo total, incluida la IA en Windows.
