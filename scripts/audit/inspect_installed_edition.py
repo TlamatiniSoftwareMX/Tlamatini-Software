@@ -226,7 +226,7 @@ def main():
         archive = CArchiveReader(str(executable))
         names = [name for name in archive.toc if name.lower().endswith('.pyz')]
         modules = archive.open_embedded_archive(names[0]).toc
-        report['feature_modules'] = {name: name in modules or any(entry.startswith(name.replace('.', '/') + '/') for entry in archive.toc) for name in ['tkinter','PIL','numpy','cv2','cryptography','requests','pmtiles','tkinterdnd2','fitz','pymupdf','pypdf','pytesseract']}
+        report['feature_modules'] = {name: name in modules or any(entry.replace('\', '/').startswith(name.replace('.', '/') + '/') for entry in archive.toc) for name in ['tkinter','PIL','numpy','cv2','cryptography','requests','pmtiles','tkinterdnd2','fitz','pymupdf','pypdf','pytesseract']}
         report['external_ocr_runtime'] = __import__('shutil').which('tesseract')
         report['packaged_ocr_runtime'] = [str(path.relative_to(args.root)) for name in ['tesseract.exe','tesseract'] for path in args.root.rglob(name) if path.is_file()]
         if report['feature_modules']['pytesseract'] and not report['packaged_ocr_runtime']:
